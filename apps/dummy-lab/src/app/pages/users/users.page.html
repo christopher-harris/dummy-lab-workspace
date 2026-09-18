@@ -1,0 +1,52 @@
+<main class="px-8 md:px-20 py-12 md:py-20 lg:px-80">
+
+    <p-dataView #dv [value]="usersStore.usersValue()" [layout]="'list'">
+        <ng-template #header>
+            <div class="flex justify-end">
+                <p-selectbutton [(ngModel)]="layout" [options]="options" [allowEmpty]="false">
+                    <ng-template #item let-item>
+                        <i class="pi " [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"></i>
+                    </ng-template>
+                </p-selectbutton>
+            </div>
+        </ng-template>
+        <ng-template #list let-users>
+            @for (user of users; track user.email) {
+
+            }
+        </ng-template>
+    </p-dataView>
+
+    <h1>Users</h1>
+    <div class="">
+        <div class="bg-surface-0 dark:bg-surface-900 p-6 shadow-sm rounded-2xl flex flex-col gap-8">
+            <div class="flex flex-col gap-6">
+                @for (member of usersStore.usersValue(); track member.email; let index = $index) {
+                    <div class="flex items-center gap-4">
+                        <div class="flex flex-1 items-center gap-4">
+                            <img [src]="member.image" class="w-11.25 h-11.25 rounded-full"/>
+                            <div class="flex flex-col gap-2 flex-1">
+                                <div class="font-medium text-base text-surface-900 dark:text-surface-0 leading-tight">{{ member.firstName }} {{ member.lastName }}</div>
+                                <div class="text-sm text-surface-500 dark:text-surface-400 leading-tight">{{ member.company.title }}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <div class="text-sm font-medium text-surface-900 dark:text-surface-0 leading-tight">Last
+                                Active
+                            </div>
+<!--                            @if (member.isOnline) {-->
+<!--                                <div class="flex items-center gap-1">-->
+<!--                                    <span class="w-[7px] h-[7px] rounded-full bg-primary"></span>-->
+<!--                                    <span class="text-sm text-primary leading-tight">Online</span>-->
+<!--                                </div>-->
+<!--                            }-->
+<!--                            @if (!member.isOnline) {-->
+<!--                                <div class="text-sm text-surface-500 dark:text-surface-400 leading-tight">{{ member.lastActive }}</div>-->
+<!--                            }-->
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</main>

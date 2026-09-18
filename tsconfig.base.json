@@ -1,0 +1,37 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@dummy-lab/data-access-auth": ["./libs/data-access/auth/src/index.ts"],
+      "@dummy-lab/data-access-products": [
+        "./libs/data-access/products/src/index.ts"
+      ],
+      "@dummy-lab/data-access-carts": ["./libs/data-access/carts/src/index.ts"],
+      "@dummy-lab/data-access-users": ["./libs/data-access/users/src/index.ts"],
+      "@dummy-lab/data-access-posts": ["./libs/data-access/posts/src/index.ts"],
+      "@dummy-lab/data-access-comments": [
+        "./libs/data-access/comments/src/index.ts"
+      ],
+      "@dummy-lab/data-access-recipes": [
+        "./libs/data-access/recipes/src/index.ts"
+      ],
+      "@dummy-lab/data-access-todos": ["./libs/data-access/todos/src/index.ts"],
+      "@dummy-lab/data-access-quotes": [
+        "./libs/data-access/quotes/src/index.ts"
+      ]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

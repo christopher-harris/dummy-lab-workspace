@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="NxAngularConfigService" workspaceLocation="file://$PROJECT_DIR$/nx.json">
+    <projects>
+      <project name="auth" file="file://$PROJECT_DIR$/libs/data-access/auth/project.json" />
+      <project name="carts" file="file://$PROJECT_DIR$/libs/data-access/carts/project.json" />
+      <project name="comments" file="file://$PROJECT_DIR$/libs/data-access/comments/project.json" />
+      <project name="dummy-lab" file="file://$PROJECT_DIR$/apps/dummy-lab/project.json" />
+      <project name="posts" file="file://$PROJECT_DIR$/libs/data-access/posts/project.json" />
+      <project name="products" file="file://$PROJECT_DIR$/libs/data-access/products/project.json" />
+      <project name="quotes" file="file://$PROJECT_DIR$/libs/data-access/quotes/project.json" />
+      <project name="recipes" file="file://$PROJECT_DIR$/libs/data-access/recipes/project.json" />
+      <project name="todos" file="file://$PROJECT_DIR$/libs/data-access/todos/project.json" />
+      <project name="users" file="file://$PROJECT_DIR$/libs/data-access/users/project.json" />
+    </projects>
+  </component>
+</project>

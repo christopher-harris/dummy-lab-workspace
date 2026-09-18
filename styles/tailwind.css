@@ -1,0 +1,87 @@
+@import 'tailwindcss' source('../');
+
+@theme {
+  --text-xs: 0.694rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.833rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.2rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.44rem;
+  --text-xl--line-height: 2rem;
+  --text-2xl: 1.728rem;
+  --text-2xl--line-height: 2.25rem;
+  --text-3xl: 2.074rem;
+  --text-3xl--line-height: 2.5rem;
+  --text-4xl: 2.488rem;
+  --text-4xl--line-height: 3rem;
+  --text-5xl: 2.986rem;
+  --text-5xl--line-height: 3.5rem;
+  --text-6xl: 3.583rem;
+  --text-6xl--line-height: 4.25rem;
+  --text-7xl: 4.3rem;
+  --text-7xl--line-height: 5rem;
+  --text-8xl: 5.16rem;
+  --text-8xl--line-height: 6rem;
+  --text-9xl: 6.192rem;
+  --text-9xl--line-height: 7.25rem;
+}
+
+@layer base {
+  body {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-5xl);
+    line-height: var(--text-5xl--line-height);
+  }
+
+  h2 {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl--line-height);
+  }
+
+  h3 {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+  }
+
+  h4 {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+  }
+
+  h5 {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+
+  h6 {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+  }
+
+  p {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  small {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+}
