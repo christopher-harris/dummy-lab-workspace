@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; never cancel an in-flight one mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - run: npm ci
+
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      # Pages serves a project site from /<repo>/, so the app needs a matching
+      # <base href>. `base_path` comes back without a trailing slash; Angular
+      # requires one.
+      - name: Build dummy-lab
+        run: |
+          BASE='${{ steps.pages.outputs.base_path }}'
+          case "$BASE" in */) ;; *) BASE="$BASE/" ;; esac
+          echo "base-href = $BASE"
+          npx nx build dummy-lab --base-href="$BASE"
+
+      # GitHub Pages has no SPA rewrite rule. It serves 404.html for any path it
+      # cannot resolve, and preserves the URL — so a copy of index.html lets the
+      # Angular router boot and resolve deep links like /products/5 on refresh.
+      - name: Add SPA fallback
+        run: |
+          DIST=dist/apps/dummy-lab/browser
+          test -f "$DIST/index.html" || { echo "::error::no index.html at $DIST"; exit 1; }
+          cp "$DIST/index.html" "$DIST/404.html"
+          touch "$DIST/.nojekyll"
+          ls -la "$DIST"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/apps/dummy-lab/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
