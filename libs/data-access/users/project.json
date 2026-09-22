@@ -7,10 +7,12 @@
   "tags": [],
   "targets": {
     "test": {
-      "executor": "@nx/vitest:test",
-      "outputs": ["{options.reportsDirectory}"],
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/libs/data-access/users"
+      ],
       "options": {
-        "reportsDirectory": "coverage/libs/data-access/users"
+        "coverage.reportsDirectory": "../../../coverage/libs/data-access/users"
       }
     },
     "lint": {

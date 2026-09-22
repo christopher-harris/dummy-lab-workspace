@@ -1,4 +1,124 @@
 <main>
   <h1>Carts</h1>
-  <p>Dummy Carts page.</p>
+
+  <p-table [value]="cartsStore.allCartsValue()?.carts ?? []"
+           [loading]="cartsStore.allCartsIsLoading()"
+           dataKey="id"
+           [expandedRowKeys]="expandedRows"
+           stripedRows>
+    <ng-template #header>
+      <tr>
+        <th style="width: 5rem"></th>
+
+        <th>ID</th>
+        <th>Products</th>
+        <th>Quantity</th>
+        <th>Total</th>
+        <th>After Discount</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-cart let-expanded="expanded">
+      <tr>
+        <td>
+          <p-button type="button" [pRowToggler]="cart" [text]="true" severity="secondary" [rounded]="true" [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
+        </td>
+        <td>{{ cart.id }}</td>
+        <td>{{ cart.products.length }}</td>
+        <td>{{ cart.totalQuantity }}</td>
+        <td>{{ cart.total | currency }}</td>
+        <td>{{ cart.discountedTotal | currency }}</td>
+      </tr>
+    </ng-template>
+    <ng-template #expandedrow let-cart>
+      <tr>
+        <td colspan="6">
+          <div class="p-4">
+            <h5>Products</h5>
+            <p-table [value]="cart.products" dataKey="id" stripedRows selectionMode="single"
+                     [selection]="selectedCartId() === cart.id ? selectedProduct() : null"
+                     (selectionChange)="onProductSelectionChange(cart.id, $event)">
+              <ng-template #header>
+                <tr>
+                  <th>ID</th>
+                  <td>Image</td>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-product>
+                <tr [pSelectableRow]="product">
+                  <td class="text-start">{{ product.id }}</td>
+                  <td>
+                    <img [src]="product.thumbnail" [alt]="product.title" width="50" class="shadow-xs" />
+                  </td>
+                  <td class="text-start">{{ product.title }}</td>
+                  <td>{{ product.price | currency}}</td>
+                  <td>{{ product.quantity }}</td>
+                  <td>{{ product.total | currency }}</td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <pre>{{ cartsStore.allCartsValue() | json }}</pre>
 </main>
+
+
+<p-drawer [visible]="productsStore.previewProductId() !== undefined"
+          (onHide)="onPreviewHide()"
+          position="right"
+          [modal]="true"
+          [style]="{ width: '50vw' }" blockScroll="true">
+  @if (productsStore.productPreviewValue(); as productPreview) {
+    <div class="h-auto flex flex-col items-center justify-center">
+      <div class="relative w-1/2 aspect-square">
+        <img [ngSrc]="productPreview.thumbnail" fill class="object-contain" [alt]="productPreview.title" />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <div>
+        <h3 class="text-xl font-semibold m-0">{{ productPreview.title }}</h3>
+        <p class="text-sm text-surface-500 m-0 mt-1">
+          {{ productPreview.brand ?? 'Unbranded' }} &middot; {{ productPreview.category }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3 flex-wrap">
+        <span class="text-xl font-semibold">{{ productPreview.price | currency }}</span>
+        @if (productPreview.discountPercentage) {
+          <p-tag severity="danger" [value]="'-' + productPreview.discountPercentage + '%'" />
+        }
+        <span class="flex items-center gap-1 text-sm">
+          <i class="pi pi-star-fill text-yellow-500"></i>{{ productPreview.rating }}
+        </span>
+        <p-tag [severity]="stockSeverity(productPreview.stock)"
+               [value]="productPreview.availabilityStatus ?? 'Unknown'" />
+      </div>
+
+      <p class="text-sm leading-relaxed m-0">{{ productPreview.description }}</p>
+
+      <div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+        <span class="text-surface-500">SKU</span>
+        <span>{{ productPreview.sku }}</span>
+        <span class="text-surface-500">Stock</span>
+        <span>{{ productPreview.stock }}</span>
+      </div>
+
+      @if (productPreview.tags.length) {
+        <div class="flex gap-2 flex-wrap">
+          @for (tag of productPreview.tags; track tag) {
+            <p-tag severity="secondary" [value]="tag" />
+          }
+        </div>
+      }
+    </div>
+  }
+  <pre>{{ productsStore.productPreviewValue() | json }}</pre>
+</p-drawer>

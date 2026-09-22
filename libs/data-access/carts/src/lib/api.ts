@@ -1,6 +1,6 @@
-import type { Cart, CartsResponse } from './models';
+import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
 
-const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';
+import type { Cart, CartsResponse } from './models';
 
 export async function fetchCarts(abortSignal?: AbortSignal): Promise<Cart[]> {
   const response = await fetch(`${DUMMY_JSON_BASE_URL}/carts?limit=0`, {

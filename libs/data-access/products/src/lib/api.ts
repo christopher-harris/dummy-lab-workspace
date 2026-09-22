@@ -1,6 +1,6 @@
-import type { Product, ProductsResponse } from './models';
+import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
 
-const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';
+import type { Product, ProductCategory, ProductsResponse } from './models';
 
 export async function fetchProducts(
   abortSignal?: AbortSignal,
@@ -17,7 +17,7 @@ export async function fetchProducts(
   return data.products;
 }
 
-export async function fetchAllProductCategories(): Promise<any[]> {
+export async function fetchAllProductCategories(): Promise<ProductCategory[]> {
   const response = await fetch(`${DUMMY_JSON_BASE_URL}/products/categories`);
-  return (await response.json()) as any[];
+  return (await response.json()) as ProductCategory[];
 }

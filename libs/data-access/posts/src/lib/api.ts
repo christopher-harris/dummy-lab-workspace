@@ -1,6 +1,6 @@
-import type { Post, PostsResponse } from './models';
+import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
 
-const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';
+import type { Post, PostsResponse } from './models';
 
 export async function fetchPosts(abortSignal?: AbortSignal): Promise<Post[]> {
   const response = await fetch(`${DUMMY_JSON_BASE_URL}/posts?limit=0`, {

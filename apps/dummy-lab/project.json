@@ -8,7 +8,9 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/dummy-lab",
@@ -21,7 +23,10 @@
             "input": "apps/dummy-lab/public"
           }
         ],
-        "styles": ["styles/tailwind.css", "apps/dummy-lab/src/styles.scss"]
+        "styles": [
+          "styles/tailwind.css",
+          "apps/dummy-lab/src/styles.scss"
+        ]
       },
       "configurations": {
         "production": {
@@ -65,7 +70,30 @@
     "test": {
       "executor": "@angular/build:unit-test",
       "options": {
-        "watch": false
+        "watch": false,
+        "setupFiles": [
+          "apps/dummy-lab/src/test-setup.ts"
+        ],
+        "coverageInclude": [
+          "src/**/*.ts"
+        ],
+        "coverageExclude": [
+          "src/**/*.spec.ts",
+          "src/test-setup.ts",
+          "src/main.ts",
+          "src/app/app.config.ts",
+          "src/app/app.routes.ts"
+        ],
+        "coverageReporters": [
+          "text-summary",
+          "lcov"
+        ],
+        "coverageThresholds": {
+          "statements": 75,
+          "branches": 80,
+          "functions": 70,
+          "lines": 70
+        }
       }
     },
     "serve-static": {

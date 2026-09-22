@@ -10,8 +10,11 @@
       <project name="products" file="file://$PROJECT_DIR$/libs/data-access/products/project.json" />
       <project name="quotes" file="file://$PROJECT_DIR$/libs/data-access/quotes/project.json" />
       <project name="recipes" file="file://$PROJECT_DIR$/libs/data-access/recipes/project.json" />
+      <project name="state" file="file://$PROJECT_DIR$/libs/shared/state/project.json" />
+      <project name="theme" file="file://$PROJECT_DIR$/libs/data-access/theme/project.json" />
       <project name="todos" file="file://$PROJECT_DIR$/libs/data-access/todos/project.json" />
       <project name="users" file="file://$PROJECT_DIR$/libs/data-access/users/project.json" />
+      <project name="utils" file="file://$PROJECT_DIR$/libs/shared/utils/project.json" />
     </projects>
   </component>
 </project>

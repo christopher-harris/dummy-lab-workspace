@@ -30,7 +30,10 @@
       "@dummy-lab/data-access-todos": ["./libs/data-access/todos/src/index.ts"],
       "@dummy-lab/data-access-quotes": [
         "./libs/data-access/quotes/src/index.ts"
-      ]
+      ],
+      "@dummy-lab/shared-utils": ["./libs/shared/utils/src/index.ts"],
+      "@dummy-lab/data-access-theme": ["./libs/data-access/theme/src/index.ts"],
+      "@dummy-lab/shared-state": ["./libs/shared/state/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

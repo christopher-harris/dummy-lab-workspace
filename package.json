@@ -6,7 +6,9 @@
     "nx": "nx",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
-    "lint": "nx run-many -t lint"
+    "lint": "nx run-many -t lint",
+    "check": "nx run-many -t lint build test",
+    "check:affected": "nx affected -t lint build test"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "~2.1.2",
@@ -64,5 +66,15 @@
     "primeng": "^21.1.9",
     "rxjs": "~7.8.0",
     "tailwindcss-primeui": "^0.6.1"
+  },
+  "allowScripts": {
+    "less@4.5.1": true,
+    "less@4.6.6": true,
+    "esbuild@0.27.3": true,
+    "fsevents@2.3.3": true,
+    "lmdb@3.5.1": true,
+    "nx@23.0.0": true,
+    "@parcel/watcher@2.5.6": true,
+    "msgpackr-extract@3.0.4": true
   }
 }

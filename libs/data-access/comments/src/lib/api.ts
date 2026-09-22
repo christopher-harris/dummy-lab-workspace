@@ -1,6 +1,6 @@
-import type { Comment, CommentsResponse } from './models';
+import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
 
-const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';
+import type { Comment, CommentsResponse } from './models';
 
 export async function fetchComments(
   abortSignal?: AbortSignal,

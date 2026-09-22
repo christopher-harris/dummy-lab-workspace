@@ -17,7 +17,15 @@ export interface Product {
   tags: string[];
   brand?: string;
   sku: string;
+  availabilityStatus?: string;
   thumbnail: string;
   images: string[];
   [key: string]: unknown;
+}
+
+/** An entry from DummyJSON's `/products/categories` endpoint. */
+export interface ProductCategory {
+  slug: string;
+  name: string;
+  url: string;
 }

@@ -1,0 +1,90 @@
+<p-card [header]="'Top Posts'">
+  <ul>
+    @if (postsStore.topPostsHasValue()) {
+      @for (post of postsStore.topPostsValue()?.posts; track post.id) {
+        <li class="flex py-4 border-b border-surface-200 dark:border-surface-700 gap-4">
+          <img src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle-big/avatar-f-1.png" class="w-12 h-12 rounded-full" alt="" />
+          <div class="flex-1 flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+              <div class="text-surface-900 dark:text-surface-0 font-medium leading-tight">{{post.userId}}</div>
+              <div class="text-surface-500 dark:text-surface-400 text-sm font-medium">{{ post.views }} views</div>
+            </div>
+            <div class="text-surface-700 dark:text-surface-300 leading-tight">{{post.title}}</div>
+            <div class="flex items-center justify-items-start gap-2">
+              @for (tag of post.tags; track tag) {
+                <p-tag [value]="tag" severity="secondary" />
+              }
+            </div>
+<!--            <a class="flex items-center gap-2 text-surface-900 dark:text-surface-0 text-sm">-->
+<!--              <i class="pi pi-github"></i>-->
+<!--              <span>Issue #1185</span>-->
+<!--            </a>-->
+          </div>
+        </li>
+      }
+    }
+  </ul>
+</p-card>
+
+
+<!--<div class="bg-surface-0 dark:bg-surface-900 p-6 shadow-sm rounded-2xl flex flex-col gap-8">-->
+<!--  <div class="flex justify-between items-center">-->
+<!--      <span-->
+<!--        class="text-xl font-medium text-surface-900 dark:text-surface-0 leading-tight"-->
+<!--      >Best Performing Projects</span-->
+<!--      >-->
+<!--    <div>-->
+<!--      <button-->
+<!--        pButton-->
+<!--        icon="pi pi-ellipsis-v"-->
+<!--        [text]="true"-->
+<!--        [rounded]="true"-->
+<!--        severity="secondary"-->
+<!--        (click)="menu.toggle($event)"-->
+<!--        #menuButton-->
+<!--      ></button>-->
+<!--      <p-menu #menu [popup]="true" [model]="items" appendTo="body"></p-menu>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <div class="flex flex-col gap-8">-->
+<!--    @for (product of products; track product.name; let index = $index) {-->
+<!--      <div class="flex flex-col gap-4 rounded-lg">-->
+<!--        <div class="flex items-center gap-4">-->
+<!--          <div class="flex flex-1 items-start gap-4">-->
+<!--            <div-->
+<!--              class="text-base text-surface-900 dark:text-surface-0 leading-tight"-->
+<!--            >-->
+<!--              {{ product.name }}-->
+<!--            </div>-->
+<!--            <div class="text-base font-semibold text-primary leading-tight">-->
+<!--              %{{ product.percentage }}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div-->
+<!--            class="bg-surface-100 dark:bg-surface-800 px-2 py-1 rounded-md flex items-center gap-1"-->
+<!--          >-->
+<!--            <i-->
+<!--              [class]="product.icon"-->
+<!--              class="text-sm! leading-tight! text-surface-600 dark:text-surface-400"-->
+<!--            ></i>-->
+<!--            <span-->
+<!--              class="text-sm font-bold text-surface-600 dark:text-surface-400"-->
+<!--            >{{ product.category }}</span-->
+<!--            >-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <div class="w-full h-1.5 rounded-md flex">-->
+<!--          <div-->
+<!--            class="bg-primary rounded-l-md"-->
+<!--            [style.width.%]="product.percentage"-->
+<!--          ></div>-->
+<!--          <div-->
+<!--            class="bg-surface-200 dark:bg-surface-700 flex-1 rounded-r-md"-->
+<!--          ></div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    }-->
+<!--  </div>-->
+<!--</div>-->

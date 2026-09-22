@@ -1,129 +1,235 @@
-<nav class="relative bg-surface-0 dark:bg-surface-900 flex items-center justify-center gap-4 md:gap-8 px-6 md:px-12 lg:px-20 py-4">
-    <div class="flex items-center gap-4">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M6.84219 2.87829C5.69766 3.67858 4.6627 4.62478 3.76426 5.68992C7.4357 5.34906 12.1001 5.90564 17.5155 8.61335C23.2984 11.5047 27.955 11.6025 31.1958 10.9773C30.9017 10.087 30.5315 9.23135 30.093 8.41791C26.3832 8.80919 21.6272 8.29127 16.0845 5.51998C12.5648 3.76014 9.46221 3.03521 6.84219 2.87829ZM27.9259 5.33332C24.9962 2.06 20.7387 0 16 0C14.6084 0 13.2581 0.177686 11.9709 0.511584C13.7143 0.987269 15.5663 1.68319 17.5155 2.65781C21.5736 4.68682 25.0771 5.34013 27.9259 5.33332ZM31.8887 14.1025C27.9735 14.8756 22.567 14.7168 16.0845 11.4755C10.024 8.44527 5.20035 8.48343 1.94712 9.20639C1.7792 9.24367 1.61523 9.28287 1.45522 9.32367C1.0293 10.25 0.689308 11.2241 0.445362 12.2356C0.705909 12.166 0.975145 12.0998 1.25293 12.0381C5.19966 11.161 10.7761 11.1991 17.5155 14.5689C23.5761 17.5991 28.3997 17.561 31.6529 16.838C31.7644 16.8133 31.8742 16.7877 31.9822 16.7613C31.9941 16.509 32 16.2552 32 16C32 15.358 31.9622 14.7248 31.8887 14.1025ZM31.4598 20.1378C27.5826 20.8157 22.3336 20.5555 16.0845 17.431C10.024 14.4008 5.20035 14.439 1.94712 15.1619C1.225 15.3223 0.575392 15.5178 0.002344 15.7241C0.000781601 15.8158 0 15.9078 0 16C0 24.8366 7.16344 32 16 32C23.4057 32 29.6362 26.9687 31.4598 20.1378Z"
-                    class="fill-surface-900 dark:fill-surface-0"
-            />
-        </svg>
-        <div class="text-surface-900 dark:text-surface-100 font-semibold text-lg">Trimzales</div>
-    </div>
-    <div class="hidden lg:flex items-center justify-center gap-2">
-        @for (item of navs; track item.label; let index = $index) {
-            <button
-                    pButton
-                    text
-                    class="p-2"
-                    [ngClass]="[
-                                selectedNav() === item.label
-                                    ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-md outline outline-1 outline-primary-100 dark:outline-primary-300/30'
-                                    : 'text-surface-600 dark:text-surface-400'
-                            ]"
-                    (click)="selectedNav.set(item.label)"
-            >
-                <i pButtonIcon [class]="item.icon" class="text-base! leading-none!"></i>
-            </button>
-        }
-    </div>
-    <div class="hidden lg:block flex-1">
-        <p-iconfield class="w-full!">
-            <p-inputicon class="pi pi-search"></p-inputicon>
-            <input pInputText [(ngModel)]="search" placeholder="Search"
-                   class="w-full! h-8 dark:bg-surface-900! px-3 py-2 rounded-md placeholder:text-surface-400 dark:placeholder:text-surface-500"/>
-        </p-iconfield>
-    </div>
-    <div class="hidden lg:flex items-center gap-4">
-        <div class="flex items-center gap-2">
-            <button pButton text class="p-2 text-surface-600 dark:text-surface-400">
-                <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>
-            </button>
-            <button pButton text class="p-2 text-surface-600 dark:text-surface-400">
-                <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>
-            </button>
-        </div>
-        <div class="flex items-center gap-2">
-            <div class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">
-                Available
-            </div>
-            <p-avatar shape="circle"
-                      image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/avatar-amyels.png"
-                      styleClass="w-8 h-8 block cursor-pointer"></p-avatar>
-        </div>
-    </div>
-    <a
-            pStyleClass="#mobile-menu"
-            enterFromClass="hidden"
-            enterActiveClass="animate-fadein"
-            leaveToClass="hidden"
-            leaveActiveClass="animate-fadeout"
-            [hideOnOutsideClick]="true"
-            resizeSelector=".resize-container-2"
-            [hideOnResize]="true"
-            class="cursor-pointer block lg:hidden ml-auto text-surface-600 dark:text-surface-200"
-    >
-        <i class="pi pi-bars text-xl! leading-none!"></i>
+<p-toolbar [pt]="toolbarPassThrough">
+  <ng-template #start>
+    <a [routerLink]="['/dashboard']" class="flex items-center gap-4">
+      <svg
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M6.84219 2.87829C5.69766 3.67858 4.6627 4.62478 3.76426 5.68992C7.4357 5.34906 12.1001 5.90564 17.5155 8.61335C23.2984 11.5047 27.955 11.6025 31.1958 10.9773C30.9017 10.087 30.5315 9.23135 30.093 8.41791C26.3832 8.80919 21.6272 8.29127 16.0845 5.51998C12.5648 3.76014 9.46221 3.03521 6.84219 2.87829ZM27.9259 5.33332C24.9962 2.06 20.7387 0 16 0C14.6084 0 13.2581 0.177686 11.9709 0.511584C13.7143 0.987269 15.5663 1.68319 17.5155 2.65781C21.5736 4.68682 25.0771 5.34013 27.9259 5.33332ZM31.8887 14.1025C27.9735 14.8756 22.567 14.7168 16.0845 11.4755C10.024 8.44527 5.20035 8.48343 1.94712 9.20639C1.7792 9.24367 1.61523 9.28287 1.45522 9.32367C1.0293 10.25 0.689308 11.2241 0.445362 12.2356C0.705909 12.166 0.975145 12.0998 1.25293 12.0381C5.19966 11.161 10.7761 11.1991 17.5155 14.5689C23.5761 17.5991 28.3997 17.561 31.6529 16.838C31.7644 16.8133 31.8742 16.7877 31.9822 16.7613C31.9941 16.509 32 16.2552 32 16C32 15.358 31.9622 14.7248 31.8887 14.1025ZM31.4598 20.1378C27.5826 20.8157 22.3336 20.5555 16.0845 17.431C10.024 14.4008 5.20035 14.439 1.94712 15.1619C1.225 15.3223 0.575392 15.5178 0.002344 15.7241C0.000781601 15.8158 0 15.9078 0 16C0 24.8366 7.16344 32 16 32C23.4057 32 29.6362 26.9687 31.4598 20.1378Z"
+          class="fill-surface-900 dark:fill-surface-0"
+        />
+      </svg>
+      <div class="text-surface-900 dark:text-surface-100 font-semibold text-lg">
+        Trimzales
+      </div>
     </a>
-
-    <div id="mobile-menu"
-         class="hidden flex-col gap-6 absolute top-full left-0 w-full bg-surface-0 dark:bg-surface-900 border-y border-surface py-4 px-6 shadow-lg z-20">
-        <ul class="flex flex-col gap-2">
-            @for (item of navs; track item.label; let index = $index) {
-                <li>
-                    <a
-                            href="#"
-                            class="flex items-center w-full justify-start! p-2!"
-                            [ngClass]="[
-                                        selectedNav() === item.label
-                                            ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-lg outline outline-1 outline-primary-100 dark:outline-primary-300/30'
-                                            : 'text-surface-600 dark:text-surface-400'
-                                    ]"
-                            (click)="selectedNav.set(item.label); $event.preventDefault()"
-                    >
-                        <i [class]="item.icon" class="text-base! leading-none!"></i>
-                        <span class="ml-2">{{ item.label }}</span>
-                    </a>
-                </li>
-            }
-        </ul>
-        <div class="py-6">
-            <p-iconfield class="w-full!">
-                <p-inputicon class="pi pi-search text-base! leading-none!"></p-inputicon>
-                <input
-                        pInputText
-                        [(ngModel)]="search"
-                        placeholder="Search"
-                        class="w-full! h-9 dark:bg-surface-900! px-3 py-2 rounded-md outline outline-1 outline-surface-300 dark:outline-surface-700 placeholder:text-surface-400 dark:placeholder:text-surface-500"
-                />
-            </p-iconfield>
-        </div>
-        <ul class="flex flex-col gap-2">
-            <li>
-                <button pButton text class="w-full justify-start p-2 text-surface-600 dark:text-surface-400">
-                    <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>
-                    <span pButtonLabel class="ml-2">Notifications</span>
-                </button>
-            </li>
-            <li>
-                <button pButton text class="w-full justify-start p-2 text-surface-600 dark:text-surface-400">
-                    <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>
-                    <span pButtonLabel class="ml-2">Settings</span>
-                </button>
-            </li>
-            <li class="flex items-center gap-2 pt-2 justify-between">
-                <div class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">
-                    Available
-                </div>
-                <div class="flex items-center gap-2">
-                    <p-avatar
-                            shape="circle"
-                            image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-f-1.png"
-                            styleClass="w-8 h-8 block cursor-pointer"
-                    ></p-avatar>
-                    <span class="font-medium text-surface-900 dark:text-surface-0">Josephine Lillard</span>
-                </div>
-            </li>
-        </ul>
+    <div class="hidden lg:flex items-center justify-center gap-2">
+      <p-menubar [model]="menuItems()" [pt]="menuPassThrough" />
+      <!--            @for (item of menuItems(); track item.label; let index = $index) {-->
+      <!--                <button pButton-->
+      <!--                        text-->
+      <!--                        class="p-2"-->
+      <!--                        [ngClass]="[-->
+      <!--                                selectedNav() === item.label-->
+      <!--                                    ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-md outline outline-1 outline-primary-100 dark:outline-primary-300/30'-->
+      <!--                                    : 'text-surface-600 dark:text-surface-400'-->
+      <!--                            ]"-->
+      <!--                >-->
+      <!--                    <i pButtonIcon [class]="item.icon" class="text-base! leading-none!"></i>-->
+      <!--                </button>-->
+      <!--            }-->
     </div>
-</nav>
+  </ng-template>
+  <ng-template #center>
+    <div class="hidden lg:block flex-1">
+      <p-iconfield class="w-full!">
+        <p-inputicon class="pi pi-search"></p-inputicon>
+        <input
+          pInputText
+          [(ngModel)]="search"
+          placeholder="Search"
+          class="w-full! h-8 dark:bg-surface-900! px-3 py-2 rounded-md placeholder:text-surface-400 dark:placeholder:text-surface-500"
+        />
+      </p-iconfield>
+    </div>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex items-center gap-2">
+      <p-button text class="p-2 text-surface-600 dark:text-surface-400"
+                (click)="themeStore.toggleDarkMode()"
+                [icon]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></p-button>
+      <button pButton text class="p-2 text-surface-600 dark:text-surface-400">
+        <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>
+      </button>
+      <p-menu
+        #colorMenu
+        [model]="colorMenuItems()"
+        [popup]="true"
+        styleClass="w-56 max-h-80 overflow-y-auto"
+      >
+        <ng-template #item let-item>
+          <a
+            pRipple
+            class="p-menu-item-link flex items-center gap-2 px-3 py-2 cursor-pointer"
+          >
+            <span
+              class="w-4 h-4 rounded-full border border-surface shrink-0"
+              [style.background-color]="'var(--p-' + item.color + '-500)'"
+            ></span>
+            <span class="text-sm capitalize">{{ item.label }}</span>
+            @if (item.selected) {
+              <i class="pi pi-check ms-auto text-xs"></i>
+            }
+          </a>
+        </ng-template>
+      </p-menu>
+      <button
+        pButton
+        text
+        class="p-2 text-surface-600 dark:text-surface-400"
+        aria-label="Theme settings"
+        aria-haspopup="true"
+        (click)="colorMenu.toggle($event)"
+      >
+        <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>
+      </button>
+    </div>
+    <div class="flex items-center gap-2">
+      <div
+        class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300"
+      >
+        Available
+      </div>
+      <p-avatar
+        shape="circle"
+        image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/avatar-amyels.png"
+        styleClass="w-8 h-8 block cursor-pointer"
+      ></p-avatar>
+    </div>
+  </ng-template>
+</p-toolbar>
+
+<!--<nav class="relative bg-surface-0 dark:bg-surface-900 flex items-center justify-center gap-4 md:gap-8 px-6 md:px-12 lg:px-20 py-4">-->
+<!--    <div class="flex items-center gap-4">-->
+<!--        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+<!--            <path-->
+<!--                    fill-rule="evenodd"-->
+<!--                    clip-rule="evenodd"-->
+<!--                    d="M6.84219 2.87829C5.69766 3.67858 4.6627 4.62478 3.76426 5.68992C7.4357 5.34906 12.1001 5.90564 17.5155 8.61335C23.2984 11.5047 27.955 11.6025 31.1958 10.9773C30.9017 10.087 30.5315 9.23135 30.093 8.41791C26.3832 8.80919 21.6272 8.29127 16.0845 5.51998C12.5648 3.76014 9.46221 3.03521 6.84219 2.87829ZM27.9259 5.33332C24.9962 2.06 20.7387 0 16 0C14.6084 0 13.2581 0.177686 11.9709 0.511584C13.7143 0.987269 15.5663 1.68319 17.5155 2.65781C21.5736 4.68682 25.0771 5.34013 27.9259 5.33332ZM31.8887 14.1025C27.9735 14.8756 22.567 14.7168 16.0845 11.4755C10.024 8.44527 5.20035 8.48343 1.94712 9.20639C1.7792 9.24367 1.61523 9.28287 1.45522 9.32367C1.0293 10.25 0.689308 11.2241 0.445362 12.2356C0.705909 12.166 0.975145 12.0998 1.25293 12.0381C5.19966 11.161 10.7761 11.1991 17.5155 14.5689C23.5761 17.5991 28.3997 17.561 31.6529 16.838C31.7644 16.8133 31.8742 16.7877 31.9822 16.7613C31.9941 16.509 32 16.2552 32 16C32 15.358 31.9622 14.7248 31.8887 14.1025ZM31.4598 20.1378C27.5826 20.8157 22.3336 20.5555 16.0845 17.431C10.024 14.4008 5.20035 14.439 1.94712 15.1619C1.225 15.3223 0.575392 15.5178 0.002344 15.7241C0.000781601 15.8158 0 15.9078 0 16C0 24.8366 7.16344 32 16 32C23.4057 32 29.6362 26.9687 31.4598 20.1378Z"-->
+<!--                    class="fill-surface-900 dark:fill-surface-0"-->
+<!--            />-->
+<!--        </svg>-->
+<!--        <div class="text-surface-900 dark:text-surface-100 font-semibold text-lg">Trimzales</div>-->
+<!--    </div>-->
+<!--    <div class="hidden lg:flex items-center justify-center gap-2">-->
+<!--        @for (item of navs; track item.label; let index = $index) {-->
+<!--            <button pButton-->
+<!--                    text-->
+<!--                    class="p-2"-->
+<!--                    [ngClass]="[-->
+<!--                                selectedNav() === item.label-->
+<!--                                    ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-md outline outline-1 outline-primary-100 dark:outline-primary-300/30'-->
+<!--                                    : 'text-surface-600 dark:text-surface-400'-->
+<!--                            ]"-->
+<!--                    (click)="selectedNav.set(item.label)"-->
+<!--            >-->
+<!--                <i pButtonIcon [class]="item.icon" class="text-base! leading-none!"></i>-->
+<!--            </button>-->
+<!--        }-->
+<!--    </div>-->
+<!--    <div class="hidden lg:block flex-1">-->
+<!--        <p-iconfield class="w-full!">-->
+<!--            <p-inputicon class="pi pi-search"></p-inputicon>-->
+<!--            <input pInputText [(ngModel)]="search" placeholder="Search"-->
+<!--                   class="w-full! h-8 dark:bg-surface-900! px-3 py-2 rounded-md placeholder:text-surface-400 dark:placeholder:text-surface-500"/>-->
+<!--        </p-iconfield>-->
+<!--    </div>-->
+<!--    <div class="hidden lg:flex items-center gap-4">-->
+<!--        <div class="flex items-center gap-2">-->
+<!--            <button pButton text class="p-2 text-surface-600 dark:text-surface-400">-->
+<!--                <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>-->
+<!--            </button>-->
+<!--            <button pButton text class="p-2 text-surface-600 dark:text-surface-400">-->
+<!--                <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--        <div class="flex items-center gap-2">-->
+<!--            <div class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">-->
+<!--                Available-->
+<!--            </div>-->
+<!--            <p-avatar shape="circle"-->
+<!--                      image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/avatar-amyels.png"-->
+<!--                      styleClass="w-8 h-8 block cursor-pointer"></p-avatar>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <a-->
+<!--            pStyleClass="#mobile-menu"-->
+<!--            enterFromClass="hidden"-->
+<!--            enterActiveClass="animate-fadein"-->
+<!--            leaveToClass="hidden"-->
+<!--            leaveActiveClass="animate-fadeout"-->
+<!--            [hideOnOutsideClick]="true"-->
+<!--            resizeSelector=".resize-container-2"-->
+<!--            [hideOnResize]="true"-->
+<!--            class="cursor-pointer block lg:hidden ml-auto text-surface-600 dark:text-surface-200"-->
+<!--    >-->
+<!--        <i class="pi pi-bars text-xl! leading-none!"></i>-->
+<!--    </a>-->
+
+<!--    <div id="mobile-menu"-->
+<!--         class="hidden flex-col gap-6 absolute top-full left-0 w-full bg-surface-0 dark:bg-surface-900 border-y border-surface py-4 px-6 shadow-lg z-20">-->
+<!--        <ul class="flex flex-col gap-2">-->
+<!--            @for (item of navs; track item.label; let index = $index) {-->
+<!--                <li>-->
+<!--                    <a-->
+<!--                            href="#"-->
+<!--                            class="flex items-center w-full justify-start! p-2!"-->
+<!--                            [ngClass]="[-->
+<!--                                        selectedNav() === item.label-->
+<!--                                            ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-lg outline outline-1 outline-primary-100 dark:outline-primary-300/30'-->
+<!--                                            : 'text-surface-600 dark:text-surface-400'-->
+<!--                                    ]"-->
+<!--                            (click)="selectedNav.set(item.label); $event.preventDefault()"-->
+<!--                    >-->
+<!--                        <i [class]="item.icon" class="text-base! leading-none!"></i>-->
+<!--                        <span class="ml-2">{{ item.label }}</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--            }-->
+<!--        </ul>-->
+<!--        <div class="py-6">-->
+<!--            <p-iconfield class="w-full!">-->
+<!--                <p-inputicon class="pi pi-search text-base! leading-none!"></p-inputicon>-->
+<!--                <input-->
+<!--                        pInputText-->
+<!--                        [(ngModel)]="search"-->
+<!--                        placeholder="Search"-->
+<!--                        class="w-full! h-9 dark:bg-surface-900! px-3 py-2 rounded-md outline outline-1 outline-surface-300 dark:outline-surface-700 placeholder:text-surface-400 dark:placeholder:text-surface-500"-->
+<!--                />-->
+<!--            </p-iconfield>-->
+<!--        </div>-->
+<!--        <ul class="flex flex-col gap-2">-->
+<!--            <li>-->
+<!--                <button pButton text class="w-full justify-start p-2 text-surface-600 dark:text-surface-400">-->
+<!--                    <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>-->
+<!--                    <span pButtonLabel class="ml-2">Notifications</span>-->
+<!--                </button>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--                <button pButton text class="w-full justify-start p-2 text-surface-600 dark:text-surface-400">-->
+<!--                    <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>-->
+<!--                    <span pButtonLabel class="ml-2">Settings</span>-->
+<!--                </button>-->
+<!--            </li>-->
+<!--            <li class="flex items-center gap-2 pt-2 justify-between">-->
+<!--                <div class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">-->
+<!--                    Available-->
+<!--                </div>-->
+<!--                <div class="flex items-center gap-2">-->
+<!--                    <p-avatar-->
+<!--                            shape="circle"-->
+<!--                            image="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-f-1.png"-->
+<!--                            styleClass="w-8 h-8 block cursor-pointer"-->
+<!--                    ></p-avatar>-->
+<!--                    <span class="font-medium text-surface-900 dark:text-surface-0">Josephine Lillard</span>-->
+<!--                </div>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--</nav>-->

@@ -1,6 +1,6 @@
-import type { Quote, QuotesResponse } from './models';
+import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
 
-const DUMMY_JSON_BASE_URL = 'https://dummyjson.com';
+import type { Quote, QuotesResponse } from './models';
 
 export async function fetchQuotes(abortSignal?: AbortSignal): Promise<Quote[]> {
   const response = await fetch(`${DUMMY_JSON_BASE_URL}/quotes?limit=0`, {

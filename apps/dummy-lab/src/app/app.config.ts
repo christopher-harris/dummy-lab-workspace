@@ -1,24 +1,29 @@
 import {
-    ApplicationConfig,
-    provideBrowserGlobalErrorListeners,
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import {provideRouter} from '@angular/router';
-import {appRoutes} from './app.routes';
-import {providePrimeNG} from "primeng/config";
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withFetch } from '@angular/common/http';
+import { appRoutes } from './app.routes';
+import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 
-
 export const appConfig: ApplicationConfig = {
-    providers: [
-        provideBrowserGlobalErrorListeners(),
-        provideRouter(appRoutes),
-        providePrimeNG({
-            theme: {
-                preset: Aura,
-                options: {
-                    darkModeSelector: '.my-app-dark'
-                }
-            }
-        })
-    ],
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideRouter(appRoutes),
+    provideHttpClient(withFetch()),
+    providePrimeNG({
+      theme: {
+        preset: Aura,
+        options: {
+          darkModeSelector: '.my-app-dark',
+          cssLayer: {
+            name: 'primeng',
+            order: 'theme, base, primeng, utilities',
+          },
+        },
+      },
+    }),
+  ],
 };
