@@ -33,7 +33,8 @@
       ],
       "@dummy-lab/shared-utils": ["./libs/shared/utils/src/index.ts"],
       "@dummy-lab/data-access-theme": ["./libs/data-access/theme/src/index.ts"],
-      "@dummy-lab/shared-state": ["./libs/shared/state/src/index.ts"]
+      "@dummy-lab/shared-state": ["./libs/shared/state/src/index.ts"],
+      "@dummy-lab/platform": ["./libs/platform/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
