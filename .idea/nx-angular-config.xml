@@ -6,6 +6,7 @@
       <project name="carts" file="file://$PROJECT_DIR$/libs/data-access/carts/project.json" />
       <project name="comments" file="file://$PROJECT_DIR$/libs/data-access/comments/project.json" />
       <project name="dummy-lab" file="file://$PROJECT_DIR$/apps/dummy-lab/project.json" />
+      <project name="platform" file="file://$PROJECT_DIR$/libs/platform/project.json" />
       <project name="posts" file="file://$PROJECT_DIR$/libs/data-access/posts/project.json" />
       <project name="products" file="file://$PROJECT_DIR$/libs/data-access/products/project.json" />
       <project name="quotes" file="file://$PROJECT_DIR$/libs/data-access/quotes/project.json" />
