@@ -1,5 +1,5 @@
-import { Route } from '@angular/router';
-import { ShellComponent } from './components/layout/shell/shell.component';
+import {Route} from '@angular/router';
+import {ShellComponent} from './components/layout/shell/shell.component';
 
 export const appRoutes: Route[] = [
   {
@@ -20,6 +20,7 @@ export const appRoutes: Route[] = [
           ),
         data: {
           icon: 'pi pi-home',
+          topLevelNavigation: false,
         },
       },
       {
@@ -29,6 +30,7 @@ export const appRoutes: Route[] = [
           import('./pages/products/products.page').then((m) => m.ProductsPage),
         data: {
           icon: 'pi pi-shopping-bag',
+          topLevelNavigation: true,
         },
         children: [
           {
@@ -45,7 +47,7 @@ export const appRoutes: Route[] = [
             loadComponent: () =>
               import(
                 './pages/products/product-detail/product-detail.page'
-              ).then((m) => m.ProductDetailPage),
+                ).then((m) => m.ProductDetailPage),
           },
         ],
       },
@@ -56,6 +58,7 @@ export const appRoutes: Route[] = [
           import('./pages/users/users.page').then((m) => m.UsersPage),
         data: {
           icon: 'pi pi-users',
+          topLevelNavigation: true,
         },
       },
       {
@@ -65,6 +68,7 @@ export const appRoutes: Route[] = [
           import('./pages/carts/carts.page').then((m) => m.CartsPage),
         data: {
           icon: 'pi pi-shopping-cart',
+          topLevelNavigation: true,
         },
       },
       {
@@ -74,6 +78,7 @@ export const appRoutes: Route[] = [
           import('./pages/posts/posts.page').then((m) => m.PostsPage),
         data: {
           icon: 'pi pi-comment',
+          topLevelNavigation: true,
         },
       },
       {
@@ -83,6 +88,7 @@ export const appRoutes: Route[] = [
           import('./pages/recipes/recipes.page').then((m) => m.RecipesPage),
         data: {
           icon: 'pi pi-book',
+          topLevelNavigation: true,
         },
       },
       {
@@ -92,6 +98,7 @@ export const appRoutes: Route[] = [
           import('./pages/todos/todos.page').then((m) => m.TodosPage),
         data: {
           icon: 'pi pi-check',
+          topLevelNavigation: true,
         },
       },
       {
@@ -101,13 +108,27 @@ export const appRoutes: Route[] = [
           import('./pages/quotes/quotes.page').then((m) => m.QuotesPage),
         data: {
           icon: 'pi pi-quote',
+          topLevelNavigation: true,
+        },
+      },
+      {
+        path: 'account',
+        title: 'Account | Dummy Lab',
+        loadChildren: () => import('./pages/account/account.routes').then((m) => m.ACCOUNT_ROUTES),
+        data: {
+          icon: 'pi pi-user',
+          topLevelNavigation: false,
         },
       },
       {
         path: 'auth',
         title: 'Auth | Dummy Lab',
-        loadComponent: () =>
-          import('./pages/auth/auth.page').then((m) => m.AuthPage),
+        loadChildren: () => import('./pages/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+        // loadComponent: () =>
+        //   import('./pages/auth/auth.page').then((m) => m.AuthPage),
+        data: {
+          topLevelNavigation: false,
+        },
       },
     ],
   },

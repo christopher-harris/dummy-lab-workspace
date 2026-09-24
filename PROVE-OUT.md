@@ -50,10 +50,10 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Lib taxonomy — `data-access` + `util` axis | 🟡 Partial | no `ui`, no `feature` libs exist |
 | Vitest + coverage thresholds | 🟡 Partial | thresholds pass over placeholder specs |
 | Design tokens | 🟡 Partial | type ramp only; PrimeNG is stock Aura, no brand preset, no color tokens |
-| **Tags / module boundaries** | ❌ Absent | all 13 projects `"tags": []`; `depConstraints` is stock `*` → `*` |
+| **Tags / module boundaries** | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed |
 | Deploy topology (marketing / ordering / account) | ❌ Absent | one app |
 | SSR / SSG | ❌ Absent | no `@angular/ssr`, no server entry, no prerender |
-| CI | ❌ Absent | no `.github/` |
+| CI | ✅ Proven | `.github/workflows/ci.yml` + `deploy-pages.yml` |
 | Interceptors / HttpClient discipline | ❌ Absent | raw `fetch()` in every `api.ts` |
 | DTO → domain mapping | ❌ Absent | DummyJSON shapes are the state |
 | Forms & validation | ❌ Absent | `ngModel` only |
@@ -75,9 +75,11 @@ at all. Everything in Tier 2+ is enrichment.
 
 ### ☐ P1 — Tags and a boundary rule that actually fails a build
 
-**Today:** every project is `"tags": []`. `eslint.config.mjs` carries the stock
-`{ sourceTag: '*', onlyDependOnLibsWithTags: ['*'] }`. Nothing is enforced. There is also no
-*negative* test — nothing proves a violating import goes red.
+**In progress:** all 13 projects now carry `type:*`/`scope:*` tags. `eslint.config.mjs`
+`depConstraints` enforces `type:data-access → type:data-access|type:util`, but `type:ui` still has
+a no-op rule (`onlyDependOnLibsWithTags: ['*']`) and there are no `scope:*` constraints yet, so
+cross-domain imports (`carts` → `products`) are still unenforced. Still no negative test — nothing
+proves a violating import goes red.
 
 **Why it's #1:** `ideal-architecture.md` says boundaries are *"enforced by Nx tags +
 `@nx/enforce-module-boundaries`, not by convention."* That sentence is the load-bearing claim of
@@ -120,9 +122,11 @@ events, three `httpResource`s, entity resources). `libs/products/feature` + `lib
 
 ---
 
-### ☐ P3 — CI running `nx affected`
+### ☑ P3 — CI running `nx affected`
 
-**Today:** no `.github/` directory. No workflow of any kind.
+**Done:** `.github/workflows/ci.yml` — `nrwl/nx-set-shas` + `npx nx affected -t lint test build`,
+plus `deploy-pages.yml`. Not part of the greenfield-lab charter (`PRD.md`'s non-goal list, see
+open question 1), added anyway to prove the gate is executable.
 
 **Why it matters:** the `ngfe-web` ROADMAP is built entirely on *mechanically checkable* gates —
 `nx affected -t lint test build` against the last successful main SHA via `nrwl/nx-set-shas`,

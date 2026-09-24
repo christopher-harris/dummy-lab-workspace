@@ -4,7 +4,6 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {StyleClass} from 'primeng/styleclass';
 import {CommonModule} from '@angular/common';
 import {Router, RouterLink, Routes} from '@angular/router';
 import {MenuItem} from 'primeng/api';
@@ -12,8 +11,9 @@ import {MenubarModule, MenubarPassThrough} from 'primeng/menubar';
 import {ToolbarModule, ToolbarPassThrough} from 'primeng/toolbar';
 import {AvatarModule} from 'primeng/avatar';
 import {MenuModule} from 'primeng/menu';
-import {Ripple} from 'primeng/ripple';
 import {PRIMARY_COLORS, ThemeStore} from "@dummy-lab/data-access-theme";
+import {authEvents, AuthStore} from "@dummy-lab/data-access-auth";
+import {injectDispatch} from "@ngrx/signals/events";
 
 @Component({
   selector: 'dl-navbar',
@@ -27,18 +27,17 @@ import {PRIMARY_COLORS, ThemeStore} from "@dummy-lab/data-access-theme";
     InputIcon,
     InputText,
     ReactiveFormsModule,
-    StyleClass,
     FormsModule,
     RouterLink,
     MenuModule,
-    Ripple,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
+  authStore = inject(AuthStore);
+  authActions = injectDispatch(authEvents);
   search = '';
-  selectedNav = signal('Home');
   themeStore = inject(ThemeStore);
 
   readonly colors = PRIMARY_COLORS;
@@ -49,10 +48,7 @@ export class NavbarComponent {
   apps = computed(
     () =>
       this.routeConfig()[0].children?.filter(
-        (route) =>
-          route.path !== '' &&
-          route.path !== 'dashboard' &&
-          route.path !== 'auth',
+        (route) => route.data?.['topLevelNavigation'] === true,
       ) ?? [],
   );
 
@@ -79,6 +75,13 @@ export class NavbarComponent {
     });
   });
 
+  accountMenuItems = computed<MenuItem[]>(() => [
+    {
+      label: 'Account',
+      routerLink: '/account',
+    }
+  ]);
+
   toolbarPassThrough: ToolbarPassThrough = {
     root: {
       class:
@@ -101,10 +104,11 @@ export class NavbarComponent {
   };
 
   constructor() {
-    console.log(this.themeStore.isDark());
-    console.log(this.router.config);
+    // console.log(this.themeStore.isDark());
+    // console.log(this.router.config);
     effect(() => {
       console.log(this.menuItems());
+      console.log(this.authStore.isLoggedIn());
     });
   }
 }

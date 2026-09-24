@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/quotes/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:data-access", "scope:quotes"],
   "targets": {
     "test": {
       "outputs": [

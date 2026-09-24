@@ -4,7 +4,7 @@
   "sourceRoot": "libs/shared/state/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:util", "scope:shared"],
   "targets": {
     "test": {
       "outputs": [

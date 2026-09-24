@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/products/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:data-access", "scope:products"],
   "targets": {
     "test": {
       "outputs": [

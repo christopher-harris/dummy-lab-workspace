@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/todos/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["type:data-access", "scope:todos"],
   "targets": {
     "test": {
       "outputs": [
