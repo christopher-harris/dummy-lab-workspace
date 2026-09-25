@@ -14,6 +14,7 @@ import {MenuModule} from 'primeng/menu';
 import {PRIMARY_COLORS, ThemeStore} from "@dummy-lab/data-access-theme";
 import {authEvents, AuthStore} from "@dummy-lab/data-access-auth";
 import {injectDispatch} from "@ngrx/signals/events";
+import {UsersStore} from "@dummy-lab/data-access-users";
 
 @Component({
   selector: 'dl-navbar',
@@ -37,6 +38,7 @@ import {injectDispatch} from "@ngrx/signals/events";
 export class NavbarComponent {
   authStore = inject(AuthStore);
   authActions = injectDispatch(authEvents);
+  usersStore = inject(UsersStore);
   search = '';
   themeStore = inject(ThemeStore);
 
@@ -79,6 +81,10 @@ export class NavbarComponent {
     {
       label: 'Account',
       routerLink: '/account',
+    },
+    {
+      label: 'Logout',
+      command: () => this.onLogoutClicked(),
     }
   ]);
 
@@ -111,4 +117,10 @@ export class NavbarComponent {
       console.log(this.authStore.isLoggedIn());
     });
   }
+
+  onLogoutClicked() {
+    console.log('logout clicked');
+    this.authActions.logoutRequested();
+  }
+
 }

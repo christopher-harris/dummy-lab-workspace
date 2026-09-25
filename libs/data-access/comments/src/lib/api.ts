@@ -1,11 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { Comment, CommentsResponse } from './models';
 
 export async function fetchComments(
+  apiBaseUrl: string,
   abortSignal?: AbortSignal,
 ): Promise<Comment[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/comments?limit=0`, {
+  const response = await fetch(`${apiBaseUrl}/comments?limit=0`, {
     signal: abortSignal,
   });
 

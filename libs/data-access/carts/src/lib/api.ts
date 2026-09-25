@@ -1,9 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { Cart, CartsResponse } from './models';
 
-export async function fetchCarts(abortSignal?: AbortSignal): Promise<Cart[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/carts?limit=0`, {
+export async function fetchCarts(
+  apiBaseUrl: string,
+  abortSignal?: AbortSignal,
+): Promise<Cart[]> {
+  const response = await fetch(`${apiBaseUrl}/carts?limit=0`, {
     signal: abortSignal,
   });
 

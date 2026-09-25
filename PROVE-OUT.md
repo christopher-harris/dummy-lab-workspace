@@ -8,7 +8,8 @@ Measured directly against this tree and against four sources in `ngfe-web`:
 epics `20`–`23`).
 
 Every gap below is stated as: **what is true in this repo today** → **what proving it buys you
-in `ngfe-web`** → **rough cost**. Tick the ones you want. Nothing here is started.
+in `ngfe-web`** → **rough cost**. Status reflects the current implementation, not just a design
+decision: partial work is deliberately not marked proven.
 
 ---
 
@@ -54,11 +55,11 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Deploy topology (marketing / ordering / account) | ❌ Absent | one app |
 | SSR / SSG | ❌ Absent | no `@angular/ssr`, no server entry, no prerender |
 | CI | ✅ Proven | `.github/workflows/ci.yml` + `deploy-pages.yml` |
-| Interceptors / HttpClient discipline | ❌ Absent | raw `fetch()` in every `api.ts` |
+| Interceptors / HttpClient discipline | 🟡 Partial | functional auth interceptor registered with `provideHttpClient(withFetch(), withInterceptors(...))`; raw `fetch()` remains in every `api.ts` |
 | DTO → domain mapping | ❌ Absent | DummyJSON shapes are the state |
-| Forms & validation | ❌ Absent | `ngModel` only |
-| Guards / resolvers / error routes | ❌ Absent | zero matches repo-wide |
-| Auth vs account boundary | ❌ Absent | `auth` lib exists; no account domain, no session, no guest path |
+| Forms & validation | 🟡 Partial | login uses a typed reactive form with required validation; no shared validators, cross-field/async validation, or server-error mapping |
+| Guards / resolvers / error routes | 🟡 Partial | `accountGuard` redirects unauthenticated users; no resolver, unauthorized/404/error routes, or guard tests |
+| Auth vs account boundary | 🟡 Partial | persisted `AuthStore`, login mutation/events, auth interceptor, and authenticated `/auth/me` resource exist; no refresh/expiry policy and current-user data still lives in `UsersStore` |
 | Environment config | ❌ Absent | `DUMMY_JSON_BASE_URL` is a hardcoded const |
 | MSW / test factories | ❌ Absent | 9 of 12 lib specs are `expect(true).toBe(true)` |
 | Error taxonomy / `ErrorHandler` / fallback UI | ❌ Absent | `provideBrowserGlobalErrorListeners()` only |
@@ -173,11 +174,12 @@ blast-radius guarantee as a lint rule instead of a hope. Depends on P1 and P2.
 Tier 1 makes the architecture claim true. Tier 2 covers the things that, in my experience, are what
 a real `ngfe-web` domain migration will run aground on. Ranked by risk-to-`ngfe-web`, not by cost.
 
-### ☐ P5 — Forms & validation pattern
+### ◐ P5 — Forms & validation pattern
 
-**Today:** `FormsModule` / `ngModel` only. No typed reactive forms anywhere, no shared validators
-lib, no path for server-side validation errors back into a form, no design-system-owned error
-rendering.
+**Today:** the login page now has a typed reactive form with required username and password
+controls. That proves the basic Angular reactive-forms wiring, but not a reusable form pattern:
+there is still no shared validators lib, cross-field or async validation, server-error mapping, or
+design-system-owned error rendering.
 
 `ideal-architecture.md`: *"checkout is the hardest UI we own — it deserves an explicit pattern."*
 This is the **highest-risk unproven area relative to what `ngfe-web` actually has to migrate**, and
@@ -191,11 +193,15 @@ Carts + auth are the only realistic hosts here; a synthetic checkout is fine and
 
 ---
 
-### ☐ P6 — HttpClient + interceptors; kill the raw `fetch()`
+### ◐ P6 — HttpClient + interceptors; kill the raw `fetch()`
 
-**Today:** every `api.ts` uses raw `fetch()` (`libs/data-access/products/src/lib/api.ts`,
-and the same in posts, users, carts, recipes, todos, quotes, comments, auth) while the stores
-simultaneously use `httpResource`. Two HTTP stacks per lib.
+**Today:** `app.config.ts` registers a functional `authInterceptor` with
+`provideHttpClient(withFetch(), withInterceptors(...))`. It reads the persisted `AuthStore`
+credentials and adds a Bearer token to DummyJSON requests; the authenticated `/auth/me`
+`httpResource` consumes that policy without setting its own header. This proves the interceptor
+seam, but not the discipline: every `api.ts` still uses raw `fetch()` (products, posts, users,
+carts, recipes, todos, quotes, comments, and auth), while stores also use `httpResource`.
+Two HTTP stacks remain.
 
 **Why it matters:** `fetch()` bypasses Angular's `HttpInterceptor` chain outright, so the
 interceptors `ideal-architecture.md` names — auth, retry, correlation ID, timeout — are unprovable.
@@ -204,8 +210,10 @@ More pointedly: **this reproduces the exact anti-pattern the ROADMAP flags in Ph
 `HttpInterceptor` entirely. Hard to argue that's a defect in `ngfe-web` while the reference
 implementation does the same thing.
 
-**Shape:** one HTTP stack. `provideHttpClient(withFetch(), withInterceptors([...]))`, and prove a
-correlation-ID interceptor end to end.
+**Remaining shape:** migrate each `api.ts` to `HttpClient` so there is one HTTP stack; add tests
+that assert the auth header is attached only to the intended origin and omitted without a session;
+then prove a correlation-ID interceptor end to end. Add retry/timeout only after their policy is
+explicit—middleware is not a substitute for a failure policy.
 
 **Cost:** ~1 day. Fix on principle even if you prove nothing else with it.
 
@@ -293,16 +301,23 @@ the mechanism. Do not assert an SEO outcome.
 
 ---
 
-### ☐ P12 — Auth vs account boundary, guards, resolvers, error routes
+### ◐ P12 — Auth vs account boundary, guards, resolvers, error routes
 
-Zero matches for `canActivate` / `ResolveFn` / `canMatch` repo-wide. No 404, error, or unauthorized
-routes. No token storage or refresh strategy. No guest-vs-authenticated path.
+**Today:** `AuthStore` persists the login response, handles login/logout events, and exposes
+`isLoggedIn`; `accountGuard` redirects unauthenticated navigation to `/auth/login`. The account
+page renders an authenticated `/auth/me` resource, and a functional interceptor supplies its
+Bearer token. This establishes a guest-versus-authenticated path and a basic guard.
+
+It is not yet a clean auth/account boundary: the current-user resource is attached to
+`UsersStore`, not an account/profile owner; there is no refresh or expiry policy; and there are no
+resolver, 401/403, 404, or error routes. The guard and interceptor tests also need behavioral
+assertions, not just construction coverage.
 
 `ideal-architecture.md` calls the auth/account conflation *"the most common way this taxonomy goes
-wrong"* — ordering needs session + token refresh without pulling in profile UI. You have an `auth`
-data-access lib and no account domain, so the boundary is untested in either direction. The doc also
-asks you to **pick one default** — guards vs. store-driven redirects, resolvers vs. load-in-store —
-and not mix them arbitrarily. Neither choice is recorded.
+wrong"* — ordering needs session + token refresh without pulling in profile UI. The doc also asks
+you to **pick one default** — guards vs. store-driven redirects, resolvers vs. load-in-store — and
+not mix them arbitrarily. The current implementation indicates guards plus load-in-store; record
+that as the default only after the account/profile ownership is moved out of `UsersStore`.
 
 **Cost:** ~2 days.
 

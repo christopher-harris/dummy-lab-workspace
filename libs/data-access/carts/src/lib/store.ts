@@ -1,13 +1,12 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
-import { resource } from '@angular/core';
+import { inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
   withEntityResources,
   withResource,
 } from '@angular-architects/ngrx-toolkit';
-import { signalStore } from '@ngrx/signals';
+import { signalStore, withProps } from '@ngrx/signals';
+import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 import { fetchCarts } from './api';
 import type { Cart, CartsResponse } from './models';
@@ -17,12 +16,15 @@ export const CartsStore = signalStore(
   { providedIn: 'root' },
   withDevtools('carts'),
   withCallState({ collection: 'cartsRequest' }),
-  withResource(() => ({
-    allCarts: httpResource<CartsResponse>(() => `${DUMMY_JSON_BASE_URL}/carts`),
+  withProps(() => ({
+    apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
   })),
-  withEntityResources(() => ({
+  withResource(({ apiBaseUrl }) => ({
+    allCarts: httpResource<CartsResponse>(() => `${apiBaseUrl}/carts`),
+  })),
+  withEntityResources(({ apiBaseUrl }) => ({
     carts: resource<Cart[], void>({
-      loader: ({ abortSignal }) => fetchCarts(abortSignal),
+      loader: ({ abortSignal }) => fetchCarts(apiBaseUrl, abortSignal),
       defaultValue: [],
     }),
   })),

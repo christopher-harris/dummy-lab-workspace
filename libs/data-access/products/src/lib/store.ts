@@ -1,15 +1,15 @@
-import { computed, resource } from '@angular/core';
+import { computed, inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
   withEntityResources, withResource,
 } from '@angular-architects/ngrx-toolkit';
-import {signalStore, withComputed, withState} from '@ngrx/signals';
+import {signalStore, withComputed, withProps, withState} from '@ngrx/signals';
 
 import { fetchAllProductCategories, fetchProducts } from './api';
 import {Product, ProductCategory, ProductsResponse} from './models';
 import {httpResource} from "@angular/common/http";
-import {DUMMY_JSON_BASE_URL} from "@dummy-lab/shared-utils";
+import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 import {on, withReducer} from "@ngrx/signals/events";
 import {productsEvents} from "./events";
 import {withRouterContext} from "@dummy-lab/shared-state";
@@ -30,6 +30,9 @@ export const ProductsStore = signalStore(
   withState(initialState),
   withDevtools('products'),
   withRouterContext(),
+  withProps(() => ({
+    apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
+  })),
   withComputed(({ routeParamMap }) => ({
     /**
      * Product id from the active `products/:productId` route, or `undefined`
@@ -43,33 +46,33 @@ export const ProductsStore = signalStore(
     }),
   })),
   withCallState({ collection: 'productsRequest' }),
-  withResource(({previewProductId, routeProductId, selectedCategory}) => ({
+  withResource(({apiBaseUrl, previewProductId, routeProductId, selectedCategory}) => ({
     allProducts: httpResource<ProductsResponse>(() => {
       const category = selectedCategory();
       return category
-        ? `${DUMMY_JSON_BASE_URL}/products/category/${category.slug}`
-        : `${DUMMY_JSON_BASE_URL}/products`;
+        ? `${apiBaseUrl}/products/category/${category.slug}`
+        : `${apiBaseUrl}/products`;
     }),
     productPreview: httpResource<Product>(() => {
       const id = previewProductId();
-      return id ? `${DUMMY_JSON_BASE_URL}/products/${id}` : undefined;
+      return id ? `${apiBaseUrl}/products/${id}` : undefined;
     }),
     selectedProduct: httpResource<Product>(() => {
       const id = routeProductId();
-      return id ? `${DUMMY_JSON_BASE_URL}/products/${id}` : undefined;
+      return id ? `${apiBaseUrl}/products/${id}` : undefined;
     }),
   })),
-  withEntityResources(() => ({
+  withEntityResources(({ apiBaseUrl }) => ({
     products: resource<Product[], void>({
-      loader: ({ abortSignal }) => fetchProducts(abortSignal),
+      loader: ({ abortSignal }) => fetchProducts(apiBaseUrl, abortSignal),
       defaultValue: [],
     }),
   })),
   // Categories carry no `id` (DummyJSON keys them by `slug`), so they are not
   // entities — `withEntityResources` only accepted them while they were `any[]`.
-  withResource(() => ({
+  withResource(({ apiBaseUrl }) => ({
     productCategories: resource<ProductCategory[], void>({
-      loader: () => fetchAllProductCategories(),
+      loader: () => fetchAllProductCategories(apiBaseUrl),
       defaultValue: [],
     }),
   })),

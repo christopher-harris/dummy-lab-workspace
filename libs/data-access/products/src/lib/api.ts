@@ -1,11 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { Product, ProductCategory, ProductsResponse } from './models';
 
 export async function fetchProducts(
+  apiBaseUrl: string,
   abortSignal?: AbortSignal,
 ): Promise<Product[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/products?limit=0`, {
+  const response = await fetch(`${apiBaseUrl}/products?limit=0`, {
     signal: abortSignal,
   });
 
@@ -17,7 +16,9 @@ export async function fetchProducts(
   return data.products;
 }
 
-export async function fetchAllProductCategories(): Promise<ProductCategory[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/products/categories`);
+export async function fetchAllProductCategories(
+  apiBaseUrl: string,
+): Promise<ProductCategory[]> {
+  const response = await fetch(`${apiBaseUrl}/products/categories`);
   return (await response.json()) as ProductCategory[];
 }

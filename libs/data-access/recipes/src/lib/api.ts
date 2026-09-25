@@ -1,11 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { Recipe, RecipesResponse } from './models';
 
 export async function fetchRecipes(
+  apiBaseUrl: string,
   abortSignal?: AbortSignal,
 ): Promise<Recipe[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/recipes?limit=0`, {
+  const response = await fetch(`${apiBaseUrl}/recipes?limit=0`, {
     signal: abortSignal,
   });
 

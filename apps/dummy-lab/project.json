@@ -8,9 +8,7 @@
   "targets": {
     "build": {
       "executor": "@angular/build:application",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "outputPath": "dist/apps/dummy-lab",
@@ -23,10 +21,7 @@
             "input": "apps/dummy-lab/public"
           }
         ],
-        "styles": [
-          "styles/tailwind.css",
-          "apps/dummy-lab/src/styles.scss"
-        ]
+        "styles": ["styles/tailwind.css", "apps/dummy-lab/src/styles.scss"]
       },
       "configurations": {
         "production": {
@@ -71,12 +66,8 @@
       "executor": "@angular/build:unit-test",
       "options": {
         "watch": false,
-        "setupFiles": [
-          "apps/dummy-lab/src/test-setup.ts"
-        ],
-        "coverageInclude": [
-          "src/**/*.ts"
-        ],
+        "setupFiles": ["apps/dummy-lab/src/test-setup.ts"],
+        "coverageInclude": ["src/**/*.ts"],
         "coverageExclude": [
           "src/**/*.spec.ts",
           "src/test-setup.ts",
@@ -84,10 +75,7 @@
           "src/app/app.config.ts",
           "src/app/app.routes.ts"
         ],
-        "coverageReporters": [
-          "text-summary",
-          "lcov"
-        ],
+        "coverageReporters": ["text-summary", "lcov"],
         "coverageThresholds": {
           "statements": 75,
           "branches": 80,
@@ -103,6 +91,34 @@
         "buildTarget": "dummy-lab:build",
         "staticFilePath": "dist/apps/dummy-lab/browser",
         "spa": true
+      }
+    },
+    "serve-cloudflare": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "npm exec wrangler -- pages dev ../../dist/apps/dummy-lab/browser --port=8788",
+        "cwd": "apps/dummy-lab",
+        "forwardAllArgs": false
+      }
+    },
+    "check-cloudflare-functions": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "npm exec wrangler -- pages functions build functions --outdir ../../tmp/dummy-lab-functions-check",
+        "cwd": "apps/dummy-lab",
+        "forwardAllArgs": false
+      }
+    },
+    "deploy-cloudflare": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "npm exec wrangler -- pages deploy ../../dist/apps/dummy-lab/browser --project-name={args.projectName}",
+        "cwd": "apps/dummy-lab",
+        "forwardAllArgs": false
       }
     }
   }

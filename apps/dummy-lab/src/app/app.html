@@ -1,1 +1,17 @@
+@if (runtimeConfig.environment !== 'prod') {
+<div
+  class="border-b border-amber-300 bg-amber-100 px-4 py-2 text-center text-sm font-medium text-amber-950"
+  role="status"
+>
+  {{ runtimeConfig.environment }} environment
+</div>
+} @if (runtimeConfig.features.experimentalCatalog) {
+<div
+  class="border-b border-sky-300 bg-sky-100 px-4 py-2 text-center text-sm text-sky-950"
+  data-testid="experimental-catalog-status"
+>
+  Experimental catalog is enabled by runtime configuration.
+</div>
+}
+
 <router-outlet />

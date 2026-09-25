@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+tmp/
 
 .nx/installation
 .nx/cache
@@ -17,5 +18,11 @@ __screenshots__/
 .env
 .env.*
 *.log
+
+# Wrangler Pages local state and bindings. The committed example is safe/public.
+apps/dummy-lab/.dev.vars
+apps/dummy-lab/.dev.vars.*
+!apps/dummy-lab/.dev.vars.example
+apps/dummy-lab/.wrangler/
 
 vitest.config.*.timestamp*

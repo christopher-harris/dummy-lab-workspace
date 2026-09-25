@@ -1,0 +1,3 @@
+# Copy this file to .dev.vars before running `npm exec nx run dummy-lab:serve-cloudflare`.
+# This public JSON mirrors the dashboard binding; never put credentials here.
+RUNTIME_CONFIG_JSON='{"environment":"local","apiBaseUrl":"https://dummyjson.com","features":{"experimentalCatalog":true}}'

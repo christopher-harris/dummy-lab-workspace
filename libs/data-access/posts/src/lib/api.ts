@@ -1,9 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { Post, PostsResponse } from './models';
 
-export async function fetchPosts(abortSignal?: AbortSignal): Promise<Post[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/posts?limit=0`, {
+export async function fetchPosts(
+  apiBaseUrl: string,
+  abortSignal?: AbortSignal,
+): Promise<Post[]> {
+  const response = await fetch(`${apiBaseUrl}/posts?limit=0`, {
     signal: abortSignal,
   });
 

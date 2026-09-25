@@ -6,7 +6,7 @@ import {
 } from '@angular-architects/ngrx-toolkit';
 import {patchState, signalStore, withComputed, withProps, withState} from '@ngrx/signals';
 import type { AuthLoginCredentials, AuthSession } from './models';
-import {DUMMY_JSON_BASE_URL} from "@dummy-lab/shared-utils";
+import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 import {Events, injectDispatch, withEventHandlers, withReducer, on} from "@ngrx/signals/events";
 import {authEvents} from "./actions";
 import {tap} from "rxjs";
@@ -28,6 +28,7 @@ export const AuthStore = signalStore(
     authEvents: injectDispatch(authEvents),
     router: inject(Router),
     events: inject(Events),
+    apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
   })),
   withStorageSync('dummy-lab-auth'),
   withComputed(({credentials}) => ({
@@ -50,10 +51,10 @@ export const AuthStore = signalStore(
   //     patchState(store, { credentials: undefined, value: undefined });
   //   },
   // })),
-  withMutations(({authEvents, ...store}) => ({
+  withMutations(({apiBaseUrl, authEvents, ...store}) => ({
     loginUser: httpMutation({
       request: (credentials: AuthLoginCredentials) => ({
-        url: `${DUMMY_JSON_BASE_URL}/user/login`,
+        url: `${apiBaseUrl}/user/login`,
         method: 'POST',
         body: credentials,
         reportProgress: true,
@@ -81,6 +82,13 @@ export const AuthStore = signalStore(
       tap((event: any) => {
         console.log('loginSucceeded$', event);
         router.navigate(['/dashboard']);
+      })
+    ),
+    logoutRequested$: events.on(authEvents.logoutRequested).pipe(
+      tap(() => {
+        console.log('logoutRequested$', event);
+        patchState(store, { credentials: undefined });
+        router.navigate(['/auth/login']);
       })
     ),
   })),

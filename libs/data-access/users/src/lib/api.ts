@@ -1,9 +1,10 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { User, UsersResponse } from './models';
 
-export async function fetchUsers(abortSignal?: AbortSignal): Promise<User[]> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/users?limit=0`, {
+export async function fetchUsers(
+  apiBaseUrl: string,
+  abortSignal?: AbortSignal,
+): Promise<User[]> {
+  const response = await fetch(`${apiBaseUrl}/users?limit=0`, {
     signal: abortSignal,
   });
 

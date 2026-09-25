@@ -1,26 +1,29 @@
-import { resource } from '@angular/core';
+import { inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
   withEntityResources, withResource,
 } from '@angular-architects/ngrx-toolkit';
-import { signalStore } from '@ngrx/signals';
+import { signalStore, withProps } from '@ngrx/signals';
 
 import { fetchRecipes } from './api';
 import type {Recipe, RecipesResponse} from './models';
 import {httpResource} from "@angular/common/http";
-import {DUMMY_JSON_BASE_URL} from "@dummy-lab/shared-utils";
+import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 export const RecipesStore = signalStore(
   { providedIn: 'root' },
   withDevtools('recipes'),
   withCallState({ collection: 'recipesRequest' }),
-  withResource(() => ({
-    allRecipes: httpResource<RecipesResponse>(() => `${DUMMY_JSON_BASE_URL}/recipes`)
+  withProps(() => ({
+    apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
   })),
-  withEntityResources(() => ({
+  withResource(({ apiBaseUrl }) => ({
+    allRecipes: httpResource<RecipesResponse>(() => `${apiBaseUrl}/recipes`)
+  })),
+  withEntityResources(({ apiBaseUrl }) => ({
     recipes: resource<Recipe[], void>({
-      loader: ({ abortSignal }) => fetchRecipes(abortSignal),
+      loader: ({ abortSignal }) => fetchRecipes(apiBaseUrl, abortSignal),
       defaultValue: [],
     }),
   })),

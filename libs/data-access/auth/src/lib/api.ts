@@ -1,12 +1,11 @@
-import { DUMMY_JSON_BASE_URL } from '@dummy-lab/shared-utils';
-
 import type { AuthLoginCredentials, AuthSession } from './models';
 
 export async function login(
+  apiBaseUrl: string,
   credentials: AuthLoginCredentials,
   abortSignal?: AbortSignal,
 ): Promise<AuthSession> {
-  const response = await fetch(`${DUMMY_JSON_BASE_URL}/auth/login`, {
+  const response = await fetch(`${apiBaseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(credentials),
