@@ -91,6 +91,14 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_PAGES_PROJECT: dummy-lab-dev
     steps:
+      # This checkout supplies package-lock.json for the Wrangler install. It
+      # uses the build job's resolved commit and never contributes app output.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.commit_sha }}
+          filter: tree:0
+          fetch-depth: 1
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
