@@ -1,0 +1,123 @@
+name: Promote Cloudflare Pages release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Stable environment to receive the selected dev artifact.
+        required: true
+        type: choice
+        options:
+          - stage
+          - prod
+      dev_run_id:
+        description: Successful "Deploy Cloudflare Pages to dev" run ID. Leave blank to use its newest successful push-to-main run.
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: cloudflare-pages-${{ inputs.environment }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 22.23.0
+
+jobs:
+  select-release:
+    name: Select immutable dev release
+    runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.release.outputs.commit_sha }}
+      run_id: ${{ steps.release.outputs.run_id }}
+    steps:
+      - id: release
+        name: Find successful dev deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_RUN_ID: ${{ inputs.dev_run_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "$REQUESTED_RUN_ID" ]; then
+            release="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$REQUESTED_RUN_ID")"
+          else
+            release="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy-cloudflare.yml/runs?branch=main&event=push&status=success&per_page=1" --jq '.workflow_runs[0]')"
+          fi
+
+          run_id="$(jq -r '.id // empty' <<< "$release")"
+          commit_sha="$(jq -r '.head_sha // empty' <<< "$release")"
+          workflow_name="$(jq -r '.name // empty' <<< "$release")"
+          conclusion="$(jq -r '.conclusion // empty' <<< "$release")"
+
+          test -n "$run_id" || {
+            echo "::error::No successful dev release artifact was found."
+            exit 1
+          }
+          test "$workflow_name" = 'Deploy Cloudflare Pages to dev' || {
+            echo "::error::Run $run_id is not a Cloudflare dev deployment."
+            exit 1
+          }
+          test "$conclusion" = success || {
+            echo "::error::Run $run_id did not succeed."
+            exit 1
+          }
+
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=$commit_sha" >> "$GITHUB_OUTPUT"
+
+  promote:
+    name: Promote release to ${{ inputs.environment }}
+    needs: select-release
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_PAGES_PROJECT: ${{ inputs.environment == 'stage' && 'dummy-lab-stage' || 'dummy-lab-prod' }}
+    steps:
+      # Check out the release commit only to install its locked Wrangler
+      # version. Angular output still comes solely from the dev artifact.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.select-release.outputs.commit_sha }}
+          filter: tree:0
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      # Supplying both the token and original run ID authorizes this workflow
+      # to read an artifact created by a different workflow execution.
+      - uses: actions/download-artifact@v4
+        with:
+          name: cloudflare-pages-release
+          path: cloudflare-pages-release
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ needs.select-release.outputs.run_id }}
+
+      - name: Verify downloaded release
+        working-directory: cloudflare-pages-release
+        run: sha256sum --check SHA256SUMS
+
+      - name: Deploy exact dev release artifact
+        working-directory: cloudflare-pages-release
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          npm exec wrangler -- pages deploy browser \
+            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
+            --branch main \
+            --commit-hash "${{ needs.select-release.outputs.commit_sha }}" \
+            --commit-message "${{ github.workflow }} #${{ github.run_number }}" \
+            --commit-dirty=true
