@@ -10,7 +10,6 @@ import { MenuModule } from 'primeng/menu';
 import { RippleModule } from 'primeng/ripple';
 import { StyleClassModule } from 'primeng/styleclass';
 import { NavbarComponent } from '../navbar/navbar.component';
-import { FooterComponent } from '../footer/footer.component';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -27,7 +26,6 @@ import { RouterOutlet } from '@angular/router';
     RippleModule,
     StyleClassModule,
     NavbarComponent,
-    FooterComponent,
     RouterOutlet,
   ],
   templateUrl: './shell.component.html',

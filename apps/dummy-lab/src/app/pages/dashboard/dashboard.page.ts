@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { DividerModule } from 'primeng/divider';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
@@ -19,7 +19,6 @@ interface TopProduct {
   selector: 'dl-dashboard',
   imports: [
     DividerModule,
-    RouterLink,
     ButtonModule,
     MenuModule,
     BaseStatsComponent,

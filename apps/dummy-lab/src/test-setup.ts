@@ -6,6 +6,24 @@
  * file only has to patch the gaps between jsdom and a real browser.
  */
 
+import { TestBed } from '@angular/core/testing';
+import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
+import { beforeEach } from 'vitest';
+
+const testRuntimeConfig = {
+  environment: 'local' as const,
+  apiBaseUrl: 'https://dummyjson.com',
+  features: { experimentalCatalog: true },
+};
+
+// Data-access stores read this token during construction. Supplying it here
+// keeps isolated component specs aligned with the app bootstrap contract.
+beforeEach(() => {
+  TestBed.configureTestingModule({
+    providers: [{ provide: RUNTIME_CONFIG, useValue: testRuntimeConfig }],
+  });
+});
+
 // jsdom ships no `matchMedia`. PrimeNG's Menubar (and several other components)
 // call it during ngOnInit, which takes down any spec that renders them.
 if (!window.matchMedia) {

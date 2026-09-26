@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "dl",
   "sourceRoot": "apps/dummy-lab/src",
-  "tags": [],
+  "tags": ["type:app", "scope:dummy-lab"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
