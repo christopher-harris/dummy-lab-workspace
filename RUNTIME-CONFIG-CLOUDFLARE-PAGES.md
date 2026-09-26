@@ -419,9 +419,9 @@ Create GitHub Environments: `dev`, `stage`, and `prod`.
 
 - `dev` may deploy automatically.
 - Add approval gates to `stage` and `prod` when collaborators warrant them.
-- In every GitHub Environment, store `CLOUDFLARE_API_TOKEN` as a GitHub secret
-  and `CLOUDFLARE_ACCOUNT_ID` as a GitHub variable. The token needs only
-  Account → Cloudflare Pages → Edit on the selected Cloudflare account.
+- In every GitHub Environment, store `CLOUDFLARE_API_TOKEN` and
+  `CLOUDFLARE_ACCOUNT_ID` as GitHub secrets. The token needs only Account →
+  Cloudflare Pages → Edit on the selected Cloudflare account.
 
 Use two workflows:
 
