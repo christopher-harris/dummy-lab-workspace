@@ -413,7 +413,7 @@ It must return the expected JSON, with `cache-control: no-store`. Reload the
 app and confirm that its visible environment label and experimental catalog
 match that environment.
 
-## 4. Promote one artifact with GitHub Actions
+## 4. Deploy dev automatically and promote one artifact manually
 
 Create GitHub Environments: `dev`, `stage`, and `prod`.
 
@@ -423,24 +423,28 @@ Create GitHub Environments: `dev`, `stage`, and `prod`.
   and `CLOUDFLARE_ACCOUNT_ID` as a GitHub variable. The token needs only
   Account → Cloudflare Pages → Edit on the selected Cloudflare account.
 
-Add a manual `deploy-cloudflare.yml` workflow that takes a commit/ref and runs:
+Use two workflows:
 
-1. **build**: checkout the ref, run `npm ci`, then
-   `npm exec nx -- build dummy-lab --configuration=production`. Generate a
-   SHA-256 manifest for `dist/apps/dummy-lab/browser` and upload that directory,
-   `apps/dummy-lab/functions`, and the manifest as one Actions artifact. Restore
-   both paths in every deploy job so Wrangler runs from the Pages project root
-   and finds the Function.
-2. **deploy-dev**: download the artifact unchanged; deploy it to
-   `dummy-lab-dev` with Wrangler from the artifact's Pages-project root, then
-   smoke-test the config endpoint.
-3. **deploy-stage**: depend on dev, use the `stage` Environment, deploy the
-   same downloaded artifact to `dummy-lab-stage`, and smoke-test it.
-4. **deploy-prod**: depend on stage, use the `prod` Environment, deploy the
-   same downloaded artifact to `dummy-lab-prod`, and smoke-test it.
+1. `deploy-cloudflare.yml` runs on every push to `main` (and may be manually
+   rerun). It checks out the pushed commit, runs `npm ci`, builds once with
+   `npm exec nx -- build dummy-lab --configuration=production`, creates a
+   SHA-256 manifest for `dist/apps/dummy-lab/browser` plus
+   `apps/dummy-lab/functions`, uploads them as one 14-day artifact, and deploys
+   that artifact to `dummy-lab-dev`.
+2. `promote-cloudflare.yml` is manual. Choose `stage` or `prod`; leaving its
+   optional dev run ID blank promotes the newest successful push-to-`main` dev
+   release. It downloads that release artifact using the original workflow run
+   ID, verifies its manifest, and deploys it without rebuilding Angular.
 
-Every deployment job must compare its downloaded manifest with the build-job
-manifest before upload. It must never check out and rebuild the app.
+For a deliberate prod promotion after a newer dev release has landed, enter the
+same dev workflow run ID used for stage. This keeps stage and prod on the exact
+same artifact rather than silently promoting a newer one. Artifacts expire after
+14 days; rerun the dev workflow if the desired artifact has expired.
+
+The workflows pin Node to `22.23.0` directly rather than reading `.nvmrc`, so a
+historical checkout cannot fail merely because it predates that version file.
+Every deployment job verifies the downloaded manifest before upload. It never
+checks out and rebuilds the app.
 
 Keep the existing GitHub Pages workflow unchanged initially. Its project-site
 base href needs a separate build and is not part of this promotion proof.

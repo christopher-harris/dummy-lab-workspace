@@ -1,22 +1,25 @@
-name: Promote Cloudflare Pages release
+name: Deploy Cloudflare Pages to dev
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      ref:
-        description: Commit SHA, branch, or tag to release. Leave blank to use the ref selected when dispatching the workflow.
-        required: false
-        type: string
 
 permissions:
   actions: read
   contents: read
 
-# A release promotes one immutable artifact through each stable environment.
-# Never cancel a deployment that may already be publishing a Pages version.
+# A dev deployment is always a complete, immutable release artifact. It is
+# retained so the promotion workflow can deploy this exact output later.
 concurrency:
-  group: cloudflare-pages-promotion
+  group: cloudflare-pages-dev
   cancel-in-progress: false
+
+env:
+  # Kept inline so a checkout from a historical commit cannot fail because it
+  # predates the repository's .nvmrc file.
+  NODE_VERSION: 22.23.0
 
 jobs:
   build:
@@ -27,14 +30,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.ref }}
           filter: tree:0
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - run: npm ci
 
@@ -45,9 +47,9 @@ jobs:
       - name: Build dummy-lab
         run: npm exec nx -- build dummy-lab --configuration=production --base-href=/
 
-      # The artifact contains the static Angular output and the Pages Function
-      # source. Wrangler discovers the sibling functions directory when each
-      # deployment job runs; it never rebuilds the Angular application.
+      # The artifact contains the static Angular output and Pages Function
+      # source. Wrangler discovers the sibling functions directory during
+      # deployment; no deployment job rebuilds Angular.
       - name: Package immutable Cloudflare Pages release
         shell: bash
         run: |
@@ -80,7 +82,7 @@ jobs:
           retention-days: 14
 
   deploy-dev:
-    name: Promote release to dev
+    name: Deploy release to dev
     needs: build
     runs-on: ubuntu-latest
     environment: dev
@@ -91,87 +93,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .nvmrc
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       # This installs Wrangler only. The Angular build output comes solely
-      # from the artifact created by the build job.
-      - run: npm ci --ignore-scripts
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: cloudflare-pages-release
-          path: cloudflare-pages-release
-
-      - name: Verify downloaded release
-        working-directory: cloudflare-pages-release
-        run: sha256sum --check SHA256SUMS
-
-      - name: Deploy exact release artifact
-        working-directory: cloudflare-pages-release
-        run: |
-          set -euo pipefail
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          test -n "$CLOUDFLARE_API_TOKEN"
-          npm exec wrangler pages deploy browser \
-            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
-            --commit-hash "${{ needs.build.outputs.commit_sha }}" \
-            --commit-message "${{ github.workflow }} #${{ github.run_number }}" \
-            --commit-dirty=true
-
-  deploy-stage:
-    name: Promote release to stage
-    needs: deploy-dev
-    runs-on: ubuntu-latest
-    environment: stage
-    env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_PAGES_PROJECT: dummy-lab-stage
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'npm'
-
-      - run: npm ci --ignore-scripts
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: cloudflare-pages-release
-          path: cloudflare-pages-release
-
-      - name: Verify downloaded release
-        working-directory: cloudflare-pages-release
-        run: sha256sum --check SHA256SUMS
-
-      - name: Deploy exact release artifact
-        working-directory: cloudflare-pages-release
-        run: |
-          set -euo pipefail
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          test -n "$CLOUDFLARE_API_TOKEN"
-          npm exec wrangler pages deploy browser \
-            --project-name "$CLOUDFLARE_PAGES_PROJECT" \
-            --commit-hash "${{ needs.build.outputs.commit_sha }}" \
-            --commit-message "${{ github.workflow }} #${{ github.run_number }}" \
-            --commit-dirty=true
-
-  deploy-prod:
-    name: Promote release to prod
-    needs: deploy-stage
-    runs-on: ubuntu-latest
-    environment: prod
-    env:
-      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_PAGES_PROJECT: dummy-lab-prod
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: 'npm'
-
+      # from the immutable artifact created by the build job.
       - run: npm ci --ignore-scripts
 
       - uses: actions/download-artifact@v4
