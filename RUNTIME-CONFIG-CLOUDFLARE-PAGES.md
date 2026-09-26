@@ -328,6 +328,26 @@ Direct Upload is intentional: Cloudflare Git integration builds each Pages
 project independently. This proof requires GitHub Actions to build once and
 upload that exact output to every environment.
 
+Set each project's production branch to `main`. The workflows explicitly pass
+`--branch main`, which makes the deployment production only when that setting
+matches. This is essential because the project `*.pages.dev` domain and the
+Production `RUNTIME_CONFIG_JSON` binding apply only to production deployments;
+hash-based deployment URLs are previews. If an existing Direct Upload project
+has a different production branch, update it to `main` before its next release.
+Cloudflare does not expose that control for an existing Direct Upload project
+in the dashboard; use its Pages Project API once per project:
+
+```bash
+curl --request PATCH \
+  "https://api.cloudflare.com/client/v4/accounts/<account-id>/pages/projects/<project-name>" \
+  --header "Authorization: Bearer <api-token>" \
+  --header "Content-Type: application/json" \
+  --data '{"production_branch":"main"}'
+```
+
+Use `dummy-lab-dev`, `dummy-lab-stage`, and `dummy-lab-prod` as the project
+names. Do not place the API token in the repository or workflow logs.
+
 ### Cloudflare dashboard checklist
 
 1. In **Workers & Pages**, create a Pages project with **Direct Upload** for
