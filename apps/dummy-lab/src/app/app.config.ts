@@ -18,6 +18,6 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor])
     ),
-    providePrimeNgPlatform(),
+    providePrimeNgPlatform({ themeSource: 'figma-preview' }),
   ],
 };

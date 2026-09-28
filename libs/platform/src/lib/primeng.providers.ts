@@ -12,10 +12,14 @@ import {
   WINGSTOP_BRAND_PRIMITIVES,
   WINGSTOP_BUTTON_TOKENS,
 } from './theme/buttons.tokens';
-import {MyPreset, WINGSTOP_PRESET} from "./wingstop.preset";
+import { FIGMA_V21_PREVIEW_PRESET } from './figma-v21-preview.preset';
+
+export type PrimeNgThemeSource = 'workspace' | 'figma-preview';
 
 /** Options accepted by {@link providePrimeNgPlatform}. */
 export interface PrimeNgPlatformOptions {
+  /** Select the workspace theme or the temporary Figma-to-v21 preview. */
+  themeSource?: PrimeNgThemeSource;
   /**
    * Base preset to theme PrimeNG with.
    *
@@ -58,20 +62,32 @@ export interface PrimeNgPlatformOptions {
  * @example
  * // Lara instead of Aura, with ripple on.
  * providePrimeNgPlatform({ preset: Lara, config: { ripple: true } });
+ *
+ * @example
+ * // Preview the generated Figma tokens on PrimeNG v21.
+ * providePrimeNgPlatform({ themeSource: 'figma-preview' });
  */
 export function providePrimeNgPlatform(
   options: PrimeNgPlatformOptions = {},
 ): EnvironmentProviders {
-  const { preset = DEFAULT_PRIMENG_PRESET, config } = options;
+  const {
+    preset = DEFAULT_PRIMENG_PRESET,
+    config,
+    themeSource = 'workspace',
+  } = options;
+
+  const themePreset =
+    themeSource === 'figma-preview'
+      ? FIGMA_V21_PREVIEW_PRESET
+      : definePreset(preset, {
+          primitive: WINGSTOP_BRAND_PRIMITIVES,
+          components: { button: WINGSTOP_BUTTON_TOKENS },
+        });
 
   return providePrimeNG({
-    // ...config,
+    ...config,
     theme: {
-      preset: MyPreset,
-      // preset: definePreset(preset, {
-      //   primitive: WINGSTOP_BRAND_PRIMITIVES,
-      //   components: { button: WINGSTOP_BUTTON_TOKENS },
-      // }),
+      preset: themePreset,
       options: PRIMENG_THEME_OPTIONS,
     },
   });

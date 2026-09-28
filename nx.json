@@ -19,7 +19,7 @@
     "@angular/build:application": {
       "cache": true,
       "dependsOn": ["^build"],
-      "inputs": ["default", "^default"]
+      "inputs": ["default", "^default", "figmaTheme"]
     },
     "@nx/eslint:lint": {
       "cache": true,
@@ -34,7 +34,7 @@
     },
     "@angular/build:unit-test": {
       "cache": true,
-      "inputs": ["default", "^default"]
+      "inputs": ["default", "^default", "figmaTheme"]
     },
     "@nx/vitest:test": {
       "cache": true,
@@ -69,6 +69,7 @@
   "nxCloudId": "6ab2c7f0ecc2c1f41867fa7b",
   "namedInputs": {
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
-    "default": ["sharedGlobals"]
+    "default": ["sharedGlobals"],
+    "figmaTheme": ["{workspaceRoot}/theme/js/**/*"]
   }
 }
