@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {UsersStore} from "@dummy-lab/data-access-users";
 import {AvatarModule} from 'primeng/avatar';
 import {CardModule} from 'primeng/card';
@@ -9,6 +9,7 @@ import {TagModule} from 'primeng/tag';
   selector: 'dl-account',
   imports: [AvatarModule, CardModule, SkeletonModule, TagModule],
   templateUrl: './account.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './account.page.css',
 })
 export class AccountPage {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { DividerModule } from 'primeng/divider';
 import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
@@ -25,6 +25,7 @@ interface TopProduct {
     TopPostsCardComponent,
   ],
   templateUrl: './dashboard.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.page.css',
 })
 export class DashboardPage {

@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, signal, ChangeDetectionStrategy} from '@angular/core';
 import {CartProduct, CartsStore} from "@dummy-lab/data-access-carts";
 import {CommonModule, CurrencyPipe, JsonPipe, NgOptimizedImage} from "@angular/common";
 import {TableModule} from "primeng/table";
@@ -22,6 +22,7 @@ import {ProductsStore, productsEvents} from "@dummy-lab/data-access-products";
     TagModule
   ],
   templateUrl: './carts.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './carts.page.css',
 })
 export class CartsPage {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CartsStore } from '@dummy-lab/data-access-carts';
 import { UsersStore } from '@dummy-lab/data-access-users';
 import {SkeletonModule} from "primeng/skeleton";
@@ -29,6 +29,7 @@ export interface BaseStat {
   selector: 'dl-base-stats',
   imports: [SkeletonModule],
   templateUrl: './base-stats.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './base-stats.component.css',
 })
 export class BaseStatsComponent {

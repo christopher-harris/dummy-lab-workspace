@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {RecipesStore} from "@dummy-lab/data-access-recipes";
 import {JsonPipe} from "@angular/common";
 
@@ -8,6 +8,7 @@ import {JsonPipe} from "@angular/common";
     JsonPipe
   ],
   templateUrl: './recipes.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './recipes.page.css',
 })
 export class RecipesPage {

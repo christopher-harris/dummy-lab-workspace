@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, ChangeDetectionStrategy} from '@angular/core';
 import {TodosStore} from "@dummy-lab/data-access-todos";
 import {JsonPipe} from "@angular/common";
 
@@ -8,6 +8,7 @@ import {JsonPipe} from "@angular/common";
     JsonPipe
   ],
   templateUrl: './todos.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './todos.page.css',
 })
 export class TodosPage {

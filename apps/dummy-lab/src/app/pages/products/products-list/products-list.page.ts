@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {ProductsStore, Product, productsEvents} from '@dummy-lab/data-access-products';
@@ -33,6 +33,7 @@ type Layout = 'list' | 'grid';
     RouterLink,
   ],
   templateUrl: './products-list.page.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './products-list.page.css',
 })
 export class ProductsListPage {
