@@ -32,7 +32,7 @@ import type { ButtonDesignTokens } from '@primeuix/themes/types/button';
         badgeSize: "1rem",
         transitionDuration: "{form.field.transition.duration}",
         primary: {
-            background: "{Wingstop Green}",
+            background: "{wingstopGreen}",
             hoverBackground: "{primary.hover.color}",
             activeBackground: "{primary.active.color}",
             borderColor: "{primary.color}",
