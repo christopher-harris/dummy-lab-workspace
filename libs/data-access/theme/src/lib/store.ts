@@ -3,7 +3,7 @@ import {
   withDevtools,
   withLocalStorage,
   withStorageSync,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { updatePrimaryPalette } from '@primeuix/themes';
 import {
   patchState,

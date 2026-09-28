@@ -3,7 +3,7 @@ import {
   httpMutation,
   withDevtools, withMutations,
   withStorageSync,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import {patchState, signalStore, withComputed, withProps, withState} from '@ngrx/signals';
 import type { AuthLoginCredentials, AuthSession } from './models';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';

@@ -3,7 +3,7 @@ import {
   withCallState,
   withDevtools,
   withEntityResources, withResource,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import {signalStore, withComputed, withProps, withState} from '@ngrx/signals';
 
 import { fetchAllProductCategories, fetchProducts } from './api';

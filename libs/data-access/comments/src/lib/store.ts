@@ -3,7 +3,7 @@ import {
   withCallState,
   withDevtools,
   withEntityResources,
-} from '@angular-architects/ngrx-toolkit';
+} from '@ngrx-toolkit/core';
 import { signalStore, withProps } from '@ngrx/signals';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
