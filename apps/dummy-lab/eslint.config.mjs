@@ -24,6 +24,9 @@ export default [
           style: 'kebab-case',
         },
       ],
+      // Newly enabled by angular-eslint's tsRecommended set (bumped alongside this migration);
+      // was not enforced before the upgrade and was not explicitly configured by the user.
+      '@angular-eslint/prefer-on-push-component-change-detection': 'off',
     },
   },
   {
