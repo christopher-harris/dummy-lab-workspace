@@ -1,20 +1,20 @@
-import {Component, computed, effect, inject, signal, ChangeDetectionStrategy} from '@angular/core';
-import {ButtonModule} from 'primeng/button';
-import {IconField} from 'primeng/iconfield';
-import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {CommonModule} from '@angular/common';
-import {Router, RouterLink, Routes} from '@angular/router';
-import {MenuItem} from 'primeng/api';
-import {MenubarModule, MenubarPassThrough} from 'primeng/menubar';
-import {ToolbarModule, ToolbarPassThrough} from 'primeng/toolbar';
-import {AvatarModule} from 'primeng/avatar';
-import {MenuModule} from 'primeng/menu';
-import {PRIMARY_COLORS, ThemeStore} from "@dummy-lab/data-access-theme";
-import {authEvents, AuthStore} from "@dummy-lab/data-access-auth";
-import {injectDispatch} from "@ngrx/signals/events";
-import {UsersStore} from "@dummy-lab/data-access-users";
+import { Component, computed, inject } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, Routes } from '@angular/router';
+import { MenuItem } from 'primeng/api';
+import { MenubarModule, MenubarPassThrough } from 'primeng/menubar';
+import { ToolbarModule, ToolbarPassThrough } from 'primeng/toolbar';
+import { AvatarModule } from 'primeng/avatar';
+import { MenuModule } from 'primeng/menu';
+import { PRIMARY_COLORS, ThemeStore } from '@dummy-lab/data-access-theme';
+import { authEvents, AuthStore } from '@dummy-lab/data-access-auth';
+import { injectDispatch } from '@ngrx/signals/events';
+import { UsersStore } from '@dummy-lab/data-access-users';
 
 @Component({
   selector: 'dl-navbar',
@@ -33,7 +33,6 @@ import {UsersStore} from "@dummy-lab/data-access-users";
     MenuModule,
   ],
   templateUrl: './navbar.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './navbar.component.css',
 })
 export class NavbarComponent {
@@ -86,7 +85,7 @@ export class NavbarComponent {
     {
       label: 'Logout',
       command: () => this.onLogoutClicked(),
-    }
+    },
   ]);
 
   toolbarPassThrough: ToolbarPassThrough = {
@@ -110,18 +109,7 @@ export class NavbarComponent {
     },
   };
 
-  constructor() {
-    // console.log(this.themeStore.isDark());
-    // console.log(this.router.config);
-    effect(() => {
-      console.log(this.menuItems());
-      console.log(this.authStore.isLoggedIn());
-    });
-  }
-
   onLogoutClicked() {
-    console.log('logout clicked');
     this.authActions.logoutRequested();
   }
-
 }

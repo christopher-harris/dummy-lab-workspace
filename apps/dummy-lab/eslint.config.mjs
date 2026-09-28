@@ -24,9 +24,20 @@ export default [
           style: 'kebab-case',
         },
       ],
-      // Newly enabled by angular-eslint's tsRecommended set (bumped alongside this migration);
-      // was not enforced before the upgrade and was not explicitly configured by the user.
-      '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+      // Angular v22 makes OnPush the default: a component with no `changeDetection`
+      // is checked using OnPush. The v22 migration (`chore: [nx migration]
+      // change-detection-eager`) added an explicit `ChangeDetectionStrategy.Eager`
+      // to all 21 components to preserve the old implicit `Default`; those were
+      // reviewed and removed, so every component now inherits the OnPush default.
+      //
+      // `allowExplicitOnPush: false` keeps one way to express it — omission. A
+      // component that genuinely needs eager checking sets `Eager` with an
+      // `eslint-disable-next-line` and a written reason, so the exception is
+      // reviewable instead of invisible.
+      '@angular-eslint/prefer-on-push-component-change-detection': [
+        'error',
+        { allowExplicitOnPush: false },
+      ],
     },
   },
   {

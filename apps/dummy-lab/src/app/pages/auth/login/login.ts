@@ -1,23 +1,15 @@
-import {Component, inject, signal, ChangeDetectionStrategy} from '@angular/core';
-import {ButtonModule} from "primeng/button";
-import {CheckboxModule} from "primeng/checkbox";
-import {InputTextModule} from "primeng/inputtext";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
-import {authEvents, AuthLoginCredentials, AuthStore} from "@dummy-lab/data-access-auth";
-import {injectDispatch} from "@ngrx/signals/events";
-
-type LoginForm = Omit<AuthLoginCredentials, 'expiresInMins'>;
+import { Component, inject, signal } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { authEvents, AuthStore } from '@dummy-lab/data-access-auth';
+import { injectDispatch } from '@ngrx/signals/events';
 
 @Component({
   selector: 'dl-login',
-  imports: [
-    ButtonModule,
-    InputTextModule,
-    CheckboxModule,
-    ReactiveFormsModule,
-  ],
+  imports: [ButtonModule, InputTextModule, CheckboxModule, ReactiveFormsModule],
   templateUrl: './login.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './login.css',
 })
 export class Login {
@@ -33,7 +25,6 @@ export class Login {
   });
 
   onSignInClicked() {
-    console.log(this.loginForm.getRawValue());
     if (this.loginForm.valid) {
       this.authEvents.loginSubmitted(this.loginForm.getRawValue());
     }

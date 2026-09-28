@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
@@ -6,7 +6,6 @@ import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
   imports: [RouterOutlet],
   selector: 'dl-root',
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.scss',
 })
 export class App {

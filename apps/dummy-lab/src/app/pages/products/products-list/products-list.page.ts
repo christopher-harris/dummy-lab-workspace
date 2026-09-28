@@ -1,9 +1,13 @@
-import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {ProductsStore, Product, productsEvents} from '@dummy-lab/data-access-products';
+import {
+  ProductsStore,
+  Product,
+  productsEvents,
+} from '@dummy-lab/data-access-products';
 import { DataViewModule } from 'primeng/dataview';
-import {SelectChangeEvent, SelectModule} from 'primeng/select';
+import { SelectChangeEvent, SelectModule } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TagModule } from 'primeng/tag';
 import { RatingModule } from 'primeng/rating';
@@ -12,7 +16,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { MessageModule } from 'primeng/message';
 import { SelectItem } from 'primeng/api';
 import { RouterLink } from '@angular/router';
-import {injectDispatch} from "@ngrx/signals/events";
+import { injectDispatch } from '@ngrx/signals/events';
 
 type Layout = 'list' | 'grid';
 
@@ -33,7 +37,6 @@ type Layout = 'list' | 'grid';
     RouterLink,
   ],
   templateUrl: './products-list.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './products-list.page.css',
 })
 export class ProductsListPage {
@@ -57,7 +60,9 @@ export class ProductsListPage {
 
   readonly sortKey = signal<string | null>(null);
   readonly sortField = computed(() => this.sortKey()?.replace('!', '') ?? '');
-  readonly sortOrder = computed(() => (this.sortKey()?.startsWith('!') ? -1 : 1));
+  readonly sortOrder = computed(() =>
+    this.sortKey()?.startsWith('!') ? -1 : 1,
+  );
 
   /** Placeholder rows for the skeleton templates. */
   readonly skeletons = Array.from({ length: 8 });
@@ -73,8 +78,6 @@ export class ProductsListPage {
   }
 
   onCategoryChange(event: SelectChangeEvent) {
-    console.log(event);
     this.productsActions.productCategorySelected(event.value);
   }
-
 }

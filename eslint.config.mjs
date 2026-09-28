@@ -56,7 +56,18 @@ export default [
       '**/*.cjs',
       '**/*.mjs',
     ],
-    // Override or add rules here
-    rules: {},
+    rules: {
+      // `no-explicit-any` and `no-unused-vars` ship as warnings in the
+      // typescript-eslint recommended set. Every lint target sets
+      // `maxWarnings: 0`, so a warning already fails the build — these are
+      // errors so the failure names the real problem rather than a count.
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unused-vars': 'error',
+      // Debug logging has twice reached this repo carrying credentials
+      // (a raw login form value and a persisted session). `warn`/`error` stay
+      // allowed for genuine diagnostics such as the bootstrap failure handler
+      // in `main.ts`.
+      'no-console': ['error', { allow: ['warn', 'error'] }],
+    },
   },
 ];

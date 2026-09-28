@@ -2,22 +2,23 @@ import { computed, inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
-  withEntityResources, withResource,
+  withEntityResources,
+  withResource,
 } from '@ngrx-toolkit/core';
-import {signalStore, withComputed, withProps, withState} from '@ngrx/signals';
+import { signalStore, withComputed, withProps, withState } from '@ngrx/signals';
 
 import { fetchAllProductCategories, fetchProducts } from './api';
-import {Product, ProductCategory, ProductsResponse} from './models';
-import {httpResource} from "@angular/common/http";
+import { Product, ProductCategory, ProductsResponse } from './models';
+import { httpResource } from '@angular/common/http';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
-import {on, withReducer} from "@ngrx/signals/events";
-import {productsEvents} from "./events";
-import {withRouterContext} from "@dummy-lab/shared-state";
-import {PRODUCT_ID_PARAM} from "./route-params";
+import { on, withReducer } from '@ngrx/signals/events';
+import { productsEvents } from './events';
+import { withRouterContext } from '@dummy-lab/shared-state';
+import { PRODUCT_ID_PARAM } from './route-params';
 
 type ProductsState = {
-  previewProductId: number | undefined,
-  selectedCategory: ProductCategory | undefined,
+  previewProductId: number | undefined;
+  selectedCategory: ProductCategory | undefined;
 };
 
 const initialState: ProductsState = {
@@ -46,22 +47,24 @@ export const ProductsStore = signalStore(
     }),
   })),
   withCallState({ collection: 'productsRequest' }),
-  withResource(({apiBaseUrl, previewProductId, routeProductId, selectedCategory}) => ({
-    allProducts: httpResource<ProductsResponse>(() => {
-      const category = selectedCategory();
-      return category
-        ? `${apiBaseUrl}/products/category/${category.slug}`
-        : `${apiBaseUrl}/products`;
+  withResource(
+    ({ apiBaseUrl, previewProductId, routeProductId, selectedCategory }) => ({
+      allProducts: httpResource<ProductsResponse>(() => {
+        const category = selectedCategory();
+        return category
+          ? `${apiBaseUrl}/products/category/${category.slug}`
+          : `${apiBaseUrl}/products`;
+      }),
+      productPreview: httpResource<Product>(() => {
+        const id = previewProductId();
+        return id ? `${apiBaseUrl}/products/${id}` : undefined;
+      }),
+      selectedProduct: httpResource<Product>(() => {
+        const id = routeProductId();
+        return id ? `${apiBaseUrl}/products/${id}` : undefined;
+      }),
     }),
-    productPreview: httpResource<Product>(() => {
-      const id = previewProductId();
-      return id ? `${apiBaseUrl}/products/${id}` : undefined;
-    }),
-    selectedProduct: httpResource<Product>(() => {
-      const id = routeProductId();
-      return id ? `${apiBaseUrl}/products/${id}` : undefined;
-    }),
-  })),
+  ),
   withEntityResources(({ apiBaseUrl }) => ({
     products: resource<Product[], void>({
       loader: ({ abortSignal }) => fetchProducts(apiBaseUrl, abortSignal),
@@ -77,8 +80,14 @@ export const ProductsStore = signalStore(
     }),
   })),
   withReducer(
-    on(productsEvents.productPreviewSelected, (event) => ({previewProductId: event.payload})),
-    on(productsEvents.productPreviewCleared, () => ({previewProductId: undefined})),
-    on(productsEvents.productCategorySelected, (event, state) => ({selectedCategory:event.payload }))
-  )
+    on(productsEvents.productPreviewSelected, (event) => ({
+      previewProductId: event.payload,
+    })),
+    on(productsEvents.productPreviewCleared, () => ({
+      previewProductId: undefined,
+    })),
+    on(productsEvents.productCategorySelected, (event) => ({
+      selectedCategory: event.payload,
+    })),
+  ),
 );

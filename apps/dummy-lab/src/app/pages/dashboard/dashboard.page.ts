@@ -1,11 +1,10 @@
-import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component } from '@angular/core';
 import { DividerModule } from 'primeng/divider';
-import { Router } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { BaseStatsComponent } from './components/base-stats/base-stats.component';
-import {TopPostsCardComponent} from "./components/top-posts-card/top-posts-card.component";
+import { TopPostsCardComponent } from './components/top-posts-card/top-posts-card.component';
 
 /** Placeholder row in the "top products" panel — static mock data for now. */
 interface TopProduct {
@@ -25,19 +24,9 @@ interface TopProduct {
     TopPostsCardComponent,
   ],
   templateUrl: './dashboard.page.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './dashboard.page.css',
 })
 export class DashboardPage {
-  router = inject(Router);
-  routeConfig = this.router.config;
-
-  apps = computed(() =>
-    this.routeConfig.filter(
-      (route) => route.path !== '' && route.path !== 'dashboard',
-    ),
-  );
-
   breadcrumbs: MenuItem[] = [{ label: 'Dashboard', url: '#' }];
 
   items: MenuItem[] = [
@@ -91,10 +80,4 @@ export class DashboardPage {
       icon: 'pi pi-database',
     },
   ];
-
-  constructor() {
-    // effect(() => {
-    //     console.log(this.routeConfig);
-    // });
-  }
 }

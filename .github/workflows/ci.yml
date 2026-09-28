@@ -34,6 +34,10 @@ jobs:
       - run: npm ci
       - uses: nrwl/nx-set-shas@v5
 
+      # Formatting is a whole-repo check, not an affected one: `nx format:check`
+      # compares against the base SHA set by nx-set-shas above.
+      - run: npx nx format:check
+
       # Prepend any command with "nx record --" to record its logs to Nx Cloud
       # - run: npx nx record -- echo Hello World
       - run: npx nx affected -t lint test build
