@@ -145,7 +145,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{Wingstop Green}"
+          "$value": "{wingstopGreen}"
         },
         "color": {
           "$type": "color",
@@ -2245,7 +2245,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{Wingstop Green}"
+          "$value": "{wingstopGreen}"
         },
         "color": {
           "$type": "color",
@@ -6337,7 +6337,7 @@
     }
   },
   "aura/custom": {
-    "Wingstop Green": {
+    "wingstopGreen": {
       "$type": "color",
       "$value": "#006938ff"
     }
