@@ -70,6 +70,6 @@
   "namedInputs": {
     "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"],
     "default": ["sharedGlobals"],
-    "figmaTheme": ["{workspaceRoot}/theme/js/**/*"]
+    "figmaTheme": ["{workspaceRoot}/theme/ts/**/*"]
   }
 }

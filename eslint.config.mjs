@@ -21,7 +21,7 @@ export default [
           enforceBuildableLibDependency: true,
           allow: [
             '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
-            '^\\.\\./\\.\\./\\.\\./\\.\\./theme/js/index\\.js$',
+            '^\\.\\./\\.\\./\\.\\./\\.\\./theme/ts$',
           ],
           depConstraints: [
             {

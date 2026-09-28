@@ -60,7 +60,7 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Forms & validation | 🟡 Partial | login uses a typed reactive form with required validation; no shared validators, cross-field/async validation, or server-error mapping |
 | Guards / resolvers / error routes | 🟡 Partial | `accountGuard` redirects unauthenticated users; no resolver, unauthorized/404/error routes, or guard tests |
 | Auth vs account boundary | 🟡 Partial | persisted `AuthStore`, login mutation/events, auth interceptor, and authenticated `/auth/me` resource exist; no refresh/expiry policy and current-user data still lives in `UsersStore` |
-| Environment config | ❌ Absent | `DUMMY_JSON_BASE_URL` is a hardcoded const |
+| Environment config | ✅ Proven | runtime config loads before bootstrap from `/runtime-config.json`; typed `RUNTIME_CONFIG` is consumed by app and data-access code; Cloudflare varies configuration, not the application artifact |
 | MSW / test factories | ❌ Absent | 9 of 12 lib specs are `expect(true).toBe(true)` |
 | Error taxonomy / `ErrorHandler` / fallback UI | ❌ Absent | `provideBrowserGlobalErrorListeners()` only |
 | Accessibility | ❌ Absent | no axe, no a11y lint rules, no stated WCAG target |
@@ -239,10 +239,17 @@ reporting. Keep it off for libs without real templates or the coverage numbers l
 
 ---
 
-### ☐ P8 — Runtime vs build-time environment config
+### ☑ P8 — Runtime vs build-time environment config
 
-**Today:** `DUMMY_JSON_BASE_URL` is a hardcoded `const` in `libs/shared/utils/src/lib/config.ts`.
-There is no environment story at all.
+**Done:** `@dummy-lab/shared-runtime-config` fetches, validates, and freezes
+`/runtime-config.json` through an app initializer before Angular bootstraps. Its typed
+`RUNTIME_CONFIG` token supplies `apiBaseUrl` and public feature flags to the app and every
+data-access store; `DUMMY_JSON_BASE_URL` and build-time `fileReplacements` are gone.
+
+The Cloudflare Pages function serves environment-specific `RUNTIME_CONFIG_JSON` with
+`Cache-Control: no-store`, while the deployment workflows build the static application once and
+promote that immutable artifact. `runtime-config` has seven passing unit tests covering parsing,
+normalization, loading, and failure handling.
 
 **Why it matters:** this is disproportionate leverage. `ngfe-web` has **27 build configurations and
 25 serve configurations**, each with its own `fileReplacements`. The **27 → 3 reduction is named as
@@ -416,7 +423,7 @@ the taxonomy enforced with a failing negative test, both missing lib types in ex
 `affected` narrows, two apps with a real blast-radius rule, and no repository leaking out of a lib
 barrel.
 
-Then **P6 + P8 + P9** (~2.5 days) because they're cheap and they stop the reference implementation
+Then **P6 + P9** (~1.5 days) because they're cheap and they stop the reference implementation
 from modelling things you're calling defects in `ngfe-web`.
 
 Then **P5 + P7 + P10** as the block that decides whether a real domain migration survives contact.

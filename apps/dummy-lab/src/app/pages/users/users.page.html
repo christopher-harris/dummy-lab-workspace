@@ -1,6 +1,6 @@
 <main>
 <!--  <pre> {{ usersStore.allUsersValue() | json }}</pre>-->
-  <p-dataView #dv [value]="usersStore.allUsersValue()?.users ?? []" [layout]="'list'">
+  <p-dataview #dv [value]="usersStore.allUsersValue()?.users ?? []" [layout]="'list'">
     <ng-template #header>
       <div class="flex justify-end">
         <p-selectbutton
@@ -18,7 +18,7 @@
     <ng-template #list let-users>
       @for (user of users; track user.email) { }
     </ng-template>
-  </p-dataView>
+  </p-dataview>
 
   <h1>Users</h1>
   <div class="">
