@@ -145,7 +145,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{primary.color}"
+          "$value": "{Wingstop Green}"
         },
         "color": {
           "$type": "color",
@@ -2245,7 +2245,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{primary.color}"
+          "$value": "{Wingstop Green}"
         },
         "color": {
           "$type": "color",
@@ -6336,7 +6336,12 @@
       }
     }
   },
-  "aura/custom": {},
+  "aura/custom": {
+    "Wingstop Green": {
+      "$type": "color",
+      "$value": "#006938ff"
+    }
+  },
   "aura/semantic/common": {
     "anchor": {
       "gutter": {
