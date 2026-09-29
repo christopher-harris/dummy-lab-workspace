@@ -6,7 +6,7 @@ import type { DialogDesignTokens } from '@primeuix/themes/types/dialog';
         borderColor: "{overlay.modal.border.color}",
         color: "{overlay.modal.color}",
         borderRadius: "{overlay.modal.border.radius}",
-        shadow: "0 8px 10px -6px #0000001a, 0 20px 25px -5px #0000001a"
+        shadow: "0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a"
     },
     header: {
         padding: "{overlay.modal.padding}",

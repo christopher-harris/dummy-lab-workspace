@@ -24,7 +24,7 @@ import type { SliderDesignTokens } from '@primeuix/themes/types/slider';
             hoverBackground: "{content.background}",
             width: "16px",
             height: "16px",
-            shadow: "0 1px 1px 0 #00000024, 0 1px 0 0 #00000014"
+            shadow: "0 1px 0 0 #00000014, 0 1px 1px 0 #00000024"
         },
         focusRing: {
             width: "{focus.ring.width}",

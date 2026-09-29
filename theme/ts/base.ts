@@ -296,7 +296,6 @@ export default {
     }
 },
     semantic: {
-    transitionDuration: "0.2s",
     focusRing: {
         width: "1px",
         style: "solid",
@@ -365,7 +364,6 @@ export default {
             offset: "0",
             shadow: "none"
         },
-        transitionDuration: "{transition.duration}",
         background: "light-dark({surface.0}, {surface.950})",
         disabledBackground: "light-dark({surface.200}, {surface.700})",
         filledBackground: "light-dark({surface.50}, {surface.800})",
@@ -411,8 +409,7 @@ export default {
             icon: {
                 color: "light-dark({surface.400}, {surface.500})",
                 focusColor: "light-dark({surface.500}, {surface.400})"
-            },
-            transitionDuration: "0s"
+            }
         },
         optionGroup: {
             padding: "0.5rem 0.75rem",
@@ -431,8 +428,7 @@ export default {
     },
     mask: {
         background: "light-dark(#00000066, #00000099)",
-        color: "{surface.200}",
-        transitionDuration: "0.2s"
+        color: "{surface.200}"
     },
     navigation: {
         list: {
@@ -452,8 +448,7 @@ export default {
                 color: "light-dark({surface.400}, {surface.500})",
                 focusColor: "light-dark({surface.500}, {surface.400})",
                 activeColor: "light-dark({surface.500}, {surface.400})"
-            },
-            transitionDuration: "0s"
+            }
         },
         submenuLabel: {
             padding: "0.5rem 0.75rem",
@@ -471,7 +466,7 @@ export default {
     overlay: {
         select: {
             borderRadius: "{border.radius.md}",
-            shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a",
+            shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a",
             background: "light-dark({surface.0}, {surface.900})",
             borderColor: "light-dark({surface.200}, {surface.700})",
             color: "{text.color}"
@@ -479,7 +474,7 @@ export default {
         popover: {
             borderRadius: "{border.radius.md}",
             padding: "0.75rem",
-            shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a",
+            shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a",
             background: "light-dark({surface.0}, {surface.900})",
             borderColor: "light-dark({surface.200}, {surface.700})",
             color: "{text.color}"
@@ -487,13 +482,13 @@ export default {
         modal: {
             borderRadius: "{border.radius.xl}",
             padding: "1.25rem",
-            shadow: "0 8px 10px -6px #0000001a, 0 20px 25px -5px #0000001a",
+            shadow: "0 20px 25px -5px #0000001a, 0 8px 10px -6px #0000001a",
             background: "light-dark({surface.0}, {surface.900})",
             borderColor: "light-dark({surface.200}, {surface.700})",
             color: "{text.color}"
         },
         navigation: {
-            shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a"
+            shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a"
         }
     }
 }

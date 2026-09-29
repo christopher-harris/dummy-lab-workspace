@@ -7,7 +7,7 @@ export default {
         borderColor: "{content.border.color}",
         color: "{content.color}",
         borderRadius: "{content.border.radius}",
-        shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a",
+        shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a",
         padding: "{overlay.popover.padding}"
     },
     header: {

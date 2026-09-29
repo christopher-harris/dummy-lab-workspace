@@ -141,14 +141,14 @@ import type { DataTableDesignTokens } from '@primeuix/themes/types/datatable';
             borderColor: "{overlay.select.border.color}",
             borderRadius: "{overlay.select.border.radius}",
             color: "{overlay.select.color}",
-            shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a"
+            shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a"
         },
         overlayPopover: {
             background: "{overlay.popover.background}",
             borderColor: "{overlay.popover.border.color}",
             borderRadius: "{overlay.popover.border.radius}",
             color: "{overlay.popover.color}",
-            shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a",
+            shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a",
             padding: "{overlay.popover.padding}",
             gap: "0.5rem"
         },

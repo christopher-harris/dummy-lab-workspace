@@ -22,7 +22,7 @@ export default {
             borderRadius: "2.625px",
             size: "0.375rem",
             background: "{primary.color}",
-            insetShadow: "0 1px 1px 0 #0000001f, 0 1px 0 0 #0000000f"
+            insetShadow: "0 1px 0 0 #0000000f, 0 1px 1px 0 #0000001f"
         }
     },
     eventConnector: {

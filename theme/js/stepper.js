@@ -40,7 +40,7 @@ export default {
         fontSize: "1.143rem",
         fontWeight: "500",
         borderRadius: "1rem",
-        shadow: "0 1px 1px 0 #0000001f, 0 1px 0 0 #0000000f"
+        shadow: "0 1px 0 0 #0000000f, 0 1px 1px 0 #0000001f"
     },
     steppanels: {
         padding: "0.875rem 0.5rem 1.125rem"

@@ -42,7 +42,7 @@ import type { MegaMenuDesignTokens } from '@primeuix/themes/types/megamenu';
         borderColor: "{content.border.color}",
         borderRadius: "{content.border.radius}",
         color: "{content.color}",
-        shadow: "0 2px 4px -2px #0000001a, 0 4px 6px -1px #0000001a",
+        shadow: "0 4px 6px -1px #0000001a, 0 2px 4px -2px #0000001a",
         gap: "0.5rem"
     },
     submenu: {

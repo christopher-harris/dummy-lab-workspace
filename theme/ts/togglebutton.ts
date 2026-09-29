@@ -45,7 +45,7 @@ import type { ToggleButtonDesignTokens } from '@primeuix/themes/types/togglebutt
         padding: "0.25rem 0.75rem",
         borderRadius: "{content.border.radius}",
         checkedBackground: "light-dark({surface.0}, {surface.800})",
-        checkedShadow: "0 1px 2px 0 #0000000a, 0 1px 2px 0 #00000005",
+        checkedShadow: "0 1px 2px 0 #00000005, 0 1px 2px 0 #0000000a",
         sm: {
             padding: "0.25rem 0.75rem"
         },
