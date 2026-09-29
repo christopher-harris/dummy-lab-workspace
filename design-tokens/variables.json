@@ -145,7 +145,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{wingstopGreen}"
+          "$value": "{amber.300}"
         },
         "color": {
           "$type": "color",
