@@ -30,7 +30,7 @@ export default {
         badgeSize: "1rem",
         transitionDuration: "{form.field.transition.duration}",
         primary: {
-            background: "{wingstopGreen}",
+            background: "light-dark({amber.300}, {wingstopGreen})",
             hoverBackground: "{primary.hover.color}",
             activeBackground: "{primary.active.color}",
             borderColor: "{primary.color}",
