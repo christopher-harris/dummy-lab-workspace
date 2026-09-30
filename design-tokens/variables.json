@@ -145,7 +145,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{amber.400}"
+          "$value": "{green.500}"
         },
         "color": {
           "$type": "color",
@@ -186,7 +186,7 @@
         "border": {
           "color": {
             "$type": "color",
-            "$value": "{primary.hover.color}"
+            "$value": "{green.500}"
           }
         },
         "focus": {
@@ -2245,7 +2245,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{wingstopGreen}"
+          "$value": "{green.500}"
         },
         "color": {
           "$type": "color",
@@ -2286,7 +2286,7 @@
         "border": {
           "color": {
             "$type": "color",
-            "$value": "{primary.hover.color}"
+            "$value": "{green.500}"
           }
         },
         "focus": {
@@ -4345,7 +4345,7 @@
       "primary": {
         "background": {
           "$type": "color",
-          "$value": "{blue.600}"
+          "$value": "{green.500}"
         },
         "color": {
           "$type": "color",
@@ -4386,7 +4386,7 @@
         "border": {
           "color": {
             "$type": "color",
-            "$value": "{primary.hover.color}"
+            "$value": "{green.500}"
           }
         },
         "focus": {
