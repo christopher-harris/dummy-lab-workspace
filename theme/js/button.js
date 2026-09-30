@@ -1,10 +1,10 @@
 export default {
     root: {
-        borderRadius: "{form.field.sm.padding.y}",
+        borderRadius: "4px",
         roundedBorderRadius: "2.25rem",
         gap: "0.625rem",
-        paddingX: "{form.field.padding.y}",
-        paddingY: "{form.field.border.radius}",
+        paddingX: "24px",
+        paddingY: "10px",
         iconOnlyWidth: "2.75rem",
         sm: {
             fontSize: "{overlay.modal.border.radius}",
@@ -30,30 +30,30 @@ export default {
         badgeSize: "1rem",
         transitionDuration: "{form.field.transition.duration}",
         primary: {
-            background: "{green.500}",
-            hoverBackground: "{primary.active.color}",
-            activeBackground: "{primary.hover.color}",
-            borderColor: "{green.500}",
-            hoverBorderColor: "{primary.active.color}",
-            activeBorderColor: "{primary.hover.color}",
-            color: "light-dark({form.field.filled.background}, {navigation.item.active.background})",
-            hoverColor: "light-dark({form.field.filled.background}, {navigation.item.active.background})",
-            activeColor: "light-dark({form.field.filled.background}, {navigation.item.active.background})",
+            background: "{emerald.700}",
+            hoverBackground: "{emerald.900}",
+            activeBackground: "{emerald.900}",
+            borderColor: "{emerald.700}",
+            hoverBorderColor: "{emerald.900}",
+            activeBorderColor: "{emerald.900}",
+            color: "{surface.0}",
+            hoverColor: "{surface.0}",
+            activeColor: "{surface.0}",
             focusRing: {
                 color: "{primary.hover.color}",
                 shadow: "none"
             }
         },
         secondary: {
-            background: "light-dark({surface.50}, {surface.900})",
-            hoverBackground: "light-dark({surface.300}, {surface.800})",
-            activeBackground: "light-dark({surface.200}, {surface.700})",
-            borderColor: "light-dark({surface.50}, {surface.900})",
-            hoverBorderColor: "light-dark({surface.300}, {surface.800})",
-            activeBorderColor: "light-dark({surface.200}, {surface.700})",
-            color: "light-dark({surface.700}, {surface.200})",
-            hoverColor: "light-dark({surface.800}, {surface.300})",
-            activeColor: "light-dark({surface.900}, {surface.50})",
+            background: "{yellow.500}",
+            hoverBackground: "{yellow.600}",
+            activeBackground: "{yellow.600}",
+            borderColor: "{yellow.500}",
+            hoverBorderColor: "{yellow.600}",
+            activeBorderColor: "{yellow.600}",
+            color: "{surface.950}",
+            hoverColor: "{surface.950}",
+            activeColor: "{surface.950}",
             focusRing: {
                 color: "light-dark({surface.700}, {surface.200})",
                 shadow: "none"
@@ -152,10 +152,10 @@ export default {
     },
     outlined: {
         primary: {
-            hoverBackground: "light-dark({primary.100}, #37d6a10a)",
-            activeBackground: "light-dark({primary.50}, #37d6a129)",
-            borderColor: "light-dark({primary.300}, {primary.800})",
-            color: "{primary.hover.color}"
+            hoverBackground: "{emerald.50}",
+            activeBackground: "{emerald.50}",
+            borderColor: "{emerald.700}",
+            color: "{emerald.700}"
         },
         secondary: {
             hoverBackground: "light-dark({surface.100}, #fafafa0a)",
@@ -200,17 +200,17 @@ export default {
             color: "light-dark({surface.900}, {surface.50})"
         },
         plain: {
-            hoverBackground: "light-dark({surface.100}, {surface.900})",
-            activeBackground: "light-dark({surface.50}, {surface.800})",
-            borderColor: "light-dark({surface.300}, {surface.700})",
-            color: "light-dark({surface.800}, {surface.50})"
+            hoverBackground: "{surface.200}",
+            activeBackground: "{surface.200}",
+            borderColor: "{surface.700}",
+            color: "{surface.700}"
         }
     },
     text: {
         primary: {
-            hoverBackground: "light-dark({primary.100}, #37d6a10a)",
-            activeBackground: "light-dark({primary.50}, #37d6a129)",
-            color: "{primary.hover.color}"
+            hoverBackground: "#00000000",
+            activeBackground: "#00000000",
+            color: "{emerald.700}"
         },
         secondary: {
             hoverBackground: "light-dark({surface.100}, {surface.900})",
