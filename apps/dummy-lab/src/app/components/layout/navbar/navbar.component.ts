@@ -105,7 +105,10 @@ export class NavbarComponent {
       class: 'border-0',
     },
     itemLabel: {
-      class: 'lg:hidden',
+      // `lg:hidden` would set display:none, which drops the label out of the
+      // accessibility tree and leaves these links with no discernible name.
+      // sr-only hides it visually while keeping it readable by screen readers.
+      class: 'lg:sr-only',
     },
   };
 

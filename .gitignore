@@ -31,3 +31,8 @@ apps/dummy-lab/.dev.vars.*
 apps/dummy-lab/.wrangler/
 
 vitest.config.*.timestamp*
+
+# Local performance/analytics output — Lighthouse reports, traces, LHCI runs.
+# Never committed: these are machine- and network-specific measurements, and the
+# HTML reports are large. Baselines worth keeping go in the docs as numbers.
+/analytics/

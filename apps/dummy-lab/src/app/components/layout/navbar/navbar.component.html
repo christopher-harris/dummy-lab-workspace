@@ -21,19 +21,6 @@
     </a>
     <div class="hidden lg:flex items-center justify-center gap-2">
       <p-menubar [model]="menuItems()" [pt]="menuPassThrough" />
-      <!--            @for (item of menuItems(); track item.label; let index = $index) {-->
-      <!--                <button pButton-->
-      <!--                        text-->
-      <!--                        class="p-2"-->
-      <!--                        [ngClass]="[-->
-      <!--                                selectedNav() === item.label-->
-      <!--                                    ? 'bg-primary-50 dark:bg-primary-400/10 text-primary-600 dark:text-primary-300 rounded-md outline outline-1 outline-primary-100 dark:outline-primary-300/30'-->
-      <!--                                    : 'text-surface-600 dark:text-surface-400'-->
-      <!--                            ]"-->
-      <!--                >-->
-      <!--                    <i pButtonIcon [class]="item.icon" class="text-base! leading-none!"></i>-->
-      <!--                </button>-->
-      <!--            }-->
     </div>
   </ng-template>
   <ng-template #center>
@@ -51,14 +38,29 @@
   </ng-template>
   <ng-template #end>
     <div class="flex items-center gap-2">
-      <p-button
+      <button
+        pButton
+        iconOnly
         text
         class="p-2 text-surface-600 dark:text-surface-400"
         (click)="themeStore.toggleDarkMode()"
-        [icon]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
-      ></p-button>
-      <button pButton text class="p-2 text-surface-600 dark:text-surface-400">
-        <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>
+        [attr.aria-label]="
+          themeStore.isDark() ? 'Switch to light mode' : 'Switch to dark mode'
+        "
+      >
+        <i
+          class="text-base! leading-none!"
+          [class]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+        ></i>
+      </button>
+      <button
+        pButton
+        iconOnly
+        text
+        class="p-2 text-surface-600 dark:text-surface-400"
+        aria-label="Notifications"
+      >
+        <i class="pi pi-bell text-base! leading-none!"></i>
       </button>
       <p-menu
         #colorMenu
@@ -83,13 +85,14 @@
       </p-menu>
       <button
         pButton
+        iconOnly
         text
         class="p-2 text-surface-600 dark:text-surface-400"
         aria-label="Theme settings"
         aria-haspopup="true"
         (click)="colorMenu.toggle($event)"
       >
-        <i pButtonIcon class="pi pi-cog text-base! leading-none!"></i>
+        <i class="pi pi-cog text-base! leading-none!"></i>
       </button>
     </div>
     <div class="flex items-center gap-2">
@@ -99,10 +102,12 @@
         Available
       </div>
       <p-menu #accountMenu [model]="accountMenuItems()" [popup]="true" />
-      <p-button
-        (click)="accountMenu.toggle($event)"
-        [icon]="!authStore.isLoggedIn() ? 'pi pi-user' : ''"
+      <button
+        pButton
         text
+        (click)="accountMenu.toggle($event)"
+        [attr.aria-label]="authStore.isLoggedIn() ? 'Account menu' : 'Sign in'"
+        aria-haspopup="true"
       >
         @if (authStore.isLoggedIn()) {
           <p-avatar
@@ -110,8 +115,10 @@
             [image]="usersStore.currentUserValue()?.image || ''"
             class="w-8 h-8 block cursor-pointer"
           ></p-avatar>
+        } @else {
+          <i class="pi pi-user"></i>
         }
-      </p-button>
+      </button>
     </div>
   </ng-template>
 </p-toolbar>
