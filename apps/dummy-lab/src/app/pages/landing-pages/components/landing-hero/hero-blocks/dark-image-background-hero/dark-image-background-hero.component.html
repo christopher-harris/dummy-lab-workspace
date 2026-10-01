@@ -1,10 +1,18 @@
 <div class="relative p-8 md:p-12 lg:p-20 overflow-hidden">
   <!-- 207 KiB of background art for a slide that is off-screen at first paint.
        Every slide lives in the same flex row at the top of the document, so
-       Chrome treats it as in-viewport and fetched it at High priority, against
-       the real LCP image. `@defer` (idle) keeps it out of the critical path;
-       idle lands well before autoplay reaches this slide at ~18s, so there is
-       no pop-in. The whole gradient stack stays on one element, so
+       Chrome treats it as in-viewport and fetches it at High priority, against
+       the real LCP image.
+
+       NOTE: this `@defer` does NOT currently fix that. Measured on dev
+       (lighthouse 2026-10-01): the request still starts at ~333ms at High
+       priority, because the default `on idle` trigger fires almost immediately
+       after first render. Real options are an `on viewport` / `on timer`
+       trigger, or — better — shrinking the asset via the Supabase
+       `/render/image/` endpoint's `width`/`quality` params.
+
+       The block is kept because moving the stack onto its own layer is correct
+       either way: all four gradient layers stay on one element, so
        `background-blend-mode` composites exactly as before. -->
   @defer {
     <div class="absolute inset-0" [style]="backgroundStyle()"></div>
