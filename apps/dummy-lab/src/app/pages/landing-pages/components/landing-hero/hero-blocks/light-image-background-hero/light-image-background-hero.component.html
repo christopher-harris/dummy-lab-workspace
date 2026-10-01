@@ -1,8 +1,10 @@
 <div class="relative p-20 overflow-hidden">
-  <div
-    class="absolute top-0 left-0 w-full h-full"
-    [style]="backgroundStyle()"
-  ></div>
+  @defer {
+    <div
+      class="absolute top-0 left-0 w-full h-full"
+      [style]="backgroundStyle()"
+    ></div>
+  }
 
   <div class="text-center my-12 relative">
     <div class="text-6xl text-white font-bold mb-1 leading-tight">

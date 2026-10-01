@@ -22,14 +22,10 @@
       class="overflow-hidden w-full aspect-720/295 max-w-[720px] rounded-t-3xl shadow-2xl border border-b-0 border-primary-100 dark:border-primary-400/30"
     >
       <img
-        [src]="content().image.light.src"
-        [alt]="content().image.light.alt"
-        class="block w-full h-full object-cover object-top rounded-t-3xl dark:hidden"
-      />
-      <img
-        [src]="content().image.dark.src"
-        [alt]="content().image.dark.alt"
-        class="hidden w-full h-full object-cover object-top rounded-t-3xl dark:block"
+        [src]="heroImage().src"
+        [alt]="heroImage().alt"
+        fetchpriority="high"
+        class="block w-full h-full object-cover object-top rounded-t-3xl"
       />
     </div>
   </div>

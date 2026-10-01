@@ -14,6 +14,14 @@
 </div>
 }
 
-<router-outlet />
+<!-- The footer is a shell concern and stays here, but routed pages are lazy
+     (`loadComponent`), so with an empty outlet it would paint at the top of the
+     viewport and then get shoved down once the page arrives — a ~0.88 layout
+     shift on the landing page. Reserving a screenful keeps the footer below the
+     fold at first paint; CLS only counts elements that shift while visible, so
+     its later move costs nothing. -->
+<div class="min-h-screen">
+  <router-outlet />
+</div>
 
 <dl-footer />

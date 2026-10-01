@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { ThemeStore } from '@dummy-lab/data-access-theme';
 
 export interface HeroImage {
   src: string;
@@ -32,6 +33,22 @@ const CDN =
   styleUrl: './centered-product-image-hero.component.css',
 })
 export class CenteredProductImage {
+  private readonly theme = inject(ThemeStore);
+
+  /**
+   * This is the page's LCP element, so it renders as a single `<img>` rather
+   * than a light/dark pair toggled with `dark:hidden`. A `display: none` image
+   * is still fetched, so the pair cost ~162 KiB to show ~81 KiB of it. Reading
+   * `isDark()` also keeps the swap tied to the in-app theme toggle — a
+   * `<picture>` with `prefers-color-scheme` would desync from it, because the
+   * theme store drives a class on `<html>`, not the OS setting.
+   */
+  readonly heroImage = computed(() =>
+    this.theme.isDark()
+      ? this.content().image.dark
+      : this.content().image.light,
+  );
+
   readonly content = signal<CenteredProductImageContent>({
     eyebrow: '🔥 12 signature flavors',
     headline: 'Where Flavor',

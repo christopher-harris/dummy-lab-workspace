@@ -29,15 +29,22 @@ describe('CenteredProductImage', () => {
     expect(text).toContain(ctaLabel);
   });
 
-  it('renders a light and a dark product shot', () => {
-    const sources = Array.from(
+  it('ships a single product shot, not a light/dark pair', () => {
+    // A `display: none` twin is still fetched, and this is the page's LCP
+    // element — so there must be exactly one, carrying the priority hint.
+    const images = Array.from(
       (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLImageElement>(
         'img',
       ),
-    ).map((img) => img.getAttribute('src'));
+    );
 
-    expect(sources).toContain(component.content().image.light.src);
-    expect(sources).toContain(component.content().image.dark.src);
+    expect(images).toHaveLength(1);
+    expect(images[0].getAttribute('src')).toBe(component.heroImage().src);
+    expect(images[0].getAttribute('fetchpriority')).toBe('high');
+  });
+
+  it('resolves the product shot to the light variant by default', () => {
+    expect(component.heroImage()).toEqual(component.content().image.light);
   });
 
   it('re-renders when the content signal changes', async () => {
