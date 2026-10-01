@@ -248,22 +248,22 @@
 
   /* Weight only — size is inherited so inline links inside a heading or a
      `<small>` do not jump to Hyperlink 2's 16px. */
-  a {
-    font-weight: var(--text-hyperlink-2--font-weight);
-  }
+  /*a {*/
+  /*  font-weight: var(--text-hyperlink-2--font-weight);*/
+  /*}*/
 
-  label {
-    font-size: var(--text-label);
-    line-height: var(--text-label--line-height);
-    font-weight: var(--text-label--font-weight);
-  }
+  /*label {*/
+  /*  font-size: var(--text-label);*/
+  /*  line-height: var(--text-label--line-height);*/
+  /*  font-weight: var(--text-label--font-weight);*/
+  /*}*/
 
-  button {
-    font-family: var(--font-display);
-    font-size: var(--text-button-2);
-    line-height: var(--text-button-2--line-height);
-    font-weight: var(--text-button-2--font-weight);
-    letter-spacing: var(--text-button-2--letter-spacing);
-    text-transform: uppercase;
-  }
+  /*button {*/
+  /*  font-family: var(--font-display);*/
+  /*  font-size: var(--text-button-2);*/
+  /*  line-height: var(--text-button-2--line-height);*/
+  /*  font-weight: var(--text-button-2--font-weight);*/
+  /*  letter-spacing: var(--text-button-2--letter-spacing);*/
+  /*  text-transform: uppercase;*/
+  /*}*/
 }

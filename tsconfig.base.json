@@ -37,6 +37,9 @@
       "@dummy-lab/platform": ["./libs/platform/src/index.ts"],
       "@dummy-lab/shared-runtime-config": [
         "./libs/shared/runtime-config/src/index.ts"
+      ],
+      "@dummy-lab/data-access-location": [
+        "./libs/data-access/location/src/index.ts"
       ]
     },
     "strict": false,

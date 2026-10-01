@@ -47,10 +47,11 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Router state in a SignalStore | ✅ Proven | `libs/shared/state/src/lib/signal-store/with-router-context.ts` — closes Plan §6 **gap 3** |
 | `httpResource` | ✅ Proven | all stores |
 | Tailwind v4 `@theme` type ramp + self-hosted display face | ✅ Proven | `styles/tailwind.css` |
-| PrimeNG with `cssLayer` ordering | ✅ Proven | `apps/dummy-lab/src/app/app.config.ts` |
+| PrimeNG with `cssLayer` ordering | ✅ Proven | `libs/platform/src/lib/primeng.config.ts:16-20` — order `theme, base, primeng, utilities`, exactly as the PrimeNG Tailwind guide prescribes for v4 |
 | Lib taxonomy — `data-access` + `util` axis | 🟡 Partial | no `ui`, no `feature` libs exist |
 | Vitest + coverage thresholds | 🟡 Partial | thresholds pass over placeholder specs |
-| Design tokens | 🟡 Partial | type ramp only; PrimeNG is stock Aura, no brand preset, no color tokens |
+| PrimeNG theming (generated Figma preset) | ✅ Proven | 86-component preset in `theme/ts`, wired via `providePrimeNgPlatform()` — `libs/platform/src/lib/primeng.providers.ts`; `updatePrimaryPalette`, `light-dark()`, `extend` and `cssLayer` order all match the PrimeNG 22.1.1 docs |
+| Figma → token pipeline | 🟡 Partial | export is committed, not built: no in-repo regeneration step and no CI check that `theme/` matches Figma; `primary` still maps to Aura blue (`theme/ts/base.ts:309`); Tailwind `@theme` carries no colour tokens |
 | **Tags / module boundaries** | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed |
 | Deploy topology (marketing / ordering / account) | ❌ Absent | one app |
 | SSR / SSG | ❌ Absent | no `@angular/ssr`, no server entry, no prerender |

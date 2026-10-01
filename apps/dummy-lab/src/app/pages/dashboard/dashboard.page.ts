@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 import { BaseStatsComponent } from './components/base-stats/base-stats.component';
 import { TopPostsCardComponent } from './components/top-posts-card/top-posts-card.component';
+import { ArrowRight } from "@primeicons/angular/arrow-right";
 
 /** Placeholder row in the "top products" panel — static mock data for now. */
 interface TopProduct {
@@ -22,6 +23,7 @@ interface TopProduct {
     MenuModule,
     BaseStatsComponent,
     TopPostsCardComponent,
+    ArrowRight,
   ],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.css',

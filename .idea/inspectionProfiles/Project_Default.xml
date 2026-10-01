@@ -1,0 +1,12 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <!-- The Angular plugin registers this inspection at level="ERROR", which is
+         stricter than the Angular compiler itself: ngtsc's unusedStandaloneImports
+         extended diagnostic defaults to Warning. The ERROR level makes WebStorm's
+         "Analyze code before commit" block the commit on something `nx build` only
+         warns about, and it misfires on attribute-selector components such as
+         @primeicons/angular's `svg[data-p-icon="..."]` icons. Sandbox repo: warn. -->
+    <inspection_tool class="AngularUnusedComponentImport" enabled="true" level="WARNING" enabled_by_default="true" />
+  </profile>
+</component>

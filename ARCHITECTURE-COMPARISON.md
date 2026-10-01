@@ -13,7 +13,8 @@ doc and the tree disagree, the tree wins and the disagreement is itself a findin
 >    `error`. That row flips from a dummy-lab loss to a dummy-lab win.
 > 2. **Five of the six §8 cleanup items are applied** to this tree: the change-detection regression
 >    (§2), the credential logging and `window.event` bug (§3.2, §3.3), the dead code (§3.5), and the
->    lint and format gates. The PrimeNG license key (§3.1) is open and needs a decision. Findings
+>    lint and format gates. The PrimeNG licence key (§3.1) turned out not to be a secrets issue at
+>    all — the placement is vendor-prescribed; what is open is its `dev` tier and expiry. Findings
 >    are left as written so the before/after stays legible.
 
 ---
@@ -159,7 +160,7 @@ Provenance, from git:
 The v22 migration mechanically preserved the pre-v22 behaviour by annotating every component. Then
 the migration enabled the lint rule that would have flagged it, and the rule was switched off:
 
-```js
+```text
 // apps/dummy-lab/eslint.config.mjs
 // Newly enabled by angular-eslint's tsRecommended set (bumped alongside this migration);
 // was not enforced before the upgrade and was not explicitly configured by the user.
@@ -186,28 +187,35 @@ precision that is the entire point of the signal graph.
 
 These are not in `PROVE-OUT.md`.
 
-### 3.1 A commercial PrimeNG license key is committed to source
+### 3.1 The PrimeNG licence key is a `dev`-tier key with an expiry
 
-`libs/platform/src/lib/primeng.providers.ts:58`
+`libs/platform/src/lib/primeng.providers.ts:50`
 
 ```ts
 license: 'eyJpZCI6ImMyZTY5OTFmLThmMTQtNDIwNS1iMmI2LWRkYzk3ZjJhNzhmYiIsInByb2R1Y3Qi...';
 ```
 
-A `tier: commercial`, `type: dev` JWT, in git, in a lib that every app imports, and it ships to the
-browser in the initial bundle. `PRD.md` states: _"Secrets and private credentials must not be
-committed."_ Rotate it and move it behind `RUNTIME_CONFIG` or a build-time define. Note this also
-means the "runtime config, zero secrets" story has a hole in the lib that provides it.
+**This is not a secrets finding, and an earlier version of this document filed it as one.** The
+PrimeNG `configuration` guide (License section) prescribes exactly this placement —
+`providePrimeNG({ license: 'PRIMEUI-LICENSE-KEY' })`. A PrimeUI key is a client-side key by
+design, like a publishable API token; it is meant to ship in the bundle, and moving it behind
+`RUNTIME_CONFIG` or a build-time define would be working against the vendor's model.
+
+What is genuinely open is the **tier and the clock**. The committed JWT decodes to
+`tier: commercial`, `type: dev`, `exp: 1798232400` — late December 2026. A `dev`-tier key
+shipping in a deployed artifact is a licensing-compliance question, and it expires on a date
+nobody is tracking. The decision to make is which commercial key this workspace should carry, and
+who renews it — not where to hide it.
 
 ### 3.2 Credentials are logged to the console
 
-```ts
+```text
 // apps/dummy-lab/src/app/pages/auth/login/login.ts:36
 onSignInClicked() {
   console.log(this.loginForm.getRawValue());   // { username, password }
 ```
 
-```ts
+```text
 // libs/data-access/auth/src/lib/store.ts:77,83
 loginRequested$: events.on(authEvents.loginSubmitted).pipe(
   tap((event: any) => { console.log('loginRequested$', event); ...   // payload = credentials
@@ -220,7 +228,7 @@ rule configured, so nothing catches it.
 
 ### 3.3 The DOM global `event` is silently bound
 
-```ts
+```text
 // libs/data-access/auth/src/lib/store.ts:88-89
 logoutRequested$: events.on(authEvents.logoutRequested).pipe(
   tap(() => {
@@ -237,7 +245,7 @@ flags a reference that happens to resolve to a browser global.
 
 ### 3.4 Auth tokens are persisted with no schema and no version key
 
-```ts
+```text
 // libs/data-access/auth/src/lib/store.ts:38
 withStorageSync('dummy-lab-auth'),
 ```
@@ -503,11 +511,11 @@ The runtime switch landed and is real. The migration it was supposed to enable d
 2. ~~Make lint bite.~~ **Done** — `maxWarnings: 0` on all 15 lint targets; `no-explicit-any`,
    `no-unused-vars` and `no-console` (allowing `warn`/`error`) raised to `error`. The `**/*.html`
    half was unnecessary; see the retraction in §1.
-3. **Rotate the PrimeNG license key — open, and yours.** It is already in git history, so no edit
-   un-commits it; it needs rotating at the vendor plus a decision on where the new one lives.
-   Runtime config would contradict `runtime-config.ts`'s own "never add credentials" invariant,
-   since that document is served to every browser. Left in place deliberately rather than moved
-   from one committed file to another.
+3. **Move the PrimeNG licence off the `dev` tier — open, and yours.** Not a rotation task: the
+   key belongs in `providePrimeNG` exactly where it sits, per the vendor's own configuration
+   guide, and it is a client-side key by design. What needs deciding is which commercial
+   (non-`dev`) key this workspace carries and who renews it before `exp` lands in late December
+   2026. See the correction in §3.1.
 4. ~~Delete the credential `console.log`s; fix the `window.event` bug.~~ **Done.**
 5. ~~Delete the dead code.~~ **Done** — `auth/api.ts`, three commented-out blocks in `auth/store.ts`,
    152 commented-out lines in `carts.page.ts`, `DashboardPage.apps`/`routeConfig`, five dead

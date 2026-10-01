@@ -6,7 +6,7 @@
       ></i>
     </a>
   </li>
-  @for (item of breadcrumbs; track item.label; let i = $index) {
+  @for (item of breadcrumbs; track item.label) {
   <li>
     <div
       class="w-[3px] h-[3px] bg-surface-300 dark:bg-surface-600 rounded-full"
@@ -317,15 +317,15 @@
       <div>
         <button
           pButton
-          pRipple
-          icon="pi pi-ellipsis-v"
           [text]="true"
           [rounded]="true"
           severity="secondary"
           aria-label="Team activity options"
           (click)="menu2.toggle($event)"
           #menuButton
-        ></button>
+        >
+          <i pButtonIcon class="pi pi-ellipsis-v"></i>
+        </button>
         <p-menu #menu2 [popup]="true" [model]="items" appendTo="body"></p-menu>
       </div>
     </div>
@@ -704,7 +704,10 @@
     </div>
 
     <div class="flex justify-center">
-      <p-button class="wing p-button-accent" [icon]="'pi pi-arrow-right'" [label]="'Learn More'" [iconPos]="'right'" />
+      <button pButton>
+        Learn More
+        <svg data-p-icon="arrow-right"></svg>
+      </button>
     </div>
   </div>
   <div
