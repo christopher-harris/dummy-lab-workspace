@@ -55,7 +55,7 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | **Tags / module boundaries**                              | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed                                                                           |
 | Deploy topology (marketing / ordering / account)          | ❌ Absent  | one app                                                                                                                                                                                                                         |
 | SSR / SSG                                                 | ❌ Absent  | no `@angular/ssr`, no server entry, no prerender                                                                                                                                                                                |
-| CI                                                        | ✅ Proven  | `.github/workflows/ci.yml` + `deploy-pages.yml`                                                                                                                                                                                 |
+| CI                                                        | ✅ Proven  | `.github/workflows/ci.yml`                                                                                                                                                                                                      |
 | Interceptors / HttpClient discipline                      | 🟡 Partial | functional auth interceptor registered with `provideHttpClient(withFetch(), withInterceptors(...))`; raw `fetch()` remains in every `api.ts`                                                                                    |
 | DTO → domain mapping                                      | ❌ Absent  | DummyJSON shapes are the state                                                                                                                                                                                                  |
 | Forms & validation                                        | 🟡 Partial | login uses a typed reactive form with required validation; no shared validators, cross-field/async validation, or server-error mapping                                                                                          |
@@ -128,8 +128,8 @@ events, three `httpResource`s, entity resources). `libs/products/feature` + `lib
 ### ☑ P3 — CI running `nx affected`
 
 **Done:** `.github/workflows/ci.yml` — `nrwl/nx-set-shas` + `npx nx affected -t lint test build`,
-plus `deploy-pages.yml`. Not part of the greenfield-lab charter (`PRD.md`'s non-goal list, see
-open question 1), added anyway to prove the gate is executable.
+plus the Cloudflare Pages deploy/promote workflows. Not part of the greenfield-lab charter
+(`PRD.md`'s non-goal list, see open question 1), added anyway to prove the gate is executable.
 
 **Why it matters:** the `ngfe-web` ROADMAP is built entirely on _mechanically checkable_ gates —
 `nx affected -t lint test build` against the last successful main SHA via `nrwl/nx-set-shas`,
