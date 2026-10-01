@@ -15,6 +15,11 @@ tmp/
 
 __screenshots__/
 
+# JetBrains IDE config. Tracked since the initial commit; untracked 2026-10-01.
+# Kept local so per-developer IDE state (and the nx-angular-config.xml that
+# regenerates on every project add) stops churning the history.
+/.idea/
+
 .env
 .env.*
 *.log
