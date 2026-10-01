@@ -15,23 +15,23 @@ decision: partial work is deliberately not marked proven.
 
 ## 0. Read this first — the scope boundary
 
-**This workspace can prove the *destination*. It structurally cannot prove the *migration*.**
+**This workspace can prove the _destination_. It structurally cannot prove the _migration_.**
 
 Several of the riskiest items in the `ngfe-web` roadmap are migration proofs, and no amount of
 work in a greenfield lab will close them:
 
-| Migration proof | Why it can't happen here |
-|---|---|
-| `redux-connector` coexistence (Plan 6a: *"no feature migrates until this lands"*) | There is no legacy `@ngrx/store` slice here to coexist with |
-| Backward-compatible `persist:features` read path (Plan §5 upgrade check) | There is no legacy persisted shape to stay readable |
-| Story `21.1` — **prefixed** Tailwind, **Preflight off**, against globally-loaded Bootstrap 4 | This repo runs unprefixed Tailwind with Preflight on, greenfield |
-| All 27 `angular.json` build configurations surviving `nx init` (Plan 0a acceptance criterion) | This workspace was generated, not migrated |
+| Migration proof                                                                               | Why it can't happen here                                         |
+| --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `redux-connector` coexistence (Plan 6a: _"no feature migrates until this lands"_)             | There is no legacy `@ngrx/store` slice here to coexist with      |
+| Backward-compatible `persist:features` read path (Plan §5 upgrade check)                      | There is no legacy persisted shape to stay readable              |
+| Story `21.1` — **prefixed** Tailwind, **Preflight off**, against globally-loaded Bootstrap 4  | This repo runs unprefixed Tailwind with Preflight on, greenfield |
+| All 27 `angular.json` build configurations surviving `nx init` (Plan 0a acceptance criterion) | This workspace was generated, not migrated                       |
 
 Those need a spike branch on `ngfe-web` itself. **Decide now whether you're willing to say that
 out loud when you present this**, because the first person to ask "does this de-risk the
 migration?" deserves an honest no.
 
-What follows is everything that *is* in reach here.
+What follows is everything that _is_ in reach here.
 
 ---
 
@@ -39,34 +39,34 @@ What follows is everything that *is* in reach here.
 
 Scored against `notebook/ideal-architecture.md`, section by section.
 
-| Area | State | Evidence |
-|---|---|---|
-| Nx graph + `affected` | ✅ Proven | 13 nodes; `dummy-lab` depends on 7 of 12 libs, not all |
-| SignalStore on the core `events` path | ✅ Proven | `eventGroup` + `withReducer` + `on` + `injectDispatch` — `libs/data-access/products/` |
-| ngrx-toolkit peripherals | ✅ Proven | `withDevtools`, `withCallState`, `withResource`, `withEntityResources`, `withStorageSync`/`withLocalStorage` |
-| Router state in a SignalStore | ✅ Proven | `libs/shared/state/src/lib/signal-store/with-router-context.ts` — closes Plan §6 **gap 3** |
-| `httpResource` | ✅ Proven | all stores |
-| Tailwind v4 `@theme` type ramp + self-hosted display face | ✅ Proven | `styles/tailwind.css` |
-| PrimeNG with `cssLayer` ordering | ✅ Proven | `libs/platform/src/lib/primeng.config.ts:16-20` — order `theme, base, primeng, utilities`, exactly as the PrimeNG Tailwind guide prescribes for v4 |
-| Lib taxonomy — `data-access` + `util` axis | 🟡 Partial | no `ui`, no `feature` libs exist |
-| Vitest + coverage thresholds | 🟡 Partial | thresholds pass over placeholder specs |
-| PrimeNG theming (generated Figma preset) | ✅ Proven | 86-component preset in `theme/ts`, wired via `providePrimeNgPlatform()` — `libs/platform/src/lib/primeng.providers.ts`; `updatePrimaryPalette`, `light-dark()`, `extend` and `cssLayer` order all match the PrimeNG 22.1.1 docs |
-| Figma → token pipeline | 🟡 Partial | export is committed, not built: no in-repo regeneration step and no CI check that `theme/` matches Figma; `primary` still maps to Aura blue (`theme/ts/base.ts:309`); Tailwind `@theme` carries no colour tokens |
-| **Tags / module boundaries** | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed |
-| Deploy topology (marketing / ordering / account) | ❌ Absent | one app |
-| SSR / SSG | ❌ Absent | no `@angular/ssr`, no server entry, no prerender |
-| CI | ✅ Proven | `.github/workflows/ci.yml` + `deploy-pages.yml` |
-| Interceptors / HttpClient discipline | 🟡 Partial | functional auth interceptor registered with `provideHttpClient(withFetch(), withInterceptors(...))`; raw `fetch()` remains in every `api.ts` |
-| DTO → domain mapping | ❌ Absent | DummyJSON shapes are the state |
-| Forms & validation | 🟡 Partial | login uses a typed reactive form with required validation; no shared validators, cross-field/async validation, or server-error mapping |
-| Guards / resolvers / error routes | 🟡 Partial | `accountGuard` redirects unauthenticated users; no resolver, unauthorized/404/error routes, or guard tests |
-| Auth vs account boundary | 🟡 Partial | persisted `AuthStore`, login mutation/events, auth interceptor, and authenticated `/auth/me` resource exist; no refresh/expiry policy and current-user data still lives in `UsersStore` |
-| Environment config | ✅ Proven | runtime config loads before bootstrap from `/runtime-config.json`; typed `RUNTIME_CONFIG` is consumed by app and data-access code; Cloudflare varies configuration, not the application artifact |
-| MSW / test factories | ❌ Absent | 9 of 12 lib specs are `expect(true).toBe(true)` |
-| Error taxonomy / `ErrorHandler` / fallback UI | ❌ Absent | `provideBrowserGlobalErrorListeners()` only |
-| Accessibility | ❌ Absent | no axe, no a11y lint rules, no stated WCAG target |
-| Observability / analytics / flags | ❌ Absent | none |
-| ADRs | ❌ Absent | none |
+| Area                                                      | State      | Evidence                                                                                                                                                                                                                        |
+| --------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nx graph + `affected`                                     | ✅ Proven  | 13 nodes; `dummy-lab` depends on 7 of 12 libs, not all                                                                                                                                                                          |
+| SignalStore on the core `events` path                     | ✅ Proven  | `eventGroup` + `withReducer` + `on` + `injectDispatch` — `libs/data-access/products/`                                                                                                                                           |
+| ngrx-toolkit peripherals                                  | ✅ Proven  | `withDevtools`, `withCallState`, `withResource`, `withEntityResources`, `withStorageSync`/`withLocalStorage`                                                                                                                    |
+| Router state in a SignalStore                             | ✅ Proven  | `libs/shared/state/src/lib/signal-store/with-router-context.ts` — closes Plan §6 **gap 3**                                                                                                                                      |
+| `httpResource`                                            | ✅ Proven  | all stores                                                                                                                                                                                                                      |
+| Tailwind v4 `@theme` type ramp + self-hosted display face | ✅ Proven  | `styles/tailwind.css`                                                                                                                                                                                                           |
+| PrimeNG with `cssLayer` ordering                          | ✅ Proven  | `libs/platform/src/lib/primeng.config.ts:16-20` — order `theme, base, primeng, utilities`, exactly as the PrimeNG Tailwind guide prescribes for v4                                                                              |
+| Lib taxonomy — `data-access` + `util` axis                | 🟡 Partial | no `ui`, no `feature` libs exist                                                                                                                                                                                                |
+| Vitest + coverage thresholds                              | 🟡 Partial | thresholds pass over placeholder specs                                                                                                                                                                                          |
+| PrimeNG theming (generated Figma preset)                  | ✅ Proven  | 86-component preset in `theme/ts`, wired via `providePrimeNgPlatform()` — `libs/platform/src/lib/primeng.providers.ts`; `updatePrimaryPalette`, `light-dark()`, `extend` and `cssLayer` order all match the PrimeNG 22.1.1 docs |
+| Figma → token pipeline                                    | 🟡 Partial | export is committed, not built: no in-repo regeneration step and no CI check that `theme/` matches Figma; `primary` still maps to Aura blue (`theme/ts/base.ts:309`); Tailwind `@theme` carries no colour tokens                |
+| **Tags / module boundaries**                              | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed                                                                           |
+| Deploy topology (marketing / ordering / account)          | ❌ Absent  | one app                                                                                                                                                                                                                         |
+| SSR / SSG                                                 | ❌ Absent  | no `@angular/ssr`, no server entry, no prerender                                                                                                                                                                                |
+| CI                                                        | ✅ Proven  | `.github/workflows/ci.yml` + `deploy-pages.yml`                                                                                                                                                                                 |
+| Interceptors / HttpClient discipline                      | 🟡 Partial | functional auth interceptor registered with `provideHttpClient(withFetch(), withInterceptors(...))`; raw `fetch()` remains in every `api.ts`                                                                                    |
+| DTO → domain mapping                                      | ❌ Absent  | DummyJSON shapes are the state                                                                                                                                                                                                  |
+| Forms & validation                                        | 🟡 Partial | login uses a typed reactive form with required validation; no shared validators, cross-field/async validation, or server-error mapping                                                                                          |
+| Guards / resolvers / error routes                         | 🟡 Partial | `accountGuard` redirects unauthenticated users; no resolver, unauthorized/404/error routes, or guard tests                                                                                                                      |
+| Auth vs account boundary                                  | 🟡 Partial | persisted `AuthStore`, login mutation/events, auth interceptor, and authenticated `/auth/me` resource exist; no refresh/expiry policy and current-user data still lives in `UsersStore`                                         |
+| Environment config                                        | ✅ Proven  | runtime config loads before bootstrap from `/runtime-config.json`; typed `RUNTIME_CONFIG` is consumed by app and data-access code; Cloudflare varies configuration, not the application artifact                                |
+| MSW / test factories                                      | ❌ Absent  | 9 of 12 lib specs are `expect(true).toBe(true)`                                                                                                                                                                                 |
+| Error taxonomy / `ErrorHandler` / fallback UI             | ❌ Absent  | `provideBrowserGlobalErrorListeners()` only                                                                                                                                                                                     |
+| Accessibility                                             | ❌ Absent  | no axe, no a11y lint rules, no stated WCAG target                                                                                                                                                                               |
+| Observability / analytics / flags                         | ❌ Absent  | none                                                                                                                                                                                                                            |
+| ADRs                                                      | ❌ Absent  | none                                                                                                                                                                                                                            |
 
 ---
 
@@ -83,14 +83,14 @@ a no-op rule (`onlyDependOnLibsWithTags: ['*']`) and there are no `scope:*` cons
 cross-domain imports (`carts` → `products`) are still unenforced. Still no negative test — nothing
 proves a violating import goes red.
 
-**Why it's #1:** `ideal-architecture.md` says boundaries are *"enforced by Nx tags +
-`@nx/enforce-module-boundaries`, not by convention."* That sentence is the load-bearing claim of
+**Why it's #1:** `ideal-architecture.md` says boundaries are _"enforced by Nx tags +
+`@nx/enforce-module-boundaries`, not by convention."_ That sentence is the load-bearing claim of
 the entire architecture, and this workspace currently demonstrates the opposite. ROADMAP **Phase D's
-exit gate** is literally *"a deliberate `type:ui` → `type:data-access` import **fails the
-build**."* You cannot run that gate here.
+exit gate** is literally _"a deliberate `type:ui` → `type:data-access` import **fails the
+build**."_ You cannot run that gate here.
 
 **Proving it buys:** the Phase D gate, executable. Also settles Epic `20` story 1 (the taxonomy
-that governs extracted libs, as distinct from Plan 0b which only sketches tags for *new* libs and
+that governs extracted libs, as distinct from Plan 0b which only sketches tags for _new_ libs and
 grandfathers `scope:legacy` across 94% of the code).
 
 **Shape:** tag all 13 projects on both axes (`type:*`, `scope:*`); write the real `depConstraints`;
@@ -106,14 +106,14 @@ commit a fixture that violates a constraint and a check that asserts lint fails 
 `data-access` and `util` types; you have neither of the other two.
 
 **Why it matters:** the rule that carries the most weight in the taxonomy is **`ui` may never
-import `data-access`** — that is what makes *"pages and components do not talk to API services"*
+import `data-access`** — that is what makes _"pages and components do not talk to API services"_
 mechanical rather than aspirational. With no `ui` lib in existence, it cannot be tested. It is
 also the rule P1's negative test should target.
 
 Secondary: `shared/ui` grouped by cohesion (`layout`, `forms`, `feedback`, `data-display`) is
 untested, and `navbar` / `footer` / `shell` are sitting in the app as the obvious `shared/ui/layout`
-candidates. Epic `22` open question 5 — *"shared nav/footer: does marketing get its own, or consume
-a `shared/ui` lib? This is the first real test of the taxonomy"* — is answered by doing this.
+candidates. Epic `22` open question 5 — _"shared nav/footer: does marketing get its own, or consume
+a `shared/ui` lib? This is the first real test of the taxonomy"_ — is answered by doing this.
 
 **Proving it buys:** the taxonomy stops being a diagram. Also gives P4 something to share.
 
@@ -130,14 +130,14 @@ events, three `httpResource`s, entity resources). `libs/products/feature` + `lib
 plus `deploy-pages.yml`. Not part of the greenfield-lab charter (`PRD.md`'s non-goal list, see
 open question 1), added anyway to prove the gate is executable.
 
-**Why it matters:** the `ngfe-web` ROADMAP is built entirely on *mechanically checkable* gates —
+**Why it matters:** the `ngfe-web` ROADMAP is built entirely on _mechanically checkable_ gates —
 `nx affected -t lint test build` against the last successful main SHA via `nrwl/nx-set-shas`,
 budgets that fail rather than warn, remote cache. None of it is demonstrated here. The single most
 persuasive artifact you could put in front of the team is a PR where `affected` marks 2 projects
 instead of 13, and right now you can't show one.
 
-**Honest limit to carry over verbatim** (`ideal-architecture.md`, and ROADMAP Phase D): *an app
-build always cache-misses when any transitive lib changes.* Caching wins on lint and test of
+**Honest limit to carry over verbatim** (`ideal-architecture.md`, and ROADMAP Phase D): _an app
+build always cache-misses when any transitive lib changes._ Caching wins on lint and test of
 untouched projects, not on the app build. Say it before someone else does.
 
 **Proving it buys:** ROADMAP Phase A's posture, and the credibility of every "gate" in the plan.
@@ -155,12 +155,12 @@ optional but this is the cheap place to evaluate it.
 **Today:** one app.
 
 **Why it matters:** the deploy topology is the headline **RESOLVED** decision at the top of
-`ideal-architecture.md`, and nothing here exercises it. Epic `22`'s exit gate is *"careers served
+`ideal-architecture.md`, and nothing here exercises it. Epic `22`'s exit gate is _"careers served
 from the marketing app in production, **and** a `scope:marketing` → cart / checkout / auth import
-fails the build."* The second half of that is fully reachable in this repo.
+fails the build."_ The second half of that is fully reachable in this repo.
 
-`ideal-architecture.md` also says *"scaffold the `account` app + pipeline day one, no features in
-it — drawing a deploy boundary early is cheap, retrofitting one is not."* Worth proving that's
+`ideal-architecture.md` also says _"scaffold the `account` app + pipeline day one, no features in
+it — drawing a deploy boundary early is cheap, retrofitting one is not."_ Worth proving that's
 true by doing it.
 
 **Proving it buys:** two apps sharing `shared/ui`; a lib change marking both affected; the
@@ -182,7 +182,7 @@ controls. That proves the basic Angular reactive-forms wiring, but not a reusabl
 there is still no shared validators lib, cross-field or async validation, server-error mapping, or
 design-system-owned error rendering.
 
-`ideal-architecture.md`: *"checkout is the hardest UI we own — it deserves an explicit pattern."*
+`ideal-architecture.md`: _"checkout is the hardest UI we own — it deserves an explicit pattern."_
 This is the **highest-risk unproven area relative to what `ngfe-web` actually has to migrate**, and
 it's the one this lab is least equipped for today because there's no hard form in it.
 
@@ -223,11 +223,11 @@ explicit—middleware is not a substitute for a failure policy.
 ### ☐ P7 — MSW + real tests + test data factories
 
 **Today:** 9 of 12 lib spec files are `describe('placeholder', () => it('should pass'))`. Coverage
-thresholds in `apps/dummy-lab/project.json` are passing *over* those placeholders, which is worse
+thresholds in `apps/dummy-lab/project.json` are passing _over_ those placeholders, which is worse
 than having no thresholds — it's a green check that means nothing.
 
-**Why it matters:** `ideal-architecture.md` calls out MSW specifically so *"feature libs are
-testable with no backend and no VPN."* The VPN point is a real, named organizational pain. Also
+**Why it matters:** `ideal-architecture.md` calls out MSW specifically so _"feature libs are
+testable with no backend and no VPN."_ The VPN point is a real, named organizational pain. Also
 Phase F story 7 (testing pyramid + MSW) and Plan 6a's `@ngrx/signals/testing` patterns.
 
 **Shape:** MSW handlers over the DummyJSON shapes; real store tests (state + events, not
@@ -255,7 +255,7 @@ normalization, loading, and failure handling.
 **Why it matters:** this is disproportionate leverage. `ngfe-web` has **27 build configurations and
 25 serve configurations**, each with its own `fileReplacements`. The **27 → 3 reduction is named as
 the single biggest lever on Epic `20`'s cost** and is a hard prerequisite on ROADMAP Phase D. And
-`ideal-architecture.md` wants *"one artifact promoted across envs, ideally"* — which is a
+`ideal-architecture.md` wants _"one artifact promoted across envs, ideally"_ — which is a
 fundamentally different mechanism from `fileReplacements`, not a smaller version of it.
 
 Cheapest high-leverage item in the document after P1.
@@ -269,11 +269,11 @@ typed accessor; no `fileReplacements`.
 
 ### ☐ P9 — DTO → domain mapping
 
-**Today:** `models.ts` *is* the DummyJSON response shape, straight into store state — note
+**Today:** `models.ts` _is_ the DummyJSON response shape, straight into store state — note
 `Post` even carries an `[key: string]: unknown` index signature.
 
-`ideal-architecture.md`: *"DTO → domain model mapping so backend shapes never leak into SignalStore
-state."* That decision has real ongoing cost in `ngfe-web` and you haven't priced it. Proving it on
+`ideal-architecture.md`: _"DTO → domain model mapping so backend shapes never leak into SignalStore
+state."_ That decision has real ongoing cost in `ngfe-web` and you haven't priced it. Proving it on
 one domain tells you whether you actually believe in it.
 
 **Cost:** ~0.5 day on one domain. The point is the price tag, not the code.
@@ -286,7 +286,7 @@ one domain tells you whether you actually believe in it.
 network / validation / auth / server taxonomy, no retry / backoff policy, no per-route fallback UI,
 no degraded or offline behavior.
 
-`ideal-architecture.md` asks *"what does the user see when the menu API 500s?"* — and Phase F
+`ideal-architecture.md` asks _"what does the user see when the menu API 500s?"_ — and Phase F
 story 5 is entirely this. Currently unanswerable.
 
 **Cost:** ~1–1.5 days.
@@ -321,8 +321,8 @@ It is not yet a clean auth/account boundary: the current-user resource is attach
 resolver, 401/403, 404, or error routes. The guard and interceptor tests also need behavioral
 assertions, not just construction coverage.
 
-`ideal-architecture.md` calls the auth/account conflation *"the most common way this taxonomy goes
-wrong"* — ordering needs session + token refresh without pulling in profile UI. The doc also asks
+`ideal-architecture.md` calls the auth/account conflation _"the most common way this taxonomy goes
+wrong"_ — ordering needs session + token refresh without pulling in profile UI. The doc also asks
 you to **pick one default** — guards vs. store-driven redirects, resolvers vs. load-in-store — and
 not mix them arbitrarily. The current implementation indicates guards plus load-in-store; record
 that as the default only after the account/profile ownership is moved out of `UsersStore`.
@@ -338,14 +338,14 @@ type-only, and PrimeNG is still stock Aura with a runtime `updatePrimaryPalette`
 no color tokens.
 
 Epic `21` story 4 wants **Figma → Style Dictionary → PrimeNG preset**, and its open question 8 is
-unanswered: *"Does Style Dictionary run in this repo's build, or publish a package? WINGD-8341
-retired `ngfe-design-tokens` as a repo — so where does the pipeline live now?"* That's precisely
+unanswered: _"Does Style Dictionary run in this repo's build, or publish a package? WINGD-8341
+retired `ngfe-design-tokens` as a repo — so where does the pipeline live now?"_ That's precisely
 the kind of question this lab exists to settle.
 
 Note the deck claims this is already solved in `ws-ui-playground`. **Check that before rebuilding
 it** — if the proof exists there, porting beats inventing.
 
-Also unrecorded: `ideal-architecture.md:46` asks you to define *where custom styling is allowed*
+Also unrecorded: `ideal-architecture.md:46` asks you to define _where custom styling is allowed_
 (brand/marketing surfaces is the working answer) rather than pretend it won't exist. Write the rule.
 
 **Cost:** ~2 days, less if `ws-ui-playground` ports.
@@ -355,12 +355,12 @@ Also unrecorded: `ideal-architecture.md:46` asks you to define *where custom sty
 ### ☐ P14 — Lib public APIs stop exporting the repository
 
 `libs/data-access/products/src/index.ts` line 1 is `export * from './lib/api'` — the raw fetch
-functions are public. ROADMAP Phase F story 4: *"the lib exports the store and its events, never
-the repository."*
+functions are public. ROADMAP Phase F story 4: _"the lib exports the store and its events, never
+the repository."_
 
 Tiny diff. But this is exactly the discipline that decides whether the mega-barrel problem regrows,
-and `ideal-architecture.md` is emphatic: *"do not port the `public-api.ts` mega-barrel… this single
-decision determines whether any of the above actually works."*
+and `ideal-architecture.md` is emphatic: _"do not port the `public-api.ts` mega-barrel… this single
+decision determines whether any of the above actually works."_
 
 **Cost:** ~1 hour. Do it while you're in P1.
 
@@ -369,8 +369,8 @@ decision determines whether any of the above actually works."*
 ### ☐ P15 — Accessibility
 
 No axe, no `@angular-eslint` a11y rules enabled, no stated WCAG target.
-`ideal-architecture.md` wants the target *"stated up front and owned by the design system"* and
-*"automated axe checks in CI on every PR"* — with keyboard and screen-reader flows as acceptance
+`ideal-architecture.md` wants the target _"stated up front and owned by the design system"_ and
+_"automated axe checks in CI on every PR"_ — with keyboard and screen-reader flows as acceptance
 criteria, not remediation cards. `ngfe-web` has a whole epic (`19-accessibility/`) proving this is
 a live concern.
 
@@ -380,14 +380,14 @@ a live concern.
 
 ### ☐ P16 — Observability, typed analytics, feature flags
 
-None of the three. `ideal-architecture.md` is specific: *"typed analytics event schema emitted from
-the store — not `trackEvent()` sprinkled through components"* (ROADMAP card `25`, which the ROADMAP
-itself notes is *"almost certainly the same effort as `23.1`"* — the event catalog, called **the
+None of the three. `ideal-architecture.md` is specific: _"typed analytics event schema emitted from
+the store — not `trackEvent()` sprinkled through components"_ (ROADMAP card `25`, which the ROADMAP
+itself notes is _"almost certainly the same effort as `23.1`"_ — the event catalog, called **the
 long pole** of Phase F). Plus RUM + error tracking at bootstrap, and flags with a single evaluation
 point, typed accessors, and a retirement lifecycle.
 
-Given card `23.1` is described as *"90% of that work and nobody has written it yet"* — proving the
-*shape* of a typed event catalog here may be worth more than anything else in Tier 3.
+Given card `23.1` is described as _"90% of that work and nobody has written it yet"_ — proving the
+_shape_ of a typed event catalog here may be worth more than anything else in Tier 3.
 
 **Cost:** ~2 days for the analytics schema shape; RUM/flags are mostly plumbing.
 
@@ -441,5 +441,5 @@ Then **P5 + P7 + P10** as the block that decides whether a real domain migration
    reference.
 3. **Do you want the migration proofs at all?** If yes, they need a spike branch on `ngfe-web`, and
    that's a separate decision with a separate cost. If no, say so explicitly in whatever you present.
-4. **Who is the audience?** A reference *you* build from is a different artifact from one a team
+4. **Who is the audience?** A reference _you_ build from is a different artifact from one a team
    reads. The second needs P18 and a README; the first doesn't.

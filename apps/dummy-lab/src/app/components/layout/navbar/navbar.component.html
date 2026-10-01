@@ -51,9 +51,12 @@
   </ng-template>
   <ng-template #end>
     <div class="flex items-center gap-2">
-      <p-button text class="p-2 text-surface-600 dark:text-surface-400"
-                (click)="themeStore.toggleDarkMode()"
-                [icon]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></p-button>
+      <p-button
+        text
+        class="p-2 text-surface-600 dark:text-surface-400"
+        (click)="themeStore.toggleDarkMode()"
+        [icon]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+      ></p-button>
       <button pButton text class="p-2 text-surface-600 dark:text-surface-400">
         <i pButtonIcon class="pi pi-bell text-base! leading-none!"></i>
       </button>
@@ -64,7 +67,9 @@
         styleClass="w-56 max-h-80 overflow-y-auto"
       >
         <ng-template #item let-item>
-          <a class="p-menu-item-link flex items-center gap-2 px-3 py-2 cursor-pointer">
+          <a
+            class="p-menu-item-link flex items-center gap-2 px-3 py-2 cursor-pointer"
+          >
             <span
               class="w-4 h-4 rounded-full border border-surface shrink-0"
               [style.background-color]="'var(--p-' + item.color + '-500)'"
@@ -88,15 +93,23 @@
       </button>
     </div>
     <div class="flex items-center gap-2">
-      <div class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">
+      <div
+        class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300"
+      >
         Available
       </div>
       <p-menu #accountMenu [model]="accountMenuItems()" [popup]="true" />
-      <p-button (click)="accountMenu.toggle($event)" [icon]="!authStore.isLoggedIn() ? 'pi pi-user' : ''" text>
+      <p-button
+        (click)="accountMenu.toggle($event)"
+        [icon]="!authStore.isLoggedIn() ? 'pi pi-user' : ''"
+        text
+      >
         @if (authStore.isLoggedIn()) {
-          <p-avatar shape="circle"
-                    [image]="usersStore.currentUserValue()?.image || ''"
-                    class="w-8 h-8 block cursor-pointer"></p-avatar>
+          <p-avatar
+            shape="circle"
+            [image]="usersStore.currentUserValue()?.image || ''"
+            class="w-8 h-8 block cursor-pointer"
+          ></p-avatar>
         }
       </p-button>
     </div>

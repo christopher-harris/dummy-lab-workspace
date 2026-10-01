@@ -1,5 +1,5 @@
-import {HttpInterceptorFn} from '@angular/common/http';
-import {inject} from "@angular/core";
+import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { AuthStore } from './store';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 

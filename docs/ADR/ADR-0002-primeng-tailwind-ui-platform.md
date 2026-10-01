@@ -1,14 +1,14 @@
 # 🤖 ADR-0002 — Adopt PrimeNG + Tailwind as the UI platform, retire Bootstrap
 
-|                |                                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------------------- |
-| **Status**     | Proposed — **for discussion, not for approval**                                                    |
-| **Date**       | 2026-09-28                                                                                         |
-| **Deciders**   | Wingstop internal development leadership; Design; Procurement (see [Licensing](#licensing))        |
-| **Applies to** | `ngfe-web`                                                                                         |
-| **Prototype**  | `dummy-lab-workspace` — PrimeNG 22 + Tailwind v4 with a Figma-generated token preset               |
-| **Blocked on** | A licensing decision and a migration plan. See [Acceptance criteria](#acceptance-criteria).        |
-| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which listed this as an unproven spike      |
+|                |                                                                                               |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| **Status**     | Proposed — **for discussion, not for approval**                                               |
+| **Date**       | 2026-09-28                                                                                    |
+| **Deciders**   | Wingstop internal development leadership; Design; Procurement (see [Licensing](#licensing))   |
+| **Applies to** | `ngfe-web`                                                                                    |
+| **Prototype**  | `dummy-lab-workspace` — PrimeNG 22 + Tailwind v4 with a Figma-generated token preset          |
+| **Blocked on** | A licensing decision and a migration plan. See [Acceptance criteria](#acceptance-criteria).   |
+| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which listed this as an unproven spike |
 
 > **Purpose.** This document exists to start a conversation about the UI platform, and to put the
 > current styling situation on the record in numbers rather than impressions. It is deliberately
@@ -33,14 +33,14 @@ matches **152 of them, 10%**.
 
 Counting only real Bootstrap classes inside `class="…"` attributes across 224 templates:
 
-| Family                                             | Occurrences |
-| -------------------------------------------------- | ----------- |
-| Grid (`row`, `col-*`)                              | 56          |
-| Buttons (`btn`, `btn-*`)                           | 21          |
-| Display utilities (`d-flex`, `d-none`, `d-block`)  | 10          |
-| Forms (`form-control`, `form-group`, `custom-*`)   | 9           |
-| `container-fluid`                                  | 2           |
-| Modals (`modal-*`)                                 | 0           |
+| Family                                            | Occurrences |
+| ------------------------------------------------- | ----------- |
+| Grid (`row`, `col-*`)                             | 56          |
+| Buttons (`btn`, `btn-*`)                          | 21          |
+| Display utilities (`d-flex`, `d-none`, `d-block`) | 10          |
+| Forms (`form-control`, `form-group`, `custom-*`)  | 9           |
+| `container-fluid`                                 | 2           |
+| Modals (`modal-*`)                                | 0           |
 
 The real coupling is not in templates. It is in SCSS: **161 `@include media-breakpoint-*` calls**,
 one `make-container`, and roughly a dozen references to Bootstrap variables (`$spacer`,
@@ -70,18 +70,18 @@ build: every one of these produces a green compile.
 
 Non-spec files importing each UI dependency:
 
-| Library                      | Files | What it provides        | PrimeNG equivalent      |
-| ---------------------------- | ----- | ----------------------- | ----------------------- |
-| `@ng-bootstrap/ng-bootstrap` | 82    | modal, typeahead        | `Dialog`, `AutoComplete` |
-| `ngx-slick-carousel`         | 34    | carousel                | `Carousel`              |
-| `ngx-lottie`                 | 14    | Lottie animation        | — (keep)                |
-| `ng-busy`                    | 12    | busy indicator          | `ProgressSpinner`       |
-| `ngx-toastr`                 | 10    | toasts                  | `Toast`                 |
-| `@angular-slider/ngx-slider` | 9     | range slider            | `Slider`                |
-| `@fortawesome/*` (4 pkgs)    | 7     | icons                   | `primeicons`            |
-| `ngx-skeleton-loader`        | 3     | skeletons               | `Skeleton`              |
-| `@ng-select/ng-select`       | **0** | select                  | `Select`                |
-| `snazzy-info-window`         | **0** | map info window         | —                       |
+| Library                      | Files | What it provides | PrimeNG equivalent       |
+| ---------------------------- | ----- | ---------------- | ------------------------ |
+| `@ng-bootstrap/ng-bootstrap` | 82    | modal, typeahead | `Dialog`, `AutoComplete` |
+| `ngx-slick-carousel`         | 34    | carousel         | `Carousel`               |
+| `ngx-lottie`                 | 14    | Lottie animation | — (keep)                 |
+| `ng-busy`                    | 12    | busy indicator   | `ProgressSpinner`        |
+| `ngx-toastr`                 | 10    | toasts           | `Toast`                  |
+| `@angular-slider/ngx-slider` | 9     | range slider     | `Slider`                 |
+| `@fortawesome/*` (4 pkgs)    | 7     | icons            | `primeicons`             |
+| `ngx-skeleton-loader`        | 3     | skeletons        | `Skeleton`               |
+| `@ng-select/ng-select`       | **0** | select           | `Select`                 |
+| `snazzy-info-window`         | **0** | map info window  | —                        |
 
 The last two have **zero TypeScript or template usage** and are still loaded as global
 stylesheets in `angular.json`. Each library carries its own theming model, its own upgrade
@@ -107,13 +107,13 @@ files under `theme/ts`). `libs/platform` exposes a single `providePrimeNgPlatfor
 consumes the same preset, and `styles/tailwind.css` carries the Wingstop type ramp as Tailwind
 `@theme` tokens with a `@layer base` that styles bare HTML correctly without utility classes.
 
-|                                     | `ngfe-web` today                       | Prototype                               |
-| ----------------------------------- | -------------------------------------- | --------------------------------------- |
-| Global CSS, gzip                    | 24 kB Bootstrap alone, before app CSS  | **11 kB total**                          |
-| Source of design values             | 240 hand-written component stylesheets | One Figma export, generated             |
-| Component libraries                 | 7 (+2 dead)                            | 1                                       |
-| Unused CSS shipped                  | ~90% of Bootstrap                      | none — Tailwind is compiled per-usage   |
-| Dark mode                           | not supported                          | token-level, one class on `<html>`      |
+|                         | `ngfe-web` today                       | Prototype                             |
+| ----------------------- | -------------------------------------- | ------------------------------------- |
+| Global CSS, gzip        | 24 kB Bootstrap alone, before app CSS  | **11 kB total**                       |
+| Source of design values | 240 hand-written component stylesheets | One Figma export, generated           |
+| Component libraries     | 7 (+2 dead)                            | 1                                     |
+| Unused CSS shipped      | ~90% of Bootstrap                      | none — Tailwind is compiled per-usage |
+| Dark mode               | not supported                          | token-level, one class on `<html>`    |
 
 The number that matters is not 24 kB → 11 kB. It is that a colour changing in Figma becomes a
 regenerated token file rather than a search across 240 stylesheets.
@@ -124,10 +124,10 @@ regenerated token file rather than a search across 240 stylesheets.
 
 PrimeNG changed licence at v22. Verified by inspecting the published packages:
 
-| Version   | Licence                                                      |
-| --------- | ------------------------------------------------------------ |
-| ≤ 21.1.10 | **MIT**                                                      |
-| ≥ 22.0.0  | **PrimeUI dual licence** — Community (free) or Commercial     |
+| Version   | Licence                                                   |
+| --------- | --------------------------------------------------------- |
+| ≤ 21.1.10 | **MIT**                                                   |
+| ≥ 22.0.0  | **PrimeUI dual licence** — Community (free) or Commercial |
 
 The Community tier requires **all** of: under $1M USD annual gross revenue, fewer than 5
 developers, fewer than 10 employees, under $3M in outside funding. Wingstop meets none of these.
@@ -161,7 +161,7 @@ Figma rather than hand-authoring them.**
    without `!important`.
 7. **A ratchet from day one: no new code against Bootstrap.** New and touched templates use
    Tailwind utilities and PrimeNG components. Bootstrap's removal is the end state; its
-   *containment* starts immediately and is enforceable straight away.
+   _containment_ starts immediately and is enforceable straight away.
 8. **Delete the two dead global stylesheets now.** `@ng-select` and `snazzy-info-window` have zero
    usage and are unrelated to the rest of this decision.
 
@@ -169,14 +169,14 @@ Figma rather than hand-authoring them.**
 
 Sequenced by risk, not by visual impact:
 
-| Phase | Work                                                                        | Unblocks                          |
-| ----- | --------------------------------------------------------------------------- | --------------------------------- |
-| 0     | Delete dead globals; introduce Tailwind alongside Bootstrap; declare layers | Everything below                  |
+| Phase | Work                                                                        | Unblocks                           |
+| ----- | --------------------------------------------------------------------------- | ---------------------------------- |
+| 0     | Delete dead globals; introduce Tailwind alongside Bootstrap; declare layers | Everything below                   |
 | 1     | Replace 161 `media-breakpoint-*` calls with Tailwind breakpoints            | Dropping the Bootstrap Sass import |
-| 2     | Replace `NgbModal` (360 uses) with PrimeNG `Dialog`                         | Dropping `@ng-bootstrap`          |
-| 3     | Replace the ~90 Bootstrap template classes; drop `bootstrap`                | Bootstrap gone                    |
-| 4     | Consolidate toastr / skeleton / slider / carousel / busy into PrimeNG       | 5 dependencies gone               |
-| 5     | Collapse the 240 component stylesheets against generated tokens             | Ongoing, never "done"             |
+| 2     | Replace `NgbModal` (360 uses) with PrimeNG `Dialog`                         | Dropping `@ng-bootstrap`           |
+| 3     | Replace the ~90 Bootstrap template classes; drop `bootstrap`                | Bootstrap gone                     |
+| 4     | Consolidate toastr / skeleton / slider / carousel / busy into PrimeNG       | 5 dependencies gone                |
+| 5     | Collapse the 240 component stylesheets against generated tokens             | Ongoing, never "done"              |
 
 Phase 2 is the bulk of the effort and the only phase with real behavioural risk. Phase 5 has no
 natural end and must not be allowed to block the earlier phases.
@@ -200,8 +200,8 @@ design-system team. This trades a licence cost for an unbounded maintenance cost
 accessibility bugs the team will find one at a time.
 
 **D. Angular Material + CDK.** A genuine alternative and the honest counterweight to the
-licensing problem: MIT, maintained by the Angular team, and `@angular/cdk ^21.1.1` is *already
-installed*. Rejected on fit rather than quality. Material Design is an opinionated visual
+licensing problem: MIT, maintained by the Angular team, and `@angular/cdk ^21.1.1` is _already
+installed_. Rejected on fit rather than quality. Material Design is an opinionated visual
 language, and Wingstop's brand is not it; theming Material away from Material is well-known to be
 expensive, and doing so undercuts the reason for adopting a component library. Worth revisiting if
 the PrimeNG licence is refused and option E is also refused.
@@ -252,16 +252,16 @@ procurement cycle, and Decision 1 makes that unnecessary for the first four phas
 
 A decision with no failing build behind it is a preference. This ADR is implemented when:
 
-| Mechanism                                                                             | Notes                                                                                 |
-| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| A lint rule rejecting Bootstrap class names in new or modified templates              | This is Decision 7. Without it the ratchet is a hope                                  |
-| A lint rule rejecting `@import 'bootstrap/...'` in new SCSS                           | Blocks the mixin dependency from regrowing                                            |
-| `theme/` marked generated; a CI check that it matches a fresh Figma export            | Otherwise "generated" degrades to "generated once"                                    |
-| `@theme` permitted only in `styles/tailwind.css`, enforced by lint                    | Tailwind v4 silently discards `@theme` elsewhere — a failure with no error message     |
-| Declared CSS layer order, asserted by a test                                          | Layer order is load-bearing and invisible                                             |
-| A rule rejecting `::ng-deep` into PrimeNG internals                                   | Preset overrides are the supported seam; `::ng-deep` breaks on every PrimeNG upgrade   |
-| A non-`dev` PrimeNG licence tier, with its expiry tracked                             | Placement in `providePrimeNG` is vendor-prescribed; the tier and clock are the risk   |
-| A dependency check failing the build if `bootstrap` reappears, once Phase 3 completes | Makes removal permanent rather than temporary                                         |
+| Mechanism                                                                             | Notes                                                                                |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| A lint rule rejecting Bootstrap class names in new or modified templates              | This is Decision 7. Without it the ratchet is a hope                                 |
+| A lint rule rejecting `@import 'bootstrap/...'` in new SCSS                           | Blocks the mixin dependency from regrowing                                           |
+| `theme/` marked generated; a CI check that it matches a fresh Figma export            | Otherwise "generated" degrades to "generated once"                                   |
+| `@theme` permitted only in `styles/tailwind.css`, enforced by lint                    | Tailwind v4 silently discards `@theme` elsewhere — a failure with no error message   |
+| Declared CSS layer order, asserted by a test                                          | Layer order is load-bearing and invisible                                            |
+| A rule rejecting `::ng-deep` into PrimeNG internals                                   | Preset overrides are the supported seam; `::ng-deep` breaks on every PrimeNG upgrade |
+| A non-`dev` PrimeNG licence tier, with its expiry tracked                             | Placement in `providePrimeNG` is vendor-prescribed; the tier and clock are the risk  |
+| A dependency check failing the build if `bootstrap` reappears, once Phase 3 completes | Makes removal permanent rather than temporary                                        |
 
 ## Acceptance criteria
 

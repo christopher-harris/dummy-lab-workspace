@@ -2,13 +2,14 @@ import { inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
-  withEntityResources, withResource,
+  withEntityResources,
+  withResource,
 } from '@ngrx-toolkit/core';
 import { signalStore, withProps } from '@ngrx/signals';
 
 import { fetchRecipes } from './api';
-import type {Recipe, RecipesResponse} from './models';
-import {httpResource} from "@angular/common/http";
+import type { Recipe, RecipesResponse } from './models';
+import { httpResource } from '@angular/common/http';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 export const RecipesStore = signalStore(
@@ -19,7 +20,7 @@ export const RecipesStore = signalStore(
     apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
   })),
   withResource(({ apiBaseUrl }) => ({
-    allRecipes: httpResource<RecipesResponse>(() => `${apiBaseUrl}/recipes`)
+    allRecipes: httpResource<RecipesResponse>(() => `${apiBaseUrl}/recipes`),
   })),
   withEntityResources(({ apiBaseUrl }) => ({
     recipes: resource<Recipe[], void>({

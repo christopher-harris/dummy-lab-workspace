@@ -1,12 +1,12 @@
 # Design note — order proximity guardrail
 
-|                 |                                                                         |
-| --------------- | ----------------------------------------------------------------------- |
-| **Status**      | Draft — for discussion, not for approval                                |
-| **Date**        | 2026-10-01                                                              |
-| **Applies to**  | `@dummy-lab/data-access-location`, and the ordering flow that uses it   |
-| **Prototype**   | `libs/data-access/location` in this workspace                           |
-| **Not an ADR**  | If this becomes one, claim the number in the documentation repo first   |
+|                |                                                                       |
+| -------------- | --------------------------------------------------------------------- |
+| **Status**     | Draft — for discussion, not for approval                              |
+| **Date**       | 2026-10-01                                                            |
+| **Applies to** | `@dummy-lab/data-access-location`, and the ordering flow that uses it |
+| **Prototype**  | `libs/data-access/location` in this workspace                         |
+| **Not an ADR** | If this becomes one, claim the number in the documentation repo first |
 
 > **Purpose.** Product wants to warn a customer when the store selected for a pickup order is
 > implausibly far from where they are. This records the split between client and server, what the
@@ -36,14 +36,14 @@ we have precise or fuzzy location.
 The decision belongs **server-side**. Only the parts that physically require a browser stay on the
 client.
 
-| Client                                            | Server                                      |
-| ------------------------------------------------- | ------------------------------------------- |
-| Permission probe and the prompt                   | Threshold configuration                     |
-| Acquiring the fix                                 | Store coordinates                           |
-| Reading `accuracy` and the source tier            | The distance comparison                     |
-| Discarding an obviously stale fix                 | Re-checking staleness (do not trust clients) |
-| Rendering whatever the server decided             | Fuzzy fallback from the request IP          |
-|                                                   | The decision, and the telemetry for it      |
+| Client                                 | Server                                       |
+| -------------------------------------- | -------------------------------------------- |
+| Permission probe and the prompt        | Threshold configuration                      |
+| Acquiring the fix                      | Store coordinates                            |
+| Reading `accuracy` and the source tier | The distance comparison                      |
+| Discarding an obviously stale fix      | Re-checking staleness (do not trust clients) |
+| Rendering whatever the server decided  | Fuzzy fallback from the request IP           |
+|                                        | The decision, and the telemetry for it       |
 
 Reasons: thresholds change without a deploy, the rule stays identical across web, iOS and Android,
 a client cannot tamper with it, and the measurement lands in one place.
@@ -60,12 +60,12 @@ What the client sends, once it knows what it has:
 ```jsonc
 {
   "cartId": "…",
-  "storeId": "…",          // the store currently selected
-  "latitude": 32.7767,     // omitted entirely when we have no fix
+  "storeId": "…", // the store currently selected
+  "latitude": 32.7767, // omitted entirely when we have no fix
   "longitude": -96.797,
   "accuracyMeters": 48,
-  "source": "precise",     // "precise" | "manual"
-  "fixTimestamp": 1759276800000
+  "source": "precise", // "precise" | "manual"
+  "fixTimestamp": 1759276800000,
 }
 ```
 
@@ -81,12 +81,12 @@ What comes back — a decision, not data to interpret:
 ```jsonc
 {
   "cartId": "…",
-  "storeId": "…",          // echoed, so the client can discard stale answers
-  "outcome": "too-far",    // "ok" | "too-far" | "not-checked"
-  "reason": null,          // when not-checked: "no-location" | "stale" | "accuracy-too-poor"
+  "storeId": "…", // echoed, so the client can discard stale answers
+  "outcome": "too-far", // "ok" | "too-far" | "not-checked"
+  "reason": null, // when not-checked: "no-location" | "stale" | "accuracy-too-poor"
   "distanceMeters": 2203000,
   "thresholdMeters": 16093,
-  "tier": "precise"
+  "tier": "precise",
 }
 ```
 
@@ -169,14 +169,14 @@ chosen knowing its own accuracy radius sits on top.
 
 ## Server-side decision table
 
-| Condition                                             | Outcome                           |
-| ----------------------------------------------------- | --------------------------------- |
-| No coordinates sent and IP fallback yields nothing     | `not-checked` / `no-location`      |
-| `fixTimestamp` older than `maxFixAgeSeconds`           | `not-checked` / `stale`            |
-| `accuracyMeters > maxUsableAccuracyMeters`             | `not-checked` / `accuracy-too-poor`|
-| `distance - accuracy > threshold(tier)`                | `too-far`                          |
-| Anything else                                          | `ok`                               |
-| Config unavailable, or the check errors                | `not-checked`                      |
+| Condition                                          | Outcome                             |
+| -------------------------------------------------- | ----------------------------------- |
+| No coordinates sent and IP fallback yields nothing | `not-checked` / `no-location`       |
+| `fixTimestamp` older than `maxFixAgeSeconds`       | `not-checked` / `stale`             |
+| `accuracyMeters > maxUsableAccuracyMeters`         | `not-checked` / `accuracy-too-poor` |
+| `distance - accuracy > threshold(tier)`            | `too-far`                           |
+| Anything else                                      | `ok`                                |
+| Config unavailable, or the check errors            | `not-checked`                       |
 
 Every unknown resolves to **no warning**. The guardrail fails open. We must never discourage an
 order because we could not locate someone — that is revenue, and they may simply be indoors.
@@ -186,18 +186,18 @@ order because we could not locate someone — that is revenue, and they may simp
 Named by trust rather than technology, because the technology is not what people assume — a
 browser "precise" fix is usually a wifi-BSSID lookup, not GPS.
 
-| Tier      | Source                                      | Typical accuracy        | Determined by |
-| --------- | ------------------------------------------- | ----------------------- | ------------- |
-| `precise` | Browser geolocation                         | 20m – few hundred m     | Client        |
-| `manual`  | A zip code the customer typed               | Zip centroid, a few km  | Client        |
-| `fuzzy`   | IP of the inbound request                   | 5km – 50km, worse on VPN| Server        |
+| Tier      | Source                        | Typical accuracy         | Determined by |
+| --------- | ----------------------------- | ------------------------ | ------------- |
+| `precise` | Browser geolocation           | 20m – few hundred m      | Client        |
+| `manual`  | A zip code the customer typed | Zip centroid, a few km   | Client        |
+| `fuzzy`   | IP of the inbound request     | 5km – 50km, worse on VPN | Server        |
 
 **IP is the weakest tier and is actively misleading for this use case.** A customer on a VPN or
 corporate proxy can resolve to another state, producing exactly the false positive this feature
 most needs to avoid. Treat `fuzzy` results as a last resort, and consider whether a `fuzzy`
 mismatch should warn at all or merely be recorded.
 
-A typed zip code is *more* accurate than IP, needs no vendor and no permission. If the warning ever
+A typed zip code is _more_ accurate than IP, needs no vendor and no permission. If the warning ever
 needs to prompt for anything, asking for a zip is the cheaper ask.
 
 ## The stale-fix trap
@@ -243,12 +243,12 @@ Lives with the admin portal, read server-side. Rough shape:
 {
   "version": 1,
   "thresholds": {
-    "precise": { "maxDistanceMeters": 16093 },  // ~10 miles
-    "manual":  { "maxDistanceMeters": 24140 },  // ~15 miles
-    "fuzzy":   { "maxDistanceMeters": 40234 }   // ~25 miles
+    "precise": { "maxDistanceMeters": 16093 }, // ~10 miles
+    "manual": { "maxDistanceMeters": 24140 }, // ~15 miles
+    "fuzzy": { "maxDistanceMeters": 40234 }, // ~25 miles
   },
   "maxUsableAccuracyMeters": 50000,
-  "maxFixAgeSeconds": 600
+  "maxFixAgeSeconds": 600,
 }
 ```
 

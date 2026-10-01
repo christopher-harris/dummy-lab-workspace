@@ -1,5 +1,5 @@
-import {Route} from '@angular/router';
-import {ShellComponent} from './components/layout/shell/shell.component';
+import { Route } from '@angular/router';
+import { ShellComponent } from './components/layout/shell/shell.component';
 
 export const appRoutes: Route[] = [
   {
@@ -47,7 +47,7 @@ export const appRoutes: Route[] = [
             loadComponent: () =>
               import(
                 './pages/products/product-detail/product-detail.page'
-                ).then((m) => m.ProductDetailPage),
+              ).then((m) => m.ProductDetailPage),
           },
         ],
       },
@@ -114,7 +114,10 @@ export const appRoutes: Route[] = [
       {
         path: 'account',
         title: 'Account | Dummy Lab',
-        loadChildren: () => import('./pages/account/account.routes').then((m) => m.ACCOUNT_ROUTES),
+        loadChildren: () =>
+          import('./pages/account/account.routes').then(
+            (m) => m.ACCOUNT_ROUTES,
+          ),
         data: {
           icon: 'pi pi-user',
           topLevelNavigation: false,
@@ -123,7 +126,8 @@ export const appRoutes: Route[] = [
       {
         path: 'auth',
         title: 'Auth | Dummy Lab',
-        loadChildren: () => import('./pages/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+        loadChildren: () =>
+          import('./pages/auth/auth.routes').then((m) => m.AUTH_ROUTES),
         // loadComponent: () =>
         //   import('./pages/auth/auth.page').then((m) => m.AuthPage),
         data: {

@@ -43,7 +43,6 @@ export const PERMISSIONS = new InjectionToken<Permissions | null>(
   'PERMISSIONS',
   {
     providedIn: 'root',
-    factory: () =>
-      inject(DOCUMENT).defaultView?.navigator?.permissions ?? null,
+    factory: () => inject(DOCUMENT).defaultView?.navigator?.permissions ?? null,
   },
 );

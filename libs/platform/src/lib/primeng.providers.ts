@@ -47,6 +47,7 @@ export function providePrimeNgPlatform(
       preset: figmaPreset,
       options: PRIMENG_THEME_OPTIONS,
     },
-    license: 'eyJpZCI6ImMyZTY5OTFmLThmMTQtNDIwNS1iMmI2LWRkYzk3ZjJhNzhmYiIsInByb2R1Y3QiOiJwcmltZXVpIiwidGllciI6ImNvbW1lcmNpYWwiLCJ0eXBlIjoiZGV2IiwiaWF0IjoxNzkwNDE4NjE3LCJleHAiOjE3OTgyMzI0MDB9.u5zQLDLU7hE7N4XXb40ngKyrAl_KLRS2pwsyOfqAz6jpNFzoQ_uQHIPWImnS0QvC1TdcPOtmhuaf6maZ-ETNBw'
+    license:
+      'eyJpZCI6ImMyZTY5OTFmLThmMTQtNDIwNS1iMmI2LWRkYzk3ZjJhNzhmYiIsInByb2R1Y3QiOiJwcmltZXVpIiwidGllciI6ImNvbW1lcmNpYWwiLCJ0eXBlIjoiZGV2IiwiaWF0IjoxNzkwNDE4NjE3LCJleHAiOjE3OTgyMzI0MDB9.u5zQLDLU7hE7N4XXb40ngKyrAl_KLRS2pwsyOfqAz6jpNFzoQ_uQHIPWImnS0QvC1TdcPOtmhuaf6maZ-ETNBw',
   });
 }

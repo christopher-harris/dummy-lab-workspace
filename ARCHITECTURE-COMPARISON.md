@@ -514,8 +514,7 @@ The runtime switch landed and is real. The migration it was supposed to enable d
 3. **Move the PrimeNG licence off the `dev` tier — open, and yours.** Not a rotation task: the
    key belongs in `providePrimeNG` exactly where it sits, per the vendor's own configuration
    guide, and it is a client-side key by design. What needs deciding is which commercial
-   (non-`dev`) key this workspace carries and who renews it before `exp` lands in late December
-   2026. See the correction in §3.1.
+   (non-`dev`) key this workspace carries and who renews it before `exp` lands in late December 2026. See the correction in §3.1.
 4. ~~Delete the credential `console.log`s; fix the `window.event` bug.~~ **Done.**
 5. ~~Delete the dead code.~~ **Done** — `auth/api.ts`, three commented-out blocks in `auth/store.ts`,
    152 commented-out lines in `carts.page.ts`, `DashboardPage.apps`/`routeConfig`, five dead

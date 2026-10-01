@@ -2,13 +2,14 @@ import { inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
-  withEntityResources, withResource,
+  withEntityResources,
+  withResource,
 } from '@ngrx-toolkit/core';
 import { signalStore, withProps } from '@ngrx/signals';
 
 import { fetchPosts } from './api';
-import {Post, PostsResponse} from './models';
-import {httpResource} from "@angular/common/http";
+import { Post, PostsResponse } from './models';
+import { httpResource } from '@angular/common/http';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 export const PostsStore = signalStore(
@@ -20,7 +21,9 @@ export const PostsStore = signalStore(
   })),
   withResource(({ apiBaseUrl }) => ({
     allPosts: httpResource<PostsResponse>(() => `${apiBaseUrl}/posts`),
-    topPosts: httpResource<PostsResponse>(() => `${apiBaseUrl}/posts?sortBy=views&order=desc&limit=5`),
+    topPosts: httpResource<PostsResponse>(
+      () => `${apiBaseUrl}/posts?sortBy=views&order=desc&limit=5`,
+    ),
   })),
   withEntityResources(({ apiBaseUrl }) => ({
     posts: resource<Post[], void>({

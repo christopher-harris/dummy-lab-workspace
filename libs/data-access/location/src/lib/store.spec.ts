@@ -339,7 +339,9 @@ describe('LocationStore events', () => {
   });
 
   it('announces the permission once the probe resolves', async () => {
-    setup({ permissions: permissionsResolving(fakePermissionStatus('prompt')) });
+    setup({
+      permissions: permissionsResolving(fakePermissionStatus('prompt')),
+    });
     const changes = payloadsOf(
       TestBed.inject(Events).on(locationEvents.permissionChanged),
     );

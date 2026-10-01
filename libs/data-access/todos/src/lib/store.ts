@@ -2,13 +2,14 @@ import { inject, resource } from '@angular/core';
 import {
   withCallState,
   withDevtools,
-  withEntityResources, withResource,
+  withEntityResources,
+  withResource,
 } from '@ngrx-toolkit/core';
 import { signalStore, withProps } from '@ngrx/signals';
 
 import { fetchTodos } from './api';
-import type {Todo, TodosResponse} from './models';
-import {httpResource} from "@angular/common/http";
+import type { Todo, TodosResponse } from './models';
+import { httpResource } from '@angular/common/http';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 export const TodosStore = signalStore(
@@ -19,7 +20,7 @@ export const TodosStore = signalStore(
     apiBaseUrl: inject(RUNTIME_CONFIG).apiBaseUrl,
   })),
   withResource(({ apiBaseUrl }) => ({
-    allTodos: httpResource<TodosResponse>(() => `${apiBaseUrl}/todos`)
+    allTodos: httpResource<TodosResponse>(() => `${apiBaseUrl}/todos`),
   })),
   withEntityResources(({ apiBaseUrl }) => ({
     todos: resource<Todo[], void>({

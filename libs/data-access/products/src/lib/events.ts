@@ -1,6 +1,6 @@
-import {eventGroup} from "@ngrx/signals/events";
-import {type} from "@ngrx/signals";
-import {ProductCategory} from "./models";
+import { eventGroup } from '@ngrx/signals/events';
+import { type } from '@ngrx/signals';
+import { ProductCategory } from './models';
 
 export const productsEvents = eventGroup({
   source: 'Products',
@@ -8,5 +8,5 @@ export const productsEvents = eventGroup({
     productPreviewSelected: type<number>(),
     productPreviewCleared: type<void>(),
     productCategorySelected: type<ProductCategory>(),
-  }
+  },
 });

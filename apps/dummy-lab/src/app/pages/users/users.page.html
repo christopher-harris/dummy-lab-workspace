@@ -1,6 +1,10 @@
 <main>
-<!--  <pre> {{ usersStore.allUsersValue() | json }}</pre>-->
-  <p-dataview #dv [value]="usersStore.allUsersValue()?.users ?? []" [layout]="'list'">
+  <!--  <pre> {{ usersStore.allUsersValue() | json }}</pre>-->
+  <p-dataview
+    #dv
+    [value]="usersStore.allUsersValue()?.users ?? []"
+    [layout]="'list'"
+  >
     <ng-template #header>
       <div class="flex justify-end">
         <p-selectbutton
@@ -9,8 +13,10 @@
           [allowEmpty]="false"
         >
           <ng-template #item let-item>
-            <i class="pi"
-               [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"></i>
+            <i
+              class="pi"
+              [ngClass]="{ 'pi-bars': item === 'list', 'pi-table': item === 'grid' }"
+            ></i>
           </ng-template>
         </p-selectbutton>
       </div>
@@ -30,7 +36,11 @@
         $index) {
         <div class="flex items-center gap-4">
           <div class="flex flex-1 items-center gap-4">
-            <img [src]="member.image" [alt]="member.firstName + ' ' + member.lastName" class="w-11.25 h-11.25 rounded-full" />
+            <img
+              [src]="member.image"
+              [alt]="member.firstName + ' ' + member.lastName"
+              class="w-11.25 h-11.25 rounded-full"
+            />
             <div class="flex flex-col gap-2 flex-1">
               <div
                 class="font-medium text-base text-surface-900 dark:text-surface-0 leading-tight"

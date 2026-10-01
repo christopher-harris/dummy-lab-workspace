@@ -1,7 +1,7 @@
-import {Component, effect, inject} from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
-import {LocationStore} from "@dummy-lab/data-access-location";
+import { LocationStore } from '@dummy-lab/data-access-location';
 
 @Component({
   imports: [RouterOutlet],
