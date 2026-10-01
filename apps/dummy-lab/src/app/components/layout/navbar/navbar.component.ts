@@ -47,11 +47,13 @@ export class NavbarComponent {
   router = inject(Router);
   routeConfig = computed<Routes>(() => this.router.config);
 
-  apps = computed(
-    () =>
-      this.routeConfig()[0].children?.filter(
-        (route) => route.data?.['topLevelNavigation'] === true,
-      ) ?? [],
+  // Flattened across every top-level route rather than read off
+  // `routeConfig()[0]`: the bare `/` landing route now sits ahead of the shell
+  // route and has no children, so indexing the first entry would empty the menu.
+  apps = computed(() =>
+    this.routeConfig()
+      .flatMap((route) => route.children ?? [])
+      .filter((route) => route.data?.['topLevelNavigation'] === true),
   );
 
   colorMenuItems = computed<MenuItem[]>(() => [

@@ -2,15 +2,21 @@ import { Route } from '@angular/router';
 import { ShellComponent } from './components/layout/shell/shell.component';
 
 export const appRoutes: Route[] = [
+  // The landing page sits outside the shell: it ships its own nav and footer,
+  // and its sections are full-bleed, so the shell's `dl-navbar` would double up
+  // and its `container mx-auto` would box them in. `pathMatch: 'full'` keeps
+  // this to the bare `/` and leaves every other URL to the shell route below.
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Dummy Lab',
+    loadComponent: () =>
+      import('./pages/landing-pages/landing.page').then((m) => m.Landing1),
+  },
   {
     path: '',
     component: ShellComponent,
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'dashboard',
-      },
       {
         path: 'dashboard',
         title: 'Dashboard | Dummy Lab',

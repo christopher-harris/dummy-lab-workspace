@@ -64,7 +64,8 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Environment config                                        | ✅ Proven  | runtime config loads before bootstrap from `/runtime-config.json`; typed `RUNTIME_CONFIG` is consumed by app and data-access code; Cloudflare varies configuration, not the application artifact                                |
 | MSW / test factories                                      | ❌ Absent  | 9 of 12 lib specs are `expect(true).toBe(true)`                                                                                                                                                                                 |
 | Error taxonomy / `ErrorHandler` / fallback UI             | ❌ Absent  | `provideBrowserGlobalErrorListeners()` only                                                                                                                                                                                     |
-| Accessibility                                             | ❌ Absent  | no axe, no a11y lint rules, no stated WCAG target                                                                                                                                                                               |
+| Accessibility                                             | 🟡 Partial | Lighthouse a11y **97** desktop on the promoted prod artifact (one failure: `color-contrast`); but still no axe, no a11y lint rules, no stated WCAG target                                                                       |
+| Performance baseline                                      | 🟡 Partial | measured on prod 2026-10-01 — desktop **95**, mobile **86**; single runs, no budget assertions, no post-SSR comparison point — see P19                                                                                          |
 | Observability / analytics / flags                         | ❌ Absent  | none                                                                                                                                                                                                                            |
 | ADRs                                                      | ❌ Absent  | none                                                                                                                                                                                                                            |
 
@@ -305,6 +306,51 @@ companion to P4 — marketing is the SSG app.
 measured SEO evidence** in hand — no Search Console, no organic traffic, no crawl stats. Describe
 the mechanism. Do not assert an SEO outcome.
 
+**The performance evidence is a different matter — that one is measured.** Lighthouse 13.5.0 against
+production `www.wingstop.com`, 2026-10-01, decomposes LCP into four phases:
+
+| Phase                   | Mobile      | Desktop     |
+| ----------------------- | ----------- | ----------- |
+| Time to first byte      | 133 ms      | 378 ms      |
+| **Resource load delay** | **6865 ms** | **7068 ms** |
+| Resource load duration  | 353 ms      | 5176 ms     |
+| Element render delay    | 45 ms       | 23 ms       |
+
+The server responds quickly and the hero image downloads quickly. Roughly **seven seconds pass
+before the browser requests it at all** — on both form factors. The LCP element already carries the
+right hints:
+
+```html
+<img
+  fetchpriority="high"
+  loading="eager"
+  data-testid="hero-lcp-img"
+  class="hero-bg-image"
+  src="…"
+/>
+```
+
+They do nothing, because the element is not in the server response. `curl https://www.wingstop.com`
+returns 41 KB of HTML containing an empty `<app-component>` shell — no `ng-server-context`, no
+`<wri-*>` elements, and **zero occurrences of `hero-lcp-img`**. The site is client-rendered, so the
+image does not exist until Angular boots and renders the hero, and the preload scanner never sees
+it. `fetchpriority="high"` cannot prioritise an element the parser has not met.
+
+This is the mechanism, measured in production, and SSR is what addresses it: server-render the hero
+and the `<img>` is in the initial HTML, discovered at TTFB instead of at ~7000 ms, at which point
+the existing hints start working. Pair it with `<link rel="preload" as="image">` for the hero URL.
+
+Two honest boundaries. This describes a **mechanism and a measurement**, not a predicted score —
+third-party load (245 of 286 requests, ~11 MB) contends for bandwidth in the same window, so SSR
+alone does not land the full seven seconds. And the related levers are not SSR's job: deferring
+vendors past the LCP window belongs to P16's single evaluation point, the render-blocking Typekit
+CSS (2445 ms) is a self-hosting fix, and a third-party weight budget in CI is what stops it
+regressing.
+
+**Tier note:** this sits in Tier 3, and the measurement argues it belongs in Tier 1. Seven seconds of
+LCP on the live site traced to a rendering-architecture decision is the strongest evidence in this
+document, and it is the one item here that is about the production site rather than about this lab.
+
 **Cost:** ~1–2 days on top of P4.
 
 ---
@@ -414,6 +460,118 @@ DTO mapping, where custom styling is allowed, one-artifact-per-env. Recording th
 almost nothing and is the difference between a lab and a reference.
 
 **Cost:** ~0.5 day.
+
+---
+
+### ◐ P19 — Performance baseline
+
+**Today:** measured, not guarded. Lighthouse 13.5.0, `dummy-lab-prod.pages.dev/dashboard`,
+2026-10-01, default clear-storage, **single runs**. The artifact is the promoted one —
+`promote-cloudflare.yml` deploys the dev build after a `SHA256SUMS` check, and both environments
+served `main-SCLTYCNS.js`, so these numbers describe the same bytes prod serves.
+
+| Form factor | Perf | FCP   | LCP   | TBT    | CLS   | A11y |
+| ----------- | ---- | ----- | ----- | ------ | ----- | ---- |
+| desktop     | 95   | 0.7 s | 1.4 s | 0 ms   | 0.021 | 97   |
+| mobile      | 86   | 2.6 s | 3.5 s | 120 ms | 0.056 | 100  |
+
+Two caveats that matter more than the scores. **Quote the desktop 97, not the mobile 100** — the
+toolbar's `end` slot is `hidden lg:flex`, so at mobile width the one real failure (`color-contrast`,
+1.3:1 on the status badge) is not rendered and not audited. And these are single runs: two mobile
+runs four minutes apart on the identical bundle scored 89 and 86, with TBT at 40 ms and 120 ms.
+Mobile is "mid-to-high 80s", not 86.
+
+**The structural cost this surfaced.** `runtime-config.json` is fetched before bootstrap with
+`cache: 'no-store'` (`libs/shared/runtime-config/src/lib/runtime-config.ts:128`) and the Pages
+Function returns `Cache-Control: no-store`. In the desktop waterfall the initial chunks finish at
+211 ms, the config request runs 228→332 ms, and the first lazy route chunk does not start until
+340 ms — roughly **130 ms of uncacheable, serialised time on every cold load**. That is the price of
+P8's "vary configuration, not the artifact." It lives in the artifact, so it is identical in dev,
+stage and prod. Mitigations exist — inline the config into `index.html` at deploy time, or allow a
+short `s-maxage` at the edge. Neither has been taken, deliberately.
+
+**No comparative claim.** There is no measured Lighthouse data for `ngfe-web` or `wingstop.com` in
+hand. Same discipline as P11's SEO note: describe the mechanism, do not assert the outcome. If a
+comparison belongs in the record, it is one `PERF_URL=… npm run perf:desktop` away.
+
+**What's missing:** nothing is guarded. Bundle budgets exist (`initial` 500kb warn / 1mb error) but
+there are no Lighthouse assertions, no per-PR preview deploy to measure against, and no second data
+point — the before/after across P11 is the only comparison here that would prove anything.
+
+**Cost:** ~0.5 day for an `lhci` target with assertions against a PR preview. The baseline above is
+already paid: `npm run perf`, `perf:desktop`, `perf:mobile` write timestamped reports to the
+gitignored `analytics/`.
+
+---
+
+### ☐ P20 — Experiment: make the hero image discoverable without prerendering
+
+**Status: unproven. This is the experiment to run, not a conclusion.**
+
+**What is established.** Measured 2026-10-01, Lighthouse 13.5.0, production `www.wingstop.com`,
+single runs. LCP decomposes as:
+
+| Phase                   | Mobile      | Desktop     |
+| ----------------------- | ----------- | ----------- |
+| Time to first byte      | 133 ms      | 378 ms      |
+| **Resource load delay** | **6865 ms** | **7068 ms** |
+| Resource load duration  | 353 ms      | 5176 ms     |
+| Element render delay    | 45 ms       | 23 ms       |
+
+The server answers fast and the image downloads fast. ~7 seconds pass before the browser requests it.
+The element already carries `fetchpriority="high"` and `loading="eager"`, and they do nothing:
+`curl https://www.wingstop.com` returns ~41 KB of HTML with an empty `<app-component>` shell — no
+`ng-server-context`, no `<wri-*>` elements, **zero occurrences of `hero-lcp-img`**. Client-rendered,
+so the preload scanner never meets the image. The asset is served from `cdn.bfldr.com` (Brandfolder).
+
+**The constraint that rules out prerendering.** The hero is marketing-controlled, can change weekly
+or hourly, and is influenced by feature flags and location. Build-time prerender would need a deploy
+per change and has no single correct output under personalization.
+
+**Two candidates to test.**
+
+**A — Edge preload injection.** A Cloudflare Worker (`HTMLRewriter`) resolves CMS + flags +
+`request.cf` geo at the edge, CMS response cached, and injects
+`<link rel="preload" as="image" href="…">` into the existing shell. No Angular server runtime. Takes
+the image fetch off the critical path; does **not** remove the boot-then-discover sequence. Same
+shape as the existing `apps/dummy-lab/functions/runtime-config.json.ts` adapter.
+
+**B — Per-route SSR.** `RenderMode.Server` on `/` via `provideServerRouting`; other route families
+`Prerender` or `Client`. The server resolves personalization and emits the `<img>` in the HTML,
+removing the sequence entirely. Costs a server runtime, puts the CMS call inside TTFB (needs edge
+cache + stale-while-revalidate), and requires the SSR-safety work below first.
+
+**Blocking question — get this before scoping either.** The real cardinality of hero
+personalization. A handful of region x flag variants caches well at the edge and both options work.
+Genuinely per-user collapses edge caching and changes the answer.
+
+**SSR-safety prerequisite for B.** Libs touching browser globals today:
+
+- `libs/shared/runtime-config/src/lib/runtime-config.ts:124` — `document.baseURI`
+- `libs/data-access/theme` — `withStorageSync` to `localStorage`
+- `libs/data-access/auth` — same, persists `accessToken`/`refreshToken`
+- `libs/data-access/location` — `navigator.permissions` / geolocation, inherently browser-only
+
+SSR is per-**application**, never per-library — but a lib can break it. Enforce with a
+`platform:universal` / `platform:browser-only` tag axis plus a `depConstraints` rule so anything in
+the server-rendered graph cannot import a browser-only lib. That is a second, independent argument
+for P1, and this class of bug does not surface until someone enables SSR months later.
+
+**How to prove it.** Measure `www.wingstop.com` before, implement one approach on a preview URL,
+re-measure under identical conditions — same Lighthouse version, same preset, **median of 3-5**,
+because production third-party variance is wide. The success metric is a drop in **LCP resource load
+delay**, not the overall score: third-party load (245 of 286 requests, ~11 MB) dominates the score
+and neither approach touches it.
+
+**Do not predict a post-fix LCP.** The phase breakdown above sums to ~7.4 s while the reported mobile
+LCP was 39.2 s — Lighthouse scales observed timings under simulated throttling while the insight
+panel reports the observed trace. The mechanism and the `curl` evidence are solid; a specific
+predicted number is not.
+
+**Related:** P11 (SSR/SSG), P16 (deferring vendors past the LCP window), P18 — the A-vs-B choice is
+ADR-shaped and would be the first real decision record.
+
+**Cost:** ~1 day to test A on a preview. B is P11-sized.
 
 ---
 

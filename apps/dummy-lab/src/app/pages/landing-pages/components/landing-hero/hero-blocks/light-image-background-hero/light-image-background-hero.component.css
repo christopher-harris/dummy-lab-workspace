@@ -1,0 +1,16 @@
+/* `flex: 1` fills the carousel item, which PrimeNG has already stretched to the
+   tallest slide — that's what keeps all four heroes the same height. */
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* This block is shorter than the tallest slide, so centre its copy in the
+   stretched root rather than leaving the dead space below it. */
+:host > div {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

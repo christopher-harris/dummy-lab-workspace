@@ -1,0 +1,5 @@
+/* The footer's own root is a full-bleed block, so the host has to be block too —
+   an inline host would add line-box spacing above it. */
+:host {
+  display: block;
+}

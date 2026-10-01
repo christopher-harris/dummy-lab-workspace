@@ -41,6 +41,21 @@ export default [
     },
   },
   {
+    // The landing hero blocks keep the unprefixed selectors they were authored
+    // with. Nothing references them by selector — the carousel mounts them
+    // through `ngComponentOutlet` — so the `dl` prefix buys no collision safety
+    // here, and renaming them would churn markup lifted in from an external
+    // block library.
+    //
+    // The rule is off rather than reconfigured: `prefix` has no "any" value, and
+    // omitting it falls back to the built-in default of `app`, which fails the
+    // same way. Scoped to this folder so every other component still needs `dl`.
+    files: ['**/hero-blocks/**/*.ts'],
+    rules: {
+      '@angular-eslint/component-selector': 'off',
+    },
+  },
+  {
     files: ['**/*.html'],
     // Override or add rules here
     rules: {},

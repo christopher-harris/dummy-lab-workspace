@@ -2,13 +2,19 @@
   "name": "dummy-lab-workspace",
   "version": "0.0.0",
   "private": true,
+  "config": {
+    "perfUrl": "https://dummy-lab-prod.pages.dev/dashboard"
+  },
   "scripts": {
     "nx": "nx",
     "build": "nx run-many -t build",
     "test": "nx run-many -t test",
     "lint": "nx run-many -t lint",
     "check": "nx run-many -t lint build test",
-    "check:affected": "nx affected -t lint build test"
+    "check:affected": "nx affected -t lint build test",
+    "perf": "npm run perf:desktop && npm run perf:mobile",
+    "perf:desktop": "URL=\"${PERF_URL:-$npm_package_config_perfUrl}\"; lighthouse \"$URL\" --preset=desktop --output=html --output=json --chrome-flags=\"--headless=new\" --output-path=./analytics/lighthouse/$(echo \"$URL\" | sed -E 's#^https?://##; s#/+$##; s#[^A-Za-z0-9._-]+#-#g')-desktop-$(date +%Y%m%dT%H%M%S)",
+    "perf:mobile": "URL=\"${PERF_URL:-$npm_package_config_perfUrl}\"; lighthouse \"$URL\" --output=html --output=json --chrome-flags=\"--headless=new\" --output-path=./analytics/lighthouse/$(echo \"$URL\" | sed -E 's#^https?://##; s#/+$##; s#[^A-Za-z0-9._-]+#-#g')-mobile-$(date +%Y%m%dT%H%M%S)"
   },
   "devDependencies": {
     "@analogjs/vite-plugin-angular": "2.6.4",
@@ -39,6 +45,7 @@
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "jsdom": "^27.1.0",
+    "lighthouse": "^13.5.0",
     "nx": "23.2.1",
     "postcss": "^8.5.15",
     "prettier": "~3.6.2",

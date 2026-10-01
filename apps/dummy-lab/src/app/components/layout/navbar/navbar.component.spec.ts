@@ -11,7 +11,7 @@ describe('NavbarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NavbarComponent],
       // The navbar derives its menu from `Router.config`, so it needs the real
-      // route tree — `provideRouter([])` leaves `routeConfig()[0]` undefined.
+      // route tree — `provideRouter([])` gives it nothing to flatten.
       providers: [provideRouter(appRoutes)],
     }).compileComponents();
 

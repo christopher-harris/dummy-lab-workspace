@@ -1,0 +1,16 @@
+<div class="overflow-hidden">
+  <p-carousel
+    [value]="slides()"
+    [numVisible]="1"
+    [numScroll]="1"
+    [circular]="true"
+    [autoplayInterval]="autoplayInterval"
+    [showNavigators]="true"
+    [showIndicators]="true"
+    [pt]="carouselPt"
+  >
+    <ng-template #item let-slide>
+      <ng-container [ngComponentOutlet]="slide.component" />
+    </ng-template>
+  </p-carousel>
+</div>

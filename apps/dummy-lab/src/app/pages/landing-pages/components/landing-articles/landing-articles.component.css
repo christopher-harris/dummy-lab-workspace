@@ -1,0 +1,6 @@
+/* Each section was a top-level block in the page's template. The component host
+   now sits between the page wrapper and that block, so it has to be block too —
+   an inline host would reintroduce line-box spacing between sections. */
+:host {
+  display: block;
+}

@@ -4,6 +4,8 @@
     class="flex flex-col container mx-auto bg-surface-50 dark:bg-surface-950"
   >
     <router-outlet />
-    <!--        <dl-footer/>-->
   </main>
+  <!-- Outside `main`: the footer is full-bleed, so `container mx-auto` would
+       box it in and leave the page background showing either side of it. -->
+  <dl-footer />
 </div>
