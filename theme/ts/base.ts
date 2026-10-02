@@ -427,6 +427,7 @@ export default {
         hoverColor: "{text.hover.color}"
     },
     mask: {
+        transitionDuration: "0.3s",
         background: "light-dark(#00000066, #00000099)",
         color: "{surface.200}"
     },

@@ -40,6 +40,15 @@
       ],
       "@dummy-lab/data-access-location": [
         "./libs/data-access/location/src/index.ts"
+      ],
+      "@dummy-lab/data-access-session-cart": [
+        "./libs/data-access/session-cart/src/index.ts"
+      ],
+      "@dummy-lab/feature-session-cart": [
+        "./libs/feature/session-cart/src/index.ts"
+      ],
+      "@dummy-lab/shared-models": [
+        "./libs/shared/models/src/index.ts"
       ]
     },
     "strict": false,

@@ -1,6 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { ProductsStore } from '@dummy-lab/data-access-products';
 import { JsonPipe } from '@angular/common';
+import { injectDispatch } from '@ngrx/signals/events';
+import {
+  sessionCartEvents,
+} from '@dummy-lab/data-access-session-cart';
 
 @Component({
   selector: 'dl-product-detail',
@@ -10,4 +14,6 @@ import { JsonPipe } from '@angular/common';
 })
 export class ProductDetailPage {
   productsStore = inject(ProductsStore);
+  cartEvents = injectDispatch(sessionCartEvents);
+
 }

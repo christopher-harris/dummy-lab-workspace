@@ -7702,6 +7702,12 @@
       }
     },
     "mask": {
+      "transition": {
+        "duration": {
+          "$type": "number",
+          "$value": "0.3s"
+        }
+      },
       "background": {
         "$type": "color",
         "$value": "#00000066"
@@ -8158,6 +8164,12 @@
       }
     },
     "mask": {
+      "transition": {
+        "duration": {
+          "$type": "number",
+          "$value": "0.3s"
+        }
+      },
       "background": {
         "$type": "color",
         "$value": "#00000099"

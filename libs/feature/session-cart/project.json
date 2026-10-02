@@ -1,0 +1,26 @@
+{
+  "name": "feature-session-cart",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature/session-cart/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:carts"],
+  "targets": {
+    "test": {
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/libs/feature/session-cart"
+      ],
+      "options": {
+        "coverage.reportsDirectory": "../../../coverage/libs/feature/session-cart",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "maxWarnings": 0
+      }
+    }
+  }
+}

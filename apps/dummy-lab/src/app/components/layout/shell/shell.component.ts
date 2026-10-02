@@ -12,6 +12,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { RouterOutlet } from '@angular/router';
+import { CartDrawerComponent } from '@dummy-lab/feature-session-cart';
 
 @Component({
   selector: 'dl-shell',
@@ -29,6 +30,7 @@ import { RouterOutlet } from '@angular/router';
     NavbarComponent,
     FooterComponent,
     RouterOutlet,
+    CartDrawerComponent,
   ],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.css',

@@ -15,6 +15,12 @@ import { PRIMARY_COLORS, ThemeStore } from '@dummy-lab/data-access-theme';
 import { authEvents, AuthStore } from '@dummy-lab/data-access-auth';
 import { injectDispatch } from '@ngrx/signals/events';
 import { UsersStore } from '@dummy-lab/data-access-users';
+import { User, ShoppingCart } from '@primeicons/angular';
+import {
+  sessionCartEvents,
+  SessionCartStore,
+} from '@dummy-lab/data-access-session-cart';
+
 
 @Component({
   selector: 'dl-navbar',
@@ -31,6 +37,7 @@ import { UsersStore } from '@dummy-lab/data-access-users';
     FormsModule,
     RouterLink,
     MenuModule,
+    User, ShoppingCart
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
@@ -41,6 +48,8 @@ export class NavbarComponent {
   usersStore = inject(UsersStore);
   search = '';
   themeStore = inject(ThemeStore);
+  sessionCartStore = inject(SessionCartStore);
+  sessionCartActions = injectDispatch(sessionCartEvents);
 
   readonly colors = PRIMARY_COLORS;
 
@@ -116,5 +125,9 @@ export class NavbarComponent {
 
   onLogoutClicked() {
     this.authActions.logoutRequested();
+  }
+
+  onCartClicked() {
+    this.sessionCartActions.toggleCartDrawer();
   }
 }

@@ -1,0 +1,13 @@
+<p-drawer
+  [visible]="sessionCartStore.cartDrawerVisible()"
+  (visibleChange)="cartEvents.cartDrawerVisibilityChanged($event)"
+  header="Cart"
+  [position]="'right'"
+  styleClass="w-full! md:w-80!"
+>
+  @if (!sessionCartStore.cart()?.products?.length) {
+    <p>No items in your cart yet</p>
+  } @else {
+    <pre>{{ sessionCartStore.cart()?.products | json }}</pre>
+  }
+</p-drawer>

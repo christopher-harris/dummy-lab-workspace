@@ -37,6 +37,15 @@ export default [
               ],
             },
             {
+              sourceTag: 'type:feature',
+              onlyDependOnLibsWithTags: [
+                'type:data-access',
+                'type:ui',
+                'type:util',
+                'scope:shared',
+              ],
+            },
+            {
               sourceTag: 'type:ui',
               onlyDependOnLibsWithTags: ['*'],
             },

@@ -17,6 +17,8 @@ import { MessageModule } from 'primeng/message';
 import { SelectItem } from 'primeng/api';
 import { RouterLink } from '@angular/router';
 import { injectDispatch } from '@ngrx/signals/events';
+import { sessionCartEvents } from '@dummy-lab/data-access-session-cart';
+import { CartProduct } from '@dummy-lab/shared-models';
 
 type Layout = 'list' | 'grid';
 
@@ -42,6 +44,7 @@ type Layout = 'list' | 'grid';
 export class ProductsListPage {
   readonly productsStore = inject(ProductsStore);
   productsActions = injectDispatch(productsEvents);
+  cartEvents = injectDispatch(sessionCartEvents);
 
   /** The grid is driven off the `allProducts` httpResource in ProductsStore. */
   readonly products = computed<Product[]>(
@@ -79,5 +82,10 @@ export class ProductsListPage {
 
   onCategoryChange(event: SelectChangeEvent) {
     this.productsActions.productCategorySelected(event.value);
+  }
+
+  onAddToCartClicked(product: CartProduct) {
+    // console.log('add to cart clicked', product);
+    this.cartEvents.itemAdded(product);
   }
 }
