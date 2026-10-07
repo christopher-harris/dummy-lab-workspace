@@ -9,12 +9,14 @@ describe('parseRuntimeConfig', () => {
     const config = parseRuntimeConfig({
       environment: 'stage',
       apiBaseUrl: 'https://dummyjson.com/',
+      cmsBaseUrl: 'https://cms.example.com/',
       features: { experimentalCatalog: true },
     });
 
     expect(config).toEqual({
       environment: 'stage',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     });
     expect(Object.isFrozen(config)).toBe(true);
@@ -26,17 +28,33 @@ describe('parseRuntimeConfig', () => {
     {
       environment: 'preview',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     },
     {
       environment: 'dev',
       apiBaseUrl: 'not-a-url',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     },
     {
       environment: 'prod',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: 'true' },
+    },
+    // A config that predates `cmsBaseUrl` must fail rather than silently
+    // yielding a store that requests `undefined/api/...`.
+    {
+      environment: 'prod',
+      apiBaseUrl: 'https://dummyjson.com',
+      features: { experimentalCatalog: true },
+    },
+    {
+      environment: 'prod',
+      apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'ftp://cms.example.com',
+      features: { experimentalCatalog: true },
     },
   ])('rejects an invalid configuration', (config) => {
     expect(() => parseRuntimeConfig(config)).toThrow(RuntimeConfigLoadError);
@@ -61,6 +79,7 @@ describe('RuntimeConfigLoader', () => {
         JSON.stringify({
           environment: 'local',
           apiBaseUrl: 'https://dummyjson.com',
+          cmsBaseUrl: 'http://localhost:1337',
           features: { experimentalCatalog: true },
         }),
       ),

@@ -1,0 +1,38 @@
+# Postgres for the Strapi CMS spike.
+#
+# Values are interpolated from apps/cms/.env (Compose auto-loads the .env file
+# sitting next to this one), so the container and Strapi read a single source of
+# truth. Defaults match what `create-strapi` wrote, so this still comes up if
+# .env is missing.
+#
+# Managed through Nx: `nx run cms:db`, `cms:db:stop`, `cms:db:reset`.
+# `nx serve cms` depends on `cms:db`, so the database comes up first.
+
+services:
+  db:
+    image: postgres:16
+    container_name: strapi-spike-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME:-strapi}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-strapi}
+      POSTGRES_DB: ${DATABASE_NAME:-strapi_spike}
+    ports:
+      - '${DATABASE_PORT:-5432}:5432'
+    volumes:
+      - strapi-spike-db-data:/var/lib/postgresql/data
+    # `docker compose up --wait` blocks on this. Without a healthcheck, Compose
+    # returns as soon as the container starts — which is before Postgres accepts
+    # connections — and Strapi loses the race on a cold boot.
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DATABASE_USERNAME:-strapi} -d ${DATABASE_NAME:-strapi_spike}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  strapi-spike-db-data:

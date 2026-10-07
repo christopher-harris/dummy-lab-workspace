@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_shared_icon_links",
+  "info": {
+    "displayName": "Icon Link",
+    "icon": "link",
+    "description": "An outbound link rendered as an icon only. The icon is a constrained vocabulary, not a CSS class: the frontend owns the mapping from these values to PrimeIcons classes, so a renamed icon set is a frontend change rather than a content migration."
+  },
+  "options": {},
+  "attributes": {
+    "icon": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "apple",
+        "android",
+        "facebook",
+        "instagram",
+        "tiktok",
+        "youtube",
+        "x"
+      ]
+    },
+    "href": {
+      "type": "string",
+      "required": true,
+      "regex": "^https://",
+      "maxLength": 2048
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    }
+  }
+}

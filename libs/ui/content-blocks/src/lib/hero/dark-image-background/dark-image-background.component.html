@@ -1,0 +1,53 @@
+<div class="relative p-8 md:p-12 lg:p-20 overflow-hidden">
+  <!-- 207 KiB of background art for a slide that is off-screen at first paint.
+       Every slide lives in the same flex row at the top of the document, so
+       Chrome treats it as in-viewport and fetches it at High priority, against
+       the real LCP image.
+
+       NOTE: this `@defer` does NOT currently fix that. Measured on dev
+       (lighthouse 2026-10-01): the request still starts at ~333ms at High
+       priority, because the default `on idle` trigger fires almost immediately
+       after first render. Real options are an `on viewport` / `on timer`
+       trigger, or — better — shrinking the asset via the Supabase
+       `/render/image/` endpoint's `width`/`quality` params.
+
+       The block is kept because moving the stack onto its own layer is correct
+       either way: all four gradient layers stay on one element, so
+       `background-blend-mode` composites exactly as before. -->
+  @defer {
+    <div class="absolute inset-0" [style]="backgroundStyle()"></div>
+  }
+  <!-- The container width constrains this copy column only; the photo
+       layer above it stays full-bleed. -->
+  <div class="text-center my-12 relative w-full {{ containerClass() }}">
+    <div class="text-4xl md:text-5xl font-bold mb-1 text-white leading-tight">
+      {{ content().headline }}
+    </div>
+    <div
+      class="text-4xl md:text-5xl text-primary-400 font-bold mb-6 leading-tight"
+    >
+      {{ content().headlineAccent }}
+    </div>
+    <p
+      class="mt-0 mb-4 leading-normal text-center mx-auto text-primary-100 max-w-xl text-xl"
+    >
+      {{ content().description }}
+    </p>
+
+    <div
+      class="flex flex-col sm:flex-row items-center justify-center gap-4 px-8 sm:px-0 py-4 sm:py-0"
+    >
+      <input
+        pInputText
+        type="text"
+        class="bg-transparent! border-white/70! p-3! rounded-full! h-12! w-full! sm:w-auto! text-surface-0/80! placeholder:text-surface-0/60!"
+        size="30"
+        [placeholder]="content().emailPlaceholder"
+        [(ngModel)]="email"
+      />
+      <button pButton rounded class="h-12! w-full! sm:w-auto!">
+        <span pButtonLabel>{{ content().ctaLabel }}</span>
+      </button>
+    </div>
+  </div>
+</div>

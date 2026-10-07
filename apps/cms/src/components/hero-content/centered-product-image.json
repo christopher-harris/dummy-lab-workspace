@@ -1,0 +1,47 @@
+{
+  "collectionName": "components_hero_content_centered_product_images",
+  "info": {
+    "displayName": "Hero Content — Centered Product Image",
+    "icon": "picture",
+    "description": "Copy and artwork for the centered-product-image hero. Carries a light/dark artwork pair because this block is the page's LCP element and the frontend picks one image rather than shipping both. Alt text lives on the media asset, not here."
+  },
+  "options": {},
+  "attributes": {
+    "eyebrow": {
+      "type": "string",
+      "maxLength": 40,
+      "required": false
+    },
+    "headline": {
+      "type": "string",
+      "maxLength": 40,
+      "required": true
+    },
+    "headlineAccent": {
+      "type": "string",
+      "maxLength": 40,
+      "required": true
+    },
+    "ctaLabel": {
+      "type": "string",
+      "maxLength": 24,
+      "required": true
+    },
+    "imageLight": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "imageDark": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

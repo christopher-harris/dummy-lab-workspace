@@ -20,6 +20,8 @@ export type RuntimeEnvironment = (typeof environments)[number];
 export interface RuntimeConfig {
   readonly environment: RuntimeEnvironment;
   readonly apiBaseUrl: string;
+  /** Origin of the headless CMS. Content only; never the same host as `apiBaseUrl`. */
+  readonly cmsBaseUrl: string;
   readonly features: Readonly<{
     experimentalCatalog: boolean;
   }>;
@@ -33,6 +35,36 @@ export class RuntimeConfigLoadError extends Error {
     super(message);
     this.name = 'RuntimeConfigLoadError';
   }
+}
+
+/**
+ * Validates one absolute base URL and strips a trailing slash, so every caller
+ * can build paths as `${base}/thing` without guessing whether to add one.
+ */
+function parseBaseUrl(value: unknown, label: string): string {
+  if (typeof value !== 'string') {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration has an invalid ${label} base URL.`,
+    );
+  }
+
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch (cause) {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration has an invalid ${label} base URL.`,
+      cause,
+    );
+  }
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration ${label} base URL must use HTTP or HTTPS.`,
+    );
+  }
+
+  return url.toString().replace(/\/$/, '');
 }
 
 /** Validates and freezes the public configuration returned by the host. */
@@ -67,31 +99,10 @@ export function parseRuntimeConfig(value: unknown): RuntimeConfig {
     );
   }
 
-  if (typeof candidate['apiBaseUrl'] !== 'string') {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration has an invalid API base URL.',
-    );
-  }
-
-  let apiBaseUrl: URL;
-  try {
-    apiBaseUrl = new URL(candidate['apiBaseUrl']);
-  } catch (cause) {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration has an invalid API base URL.',
-      cause,
-    );
-  }
-
-  if (!['http:', 'https:'].includes(apiBaseUrl.protocol)) {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration API base URL must use HTTP or HTTPS.',
-    );
-  }
-
   return Object.freeze({
     environment: candidate['environment'] as RuntimeEnvironment,
-    apiBaseUrl: apiBaseUrl.toString().replace(/\/$/, ''),
+    apiBaseUrl: parseBaseUrl(candidate['apiBaseUrl'], 'API'),
+    cmsBaseUrl: parseBaseUrl(candidate['cmsBaseUrl'], 'CMS'),
     features: Object.freeze({
       experimentalCatalog: (features as Record<string, boolean>)[
         'experimentalCatalog'

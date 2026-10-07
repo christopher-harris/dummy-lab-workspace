@@ -4,13 +4,16 @@
     [numVisible]="1"
     [numScroll]="1"
     [circular]="true"
-    [autoplayInterval]="autoplayInterval"
+    [autoplayInterval]="autoplayInterval()"
     [showNavigators]="true"
     [showIndicators]="true"
     [pt]="carouselPt"
   >
     <ng-template #item let-slide>
-      <ng-container [ngComponentOutlet]="slide.component" />
+      <ng-container
+        [ngComponentOutlet]="slide.component"
+        [ngComponentOutletInputs]="slide.inputs"
+      />
     </ng-template>
   </p-carousel>
 </div>

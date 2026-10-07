@@ -1,6 +1,7 @@
 # 🤖 Prove-Out Backlog — what's left before "this is the example"
 
-**Drafted:** 22 Sept 2026 · **Audience:** Chris · **Status:** decision instrument, not a plan
+**Drafted:** 22 Sept 2026 · **Updated:** 5 Oct 2026 · **Audience:** Chris · **Status:** decision
+instrument, not a plan
 
 Measured directly against this tree and against four sources in `ngfe-web`:
 `docs/ANGULAR-MODERNIZATION-PLAN.md`, `initial-audit/`, `notebook/` (chiefly
@@ -10,6 +11,12 @@ epics `20`–`23`).
 Every gap below is stated as: **what is true in this repo today** → **what proving it buys you
 in `ngfe-web`** → **rough cost**. Status reflects the current implementation, not just a design
 decision: partial work is deliberately not marked proven.
+
+**Addendum, 5 Oct 2026 — P21–P24 and the CMS cross-references are forward-looking.** They are not
+measured against the four `ngfe-web` sources above, because a headless CMS does not appear in any of
+them. They came out of a live planning conversation and should be read as scoping, not as an audit
+finding. Numbering is append-only so existing references stay stable — which is why Tier 2's items
+are P5–P10 and P21–P24.
 
 ---
 
@@ -66,6 +73,7 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Error taxonomy / `ErrorHandler` / fallback UI             | ❌ Absent  | `provideBrowserGlobalErrorListeners()` only                                                                                                                                                                                     |
 | Accessibility                                             | 🟡 Partial | Lighthouse a11y **97** desktop on the promoted prod artifact (one failure: `color-contrast`); but still no axe, no a11y lint rules, no stated WCAG target                                                                       |
 | Performance baseline                                      | 🟡 Partial | measured on prod 2026-10-01 — desktop **95**, mobile **86**; single runs, no budget assertions, no post-SSR comparison point — see P19                                                                                          |
+| CMS / content layer                                       | ❌ Absent  | landing content hardcoded in `pages/landing-pages/components/`; no content source, block registry, preview path, or failure policy — P21–P24                                                   |
 | Observability / analytics / flags                         | ❌ Absent  | none                                                                                                                                                                                                                            |
 | ADRs                                                      | ❌ Absent  | none                                                                                                                                                                                                                            |
 
@@ -176,6 +184,10 @@ blast-radius guarantee as a lint rule instead of a hope. Depends on P1 and P2.
 Tier 1 makes the architecture claim true. Tier 2 covers the things that, in my experience, are what
 a real `ngfe-web` domain migration will run aground on. Ranked by risk-to-`ngfe-web`, not by cost.
 
+P21–P24 are the CMS block, added 5 Oct 2026. They sit in Tier 2 rather than Tier 3 because the
+content model is being designed **now**, and several of the rules below are unwinnable arguments
+once it ships.
+
 ### ◐ P5 — Forms & validation pattern
 
 **Today:** the login page now has a typed reactive form with required username and password
@@ -277,7 +289,19 @@ typed accessor; no `fileReplacements`.
 state."_ That decision has real ongoing cost in `ngfe-web` and you haven't priced it. Proving it on
 one domain tells you whether you actually believe in it.
 
-**Cost:** ~0.5 day on one domain. The point is the price tag, not the code.
+**What the CMS changes: this stops being optional.** A CMS response is an envelope — nested
+attributes, media objects with format variants, localization, draft state, pagination meta — and the
+vendor is not decided. Mapping that envelope straight into store state marries you to one vendor's
+response shape permanently, which is precisely the mistake this document criticises elsewhere.
+**Prove the seam, not the vendor:** with a real DTO → domain boundary a vendor change is a mapper
+rewrite; without one it is a rewrite of every component that ever touched content.
+
+Pin the major version before writing any shape into the record — Strapi 4 and 5 differ materially in
+envelope structure and identifiers. Verify against a running instance; do not assert from memory.
+See P21, P22.
+
+**Cost:** ~0.5 day on one domain. The point was the price tag; with a CMS in play it is also the
+exit cost.
 
 ---
 
@@ -290,7 +314,133 @@ no degraded or offline behavior.
 `ideal-architecture.md` asks _"what does the user see when the menu API 500s?"_ — and Phase F
 story 5 is entirely this. Currently unanswerable.
 
+**The CMS raises the stakes on this exact question** — see P24. A failed product fetch costs a list.
+A failed content fetch costs the homepage.
+
 **Cost:** ~1–1.5 days.
+
+---
+
+### ☐ P21 — Content/render + cache boundary
+
+**Today:** no CMS, no content layer. Every landing surface in
+`apps/dummy-lab/src/app/pages/landing-pages/components/` — hero, announcement bar, articles,
+pricing, stats, CTA banner, features, trusted-by — carries hardcoded content. That is a block
+library with nothing behind it, which makes it the cheapest realistic CMS test bed in this repo.
+
+**The decision this forces.** Where content resolves is not a CMS question, it is a rendering
+question, and it has exactly three answers per route family: build time (SSG + webhook rebuild),
+request time at the edge (Worker + cache), or client time (fetch after boot). Each has a different
+failure mode and a different LCP profile. This is P11's decision with a second axis bolted on, and
+the two cannot be settled independently.
+
+**The self-host hypothesis — measure it, do not assume it.** Self-hosting Strapi means owning the
+cache and the throughput instead of inheriting a vendor CDN's defaults. That is a genuine lever and
+it is also an unproven claim. Stated precisely enough to be falsified:
+
+> With a self-hosted CMS behind an edge cache we control, the content fetch can be removed from the
+> LCP critical path for cacheable content, and held under _[budget]_ for the uncacheable remainder.
+
+Note where the lever actually applies. If content caches as a single object at the edge, the origin
+leaves the request path and it stops mattering much whose origin it is — the cache is doing the work
+either way. **Self-hosting pays in the cache-miss window**, and the cache-miss window is where
+personalization lives. That is the same window P20's cardinality question is about; answer that
+first, because it sizes this one.
+
+State the other half plainly too: Strapi's read path is a Node application over an ORM over
+Postgres. It is not a CDN and was not built to serve a retail homepage at traffic. "We own the
+throughput" means "we own the work of making it fast," and in practice that work is a cache in front
+of it.
+
+**Shape:** local Strapi plus a Cloudflare Worker cache in front, modelled on the existing
+`apps/dummy-lab/functions/runtime-config.json.ts` adapter. Drive the landing hero from it. Measure
+cold and warm, origin-hit and edge-hit, under P19's methodology — same Lighthouse version, same
+preset, **median of 3–5**. Report the LCP phase table, not the overall score. Describe the
+mechanism; do not assert the outcome.
+
+**Cost:** ~2 days. P20's cardinality answer scopes it but is not needed to start.
+
+---
+
+### ☐ P22 — Block registry and the taxonomy rule for content
+
+**Today:** nothing. The landing components are imported directly by their page.
+
+**Why it matters:** a CMS introduces an import direction the current taxonomy has no opinion about.
+Marketing composes a page as an ordered list of blocks, and something has to map a block
+discriminator to an Angular component. That registry is where the taxonomy goes wrong in a brand-new
+way — **if `ui` blocks fetch their own content, you have reproduced the exact `ui` → `data-access`
+violation P1 exists to prevent**, only now it arrives disguised as a content concern.
+
+The rule worth writing before the content model exists: **`ui` blocks receive content as typed
+inputs and never resolve it.** A `feature` or route-level component resolves the page, maps blocks,
+and projects. This puts P2's `ui`/`feature` split under its first real load, and it is a better
+negative test for P1 than a synthetic fixture would be.
+
+**The escape hatch to close now.** A rich-text or raw-HTML field is a hole straight through every
+boundary rule in P1 and every token in P13. If marketing can ship arbitrary markup, the design
+system is advisory and the taxonomy is decoration. Decide the allowed surface area — which blocks
+exist, which fields are constrained vocabularies, whether rich text renders through a sanitizer with
+a component allowlist — **before** the content model is built, because that argument is unwinnable
+afterward. `ideal-architecture.md:46` already asks where custom styling is allowed; this is the same
+question with a CMS behind it.
+
+**Shape:** `libs/data-access/content` owns resolution; `libs/shared/ui/blocks` owns presentation; a
+typed discriminated union for blocks; a `depConstraints` rule that makes the wrong direction fail
+the build. Extract the existing landing components as the block library.
+
+**Cost:** ~2 days. Depends on P1 and P2.
+
+---
+
+### ☐ P23 — Preview, draft, and the one-artifact promise
+
+**Today:** P8 proved "vary configuration, not the artifact" and it is the cleanest win in this
+document. A CMS with draft/publish is the first thing that will pressure it.
+
+**Why it matters:** marketing will ask for preview on day one, and preview is a second render path,
+not a flag. Draft content is uncacheable, reviewer-scoped, and must never reach a crawler. When
+preview gets retrofitted it tends to arrive as a separate build, a separate environment, or a
+long-lived `?preview=true` branch in application code — all three of which quietly undo P8.
+
+A compatible shape does exist: preview as a signed, short-lived token that selects a content source
+at request time, served `no-store` and `noindex`, **from the same artifact**. That is P8's mechanism
+extended rather than abandoned — but only if it is designed now.
+
+**Secondary:** scheduled publishes and webhook-triggered rebuilds are the same problem wearing a
+hat. If P21's answer is build-time, a scheduled publish is a deploy, and "this goes live at 9am"
+becomes a CI concern rather than a content one.
+
+**Shape:** a preview token path through the existing Pages Function; draft-versus-published source
+selected at request time; assertions that `noindex` and `no-store` are set and that the production
+artifact hash is unchanged by any of it.
+
+**Cost:** ~1 day on top of P21.
+
+---
+
+### ☐ P24 — CMS failure policy, and who owns the origin
+
+**Today:** P10 asks _"what does the user see when the menu API 500s?"_ and is unanswerable. The CMS
+asks the same question with more at stake: when DummyJSON is down you lose a product list; when the
+content source is down **you lose the homepage**.
+
+**The coupling to name.** If content resolution sits inside TTFB — P21's request-time answer, or
+P20's option B — then **CMS availability becomes site availability**, a dependency this architecture
+does not currently have anywhere. The mitigations are known and none are free: stale-while-revalidate
+with a long stale window, a last-known-good snapshot baked into the artifact as a floor, or a static
+fallback block set. Pick one deliberately instead of discovering later which one you happen to have.
+
+**The part that is not a technical question.** Self-hosting is a clear-eyed choice if someone is
+named for it. When the content origin is slow at 7pm on a Friday, who gets paged? If the answer is
+the frontend team, that is a real cost belonging in the comparison against a hosted vendor, and it is
+routinely left out of that comparison. If nobody has been named yet, **that is the risk — not the
+technology.**
+
+**Shape:** extend P10's taxonomy with a content-unavailable class; implement one fallback strategy
+and prove it by killing the origin; record the on-call answer in P18's ADR.
+
+**Cost:** ~1 day on top of P10.
 
 ---
 
@@ -301,6 +451,10 @@ story 5 is entirely this. Currently unanswerable.
 No `@angular/ssr`, no server entry, no prerender. Epic `22` story 2 is "SSG/SSR decision per route
 family," and `ideal-architecture.md` wants an incremental-hydration decision per route type. Natural
 companion to P4 — marketing is the SSG app.
+
+**The CMS adds the second axis.** "SSG/SSR per route family" cannot be decided without also deciding
+where content resolves — build time, edge, or client. P21 is that decision. They are one decision
+with two names, and answering either alone produces a commitment you will reopen.
 
 **Carry the caution verbatim** from `notebook/architecture-review-seo-notes.md`: there is **no
 measured SEO evidence** in hand — no Search Console, no organic traffic, no crawl stats. Describe
@@ -545,6 +699,13 @@ cache + stale-while-revalidate), and requires the SSR-safety work below first.
 personalization. A handful of region x flag variants caches well at the edge and both options work.
 Genuinely per-user collapses edge caching and changes the answer.
 
+**The CMS turns that from a guess into a scoping input.** A headless CMS is what makes the hero
+marketing-controlled in the first place, so the content model _is_ the cardinality answer — how many
+hero variants the model can express is something you read off a schema rather than estimate. Get it
+while that schema is still negotiable. Note too that both candidates now carry a content fetch:
+A resolves the CMS at the edge before it can inject the preload, and B puts the CMS call inside
+TTFB. See P21 for the cache boundary and P24 for what happens when that fetch fails.
+
 **SSR-safety prerequisite for B.** Libs touching browser globals today:
 
 - `libs/shared/runtime-config/src/lib/runtime-config.ts:124` — `document.baseURI`
@@ -587,6 +748,10 @@ from modelling things you're calling defects in `ngfe-web`.
 
 Then **P5 + P7 + P10** as the block that decides whether a real domain migration survives contact.
 
+If the CMS lands this quarter, **P22 jumps the queue** — not because it outranks P5/P7/P10 on risk,
+but because its rules are unwinnable arguments once a content model ships. P21 and P24 can follow
+the normal order.
+
 ---
 
 ## 6. Open questions for you
@@ -601,3 +766,14 @@ Then **P5 + P7 + P10** as the block that decides whether a real domain migration
    that's a separate decision with a separate cost. If no, say so explicitly in whatever you present.
 4. **Who is the audience?** A reference _you_ build from is a different artifact from one a team
    reads. The second needs P18 and a README; the first doesn't.
+5. **What is the real cardinality of hero and landing personalization?** P20's blocking question is
+   now also P21's scoping input, and it is answerable from the content model — but only while that
+   model is still being designed.
+6. **Who operates the content origin?** Self-hosting buys cache and throughput control and sells
+   operational ownership. Both halves are real. Name the on-call owner, or treat the hosted vendors
+   as the honest comparison rather than the expensive one.
+7. **How much custom markup is marketing allowed to ship?** Settle it before the content model
+   exists, not after — P22. Related to `ideal-architecture.md:46` and P13.
+8. **Is the lab proving Strapi, or proving the seam?** If the vendor is not final, every item here
+   should be written against "the CMS" and the only Strapi-specific work should be the measurement
+   in P21. If it is final, say so and the mapper in P9 gets cheaper.

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_hero_right_aligned_images",
+  "info": {
+    "displayName": "Hero — Right Aligned Image",
+    "icon": "arrowRight",
+    "description": "Copy on the left, product artwork on the right. Split into content and settings. Note that containerWidth has limited effect here: the copy column is already half the viewport and the artwork must bleed to the right edge for its clip-path to read correctly."
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "component",
+      "repeatable": false,
+      "component": "hero-content.right-aligned-image",
+      "required": true
+    },
+    "settings": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block-settings",
+      "required": false
+    }
+  }
+}

@@ -6,7 +6,7 @@
 | **Date**       | 2026-09-28                                                                                    |
 | **Deciders**   | Wingstop internal development leadership; Design; Procurement (see [Licensing](#licensing))   |
 | **Applies to** | `ngfe-web`                                                                                    |
-| **Prototype**  | `dummy-lab-workspace` — PrimeNG 22 + Tailwind v4 with a Figma-generated token preset          |
+| **Prototype**  | A prototype workspace — PrimeNG 22 + Tailwind v4, Figma-generated preset — _link TBD_          |
 | **Blocked on** | A licensing decision and a migration plan. See [Acceptance criteria](#acceptance-criteria).   |
 | **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which listed this as an unproven spike |
 
@@ -101,11 +101,11 @@ styling counterpart.
 
 ### What the prototype demonstrates
 
-`dummy-lab-workspace` runs PrimeNG 22.1.1 with Tailwind v4 and a token preset **generated from a
-Figma variables export** (`design-tokens/variables.json`, 409 kB → 86 generated component token
-files under `theme/ts`). `libs/platform` exposes a single `providePrimeNgPlatform()` so every app
-consumes the same preset, and `styles/tailwind.css` carries the Wingstop type ramp as Tailwind
-`@theme` tokens with a `@layer base` that styles bare HTML correctly without utility classes.
+The prototype runs PrimeNG 22.1.1 with Tailwind v4 and a token preset **generated from a Figma
+variables export** — a 409 kB variables file producing 86 component token files. A single shared
+platform library exposes one `providePrimeNgPlatform()` provider so every application consumes
+the same preset, and one Tailwind entrypoint carries the Wingstop type ramp as `@theme` tokens
+with a `@layer base` that styles bare HTML correctly without utility classes.
 
 |                         | `ngfe-web` today                       | Prototype                             |
 | ----------------------- | -------------------------------------- | ------------------------------------- |
@@ -136,9 +136,9 @@ developers, fewer than 10 employees, under $3M in outside funding. Wingstop meet
 PrimeNG **21.1.10 is MIT and supports Angular 21** (`@angular/core: ^21.0.7`), which is what
 `ngfe-web` runs. It uses the same token-based theming introduced in v18.
 
-The prototype's licence key sits in `libs/platform/src/lib/primeng.providers.ts`, which is where
-the PrimeNG configuration guide puts it — a PrimeUI key is client-side by design and belongs in
-`providePrimeNG`. It is a `dev`-tier key expiring late December 2026, so what this decision owes
+The prototype's licence key sits beside its `providePrimeNG` call in the shared platform
+library, which is where the PrimeNG configuration guide puts it — a PrimeUI key is client-side by
+design and belongs in that provider. It is a `dev`-tier key expiring late December 2026, so what this decision owes
 is a tier and a renewal owner, not a relocation.
 
 ## Decision
@@ -242,9 +242,8 @@ procurement cycle, and Decision 1 makes that unnecessary for the first four phas
   remove it. Budget for per-seat annual renewal or plan to stay on 21 indefinitely, and be honest
   about which.
 - **The prototype proves the destination, not the migration** — same caveat ADR-0001 records.
-  `dummy-lab-workspace` is greenfield. It has never had Bootstrap removed from underneath it, and
-  the generated preset has never been run against PrimeNG 21's older `@primeuix/styled` 0.7.x
-  runtime. **This ADR records a destination. It is not a migration plan.**
+  It is greenfield: it has never had Bootstrap removed from underneath it, and the generated
+  preset has never been run against PrimeNG 21's older `@primeuix/styled` 0.7.x runtime. **This ADR records a destination. It is not a migration plan.**
 - **Generated theme files are 86 files of build output in version control.** That is a deliberate
   trade for reviewability, and it will make some diffs unreadable.
 
@@ -330,7 +329,7 @@ npm pack primeng@22.0.0  && tar -xzOf primeng-22.0.0.tgz  package/LICENSE.md | h
 npm view primeng@21.1.10 peerDependencies                                                # @angular/core ^21.0.7
 ```
 
-Prototype figures measured in `dummy-lab-workspace` (PrimeNG 22.1.1, Tailwind 4.3.1) in September
-2026: `dist/apps/dummy-lab/browser/styles-*.css` is 63,430 B raw / 11,327 B gzip; `theme/js` and
-`theme/ts` each contain 86 generated component token files derived from
-`design-tokens/variables.json`.
+Prototype figures measured in September 2026 (PrimeNG 22.1.1, Tailwind 4.3.1): the built
+application's single global stylesheet is 63,430 B raw / 11,327 B gzip, and the generated theme
+output carries 86 component token files in each of its JavaScript and TypeScript forms, all
+derived from one Figma variables export.

@@ -47,9 +47,11 @@
       "@dummy-lab/feature-session-cart": [
         "./libs/feature/session-cart/src/index.ts"
       ],
-      "@dummy-lab/shared-models": [
-        "./libs/shared/models/src/index.ts"
-      ]
+      "@dummy-lab/shared-models": ["./libs/shared/models/src/index.ts"],
+      "@dummy-lab/data-access-content": [
+        "./libs/data-access/content/src/index.ts"
+      ],
+      "@dummy-lab/ui-content-blocks": ["./libs/ui/content-blocks/src/index.ts"]
     },
     "strict": false,
     "noUncheckedSideEffectImports": false,

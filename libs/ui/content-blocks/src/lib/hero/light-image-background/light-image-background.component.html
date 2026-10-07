@@ -1,0 +1,40 @@
+<div class="relative p-20 overflow-hidden">
+  @defer {
+    <div
+      class="absolute top-0 left-0 w-full h-full"
+      [style]="backgroundStyle()"
+    ></div>
+  }
+
+  <!-- The container width constrains this copy column only; the photo
+       layer above it stays full-bleed. -->
+  <div class="text-center my-12 relative w-full {{ containerClass() }}">
+    <div class="text-6xl text-white font-bold mb-1 leading-tight">
+      {{ content().headline }}
+    </div>
+    <div class="text-6xl text-primary-400 font-bold mb-6 leading-tight">
+      {{ content().headlineAccent }}
+    </div>
+    <p
+      class="mt-0 mb-6 leading-normal text-center mx-auto text-white max-w-2xl text-xl"
+    >
+      {{ content().description }}
+    </p>
+
+    <button pButton type="button">
+      <span pButtonLabel>{{ content().ctaLabel }}</span>
+    </button>
+
+    <p class="mt-6 mb-6 leading-normal text-white">
+      {{ content().availabilityNote }}
+    </p>
+    <div class="flex justify-center items-center gap-8">
+      @for (link of links(); track link.href) {
+        <a [href]="link.href" class="text-white">
+          <i class="{{ link.iconClass }} text-4xl!" [attr.aria-hidden]="true"></i>
+          <span class="sr-only">{{ link.label }}</span>
+        </a>
+      }
+    </div>
+  </div>
+</div>

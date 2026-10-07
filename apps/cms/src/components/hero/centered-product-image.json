@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_hero_centered_product_images",
+  "info": {
+    "displayName": "Hero — Centered Product Image",
+    "icon": "picture",
+    "description": "Eyebrow pill, two-line headline and a single CTA over centered product artwork. Split into content (what it says) and settings (how it presents) so the line between copy and presentation is structural rather than a convention — see PROVE-OUT P22."
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "component",
+      "repeatable": false,
+      "component": "hero-content.centered-product-image",
+      "required": true
+    },
+    "settings": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block-settings",
+      "required": false
+    }
+  }
+}

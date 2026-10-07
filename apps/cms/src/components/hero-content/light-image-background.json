@@ -1,0 +1,52 @@
+{
+  "collectionName": "components_hero_content_light_image_backgrounds",
+  "info": {
+    "displayName": "Hero Content — Light Image Background",
+    "icon": "sun",
+    "description": "Copy, CTA, availability note and icon links for the light-image-background hero. The background image is decorative — the frontend composes it as a CSS background layer, so its alt text is intentionally unused."
+  },
+  "options": {},
+  "attributes": {
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "headlineAccent": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "description": {
+      "type": "text",
+      "required": true,
+      "maxLength": 240
+    },
+    "ctaLabel": {
+      "type": "string",
+      "required": true,
+      "maxLength": 24
+    },
+    "availabilityNote": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.icon-link",
+      "required": true,
+      "min": 1,
+      "max": 4
+    },
+    "backgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

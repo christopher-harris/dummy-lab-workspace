@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_hero_light_image_backgrounds",
+  "info": {
+    "displayName": "Hero — Light Image Background",
+    "icon": "sun",
+    "description": "Full-bleed photo behind a radial scrim, with a CTA, an availability note and a row of icon links. Split into content and settings; the settings constrain the copy column only, never the photo."
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "component",
+      "repeatable": false,
+      "component": "hero-content.light-image-background",
+      "required": true
+    },
+    "settings": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block-settings",
+      "required": false
+    }
+  }
+}

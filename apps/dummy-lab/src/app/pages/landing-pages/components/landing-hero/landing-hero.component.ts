@@ -1,17 +1,9 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, signal, Type } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { CarouselModule, CarouselPassThroughOptions } from 'primeng/carousel';
-import { CenteredProductImage } from './hero-blocks/centered-product-image-hero/centered-product-image-hero.component';
-import { DarkImageBackground } from './hero-blocks/dark-image-background-hero/dark-image-background-hero.component';
-import { LightImageBackground } from './hero-blocks/light-image-background-hero/light-image-background-hero.component';
-import { RightAlignedImage } from './hero-blocks/right-aligned-image-hero/right-aligned-image-hero.component';
-
-export interface HeroSlide {
-  /** Stable key for `track`; also handy as a CMS variant id later. */
-  id: string;
-  /** Block rendered for this slide. Each block owns its own copy and artwork. */
-  component: Type<unknown>;
-}
+import { ContentStore } from '@dummy-lab/data-access-content';
+import { toBlockInputs } from '@dummy-lab/shared-models';
+import { getContentBlockEntry } from '@dummy-lab/ui-content-blocks';
 
 @Component({
   selector: 'dl-landing-hero',
@@ -20,12 +12,7 @@ export interface HeroSlide {
   styleUrl: './landing-hero.component.css',
 })
 export class LandingHeroComponent {
-  /**
-   * Milliseconds between slides. PrimeNG only honours this on the legacy
-   * `[value]` carousel — the composition API (`p-carousel-content`) has no
-   * autoplay — which is why the template uses `[value]` + `#item`.
-   */
-  readonly autoplayInterval = 6000;
+  private readonly content = inject(ContentStore);
 
   /**
    * `flex flex-col` — equal-height slides. PrimeNG lays the items out as a flex
@@ -37,11 +24,10 @@ export class LandingHeroComponent {
    *
    * `visible` — works around a PrimeNG bug in the circular autoplay wrap. On the
    * last page autoplay calls `step(-1, 0)`, which forces `totalShiftedItems` to
-   * `-(value.length + numVisible)` = -5 here, scrolling to the finishing clone.
+   * `-(value.length + numVisible)`, scrolling to the finishing clone.
    * `onTransitionEnd` then adds `p-items-hidden` and recomputes the transform
-   * from that same -5, so it never normalises back to the real first item. At
-   * that offset neither the clone (`-totalShiftedItems === value.length` is
-   * `5 === 4`) nor anything on screen is marked active, so
+   * from that same offset, so it never normalises back to the real first item.
+   * At that offset neither the clone nor anything on screen is marked active, so
    * `.p-items-hidden .p-carousel-item { visibility: hidden }` blanks the slot
    * until the next tick. Keeping items visible lets the clone — a pixel copy of
    * the first hero — stay on screen instead. Harmless with `numVisible` 1: the
@@ -61,10 +47,62 @@ export class LandingHeroComponent {
     itemClone: 'flex flex-col visible',
   };
 
-  readonly slides = signal<HeroSlide[]>([
-    { id: 'flavors', component: CenteredProductImage },
-    { id: 'delivery', component: RightAlignedImage },
-    { id: 'app', component: LightImageBackground },
-    { id: 'drops', component: DarkImageBackground },
-  ]);
+  /**
+   * Milliseconds between slides. PrimeNG only honours this on the legacy
+   * `[value]` carousel — the composition API (`p-carousel-content`) has no
+   * autoplay — which is why the template uses `[value]` + `#item`.
+   */
+  readonly autoplayInterval = computed(
+    () => this.content.landingPageValue()?.data?.heroAutoplayInterval ?? 6000,
+  );
+
+  /**
+   * One carousel item per hero block the CMS returned, in the dynamic zone's
+   * order, resolved to a component through the block registry.
+   *
+   * Two kinds of block are dropped rather than rendered as a gap, on the same
+   * reasoning: a carousel short one slide beats a broken page.
+   *
+   * - one this build has no component for — Strapi can gain a block type
+   *   before the frontend ships one;
+   * - one whose `content` component did not come back, which Strapi reports
+   *   as `null` with a 200. A block template reads `content().headline`
+   *   directly, so rendering it would throw and take every other slide down
+   *   with it.
+   *
+   * The trade is that the missing block is invisible — nothing on the page
+   * says a slide was skipped. Surfacing that is PROVE-OUT P24's job.
+   *
+   * `toBlockInputs` builds the input object rather than an inline literal:
+   * `ngComponentOutletInputs` is `Record<string, unknown>`, so this is the only
+   * place the content/settings pair gets type-checked against the block it came
+   * from. It is also what turns an unfilled `settings` component into the
+   * frontend default — a component `input()` default only applies when the key
+   * is absent, and this always passes it.
+   */
+  readonly slides = computed(() => {
+    const blocks = this.content.landingPageValue()?.data?.heroSlides ?? [];
+
+    return blocks.flatMap((block) => {
+      const entry = getContentBlockEntry(block.__component);
+
+      if (!entry) {
+        return [];
+      }
+
+      const inputs = toBlockInputs(block);
+
+      if (!inputs) {
+        return [];
+      }
+
+      return [
+        {
+          id: `${block.__component}-${block.id}`,
+          component: entry.component,
+          inputs,
+        },
+      ];
+    });
+  });
 }
