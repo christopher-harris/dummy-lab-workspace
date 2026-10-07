@@ -24,6 +24,16 @@ __screenshots__/
 .env.*
 *.log
 
+# Strapi spike residue. These are ignored by apps/cms/.gitignore, which is a
+# tracked file living only on the strapi-spike branch -- so on every other
+# branch they resurface as untracked and get swept up by `git add -A`.
+# Repeated here because the root .gitignore is the only one present on every
+# branch. Nothing is deleted; this only changes what git reports.
+apps/cms/.strapi/
+apps/cms/.strapi-updater.json
+apps/cms/public/uploads/*
+!apps/cms/public/uploads/.gitkeep
+
 # Wrangler Pages local state and bindings. The committed example is safe/public.
 apps/dummy-lab/.dev.vars
 apps/dummy-lab/.dev.vars.*
