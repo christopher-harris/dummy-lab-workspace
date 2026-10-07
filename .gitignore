@@ -24,6 +24,9 @@ __screenshots__/
 .env.*
 *.log
 
+# Env templates are placeholders, not secrets, and belong in the repo.
+!apps/cms/.env.example
+
 # Wrangler Pages local state and bindings. The committed example is safe/public.
 apps/dummy-lab/.dev.vars
 apps/dummy-lab/.dev.vars.*
