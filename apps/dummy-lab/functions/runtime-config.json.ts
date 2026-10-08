@@ -59,7 +59,7 @@ function isRuntimeConfig(value: unknown): value is RuntimeConfig {
     !environmentNames.has(environment as EnvironmentName) ||
     !isRecord(features) ||
     Object.keys(features).length !== 1 ||
-    typeof features.experimentalCatalog !== 'boolean'
+    typeof features['experimentalCatalog'] !== 'boolean'
   ) {
     return false;
   }
