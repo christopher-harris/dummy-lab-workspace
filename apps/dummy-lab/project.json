@@ -106,9 +106,18 @@
         "forwardAllArgs": false
       }
     },
+    "typecheck-functions": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "npm exec tsc -- -p apps/dummy-lab/tsconfig.functions.json",
+        "forwardAllArgs": false
+      }
+    },
     "check-cloudflare-functions": {
       "executor": "nx:run-commands",
       "cache": false,
+      "dependsOn": ["typecheck-functions"],
       "options": {
         "command": "npm exec wrangler -- pages functions build functions --outdir ../../tmp/dummy-lab-functions-check",
         "cwd": "apps/dummy-lab",

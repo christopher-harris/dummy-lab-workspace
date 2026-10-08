@@ -41,7 +41,7 @@ function isRuntimeConfig(value: unknown): value is RuntimeConfig {
     typeof apiBaseUrl !== 'string' ||
     !isRecord(features) ||
     Object.keys(features).length !== 1 ||
-    typeof features.experimentalCatalog !== 'boolean'
+    typeof features['experimentalCatalog'] !== 'boolean'
   ) {
     return false;
   }
