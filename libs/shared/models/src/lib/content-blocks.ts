@@ -18,6 +18,8 @@
  * on every nested component; they are left off rather than guessed at.
  */
 
+import type { NutritionCategory } from './nutrition';
+
 /** Icons marketing may choose. Mapping these to PrimeIcons classes is the block's job. */
 export type HeroLinkIcon =
   | 'apple'
@@ -143,6 +145,41 @@ export interface HeroDarkImageBackgroundContent extends HeroContentBase {
   backgroundImage: StrapiMedia;
 }
 
+/**
+ * One section of the nutrition table: which category to render, and what to
+ * call it.
+ *
+ * A component wrapping a single enum because Strapi has no repeatable
+ * enumeration field, and this list has to be *ordered* — its order is the
+ * render order. `label` is stored rather than derived from `category` so
+ * marketing can rename a section without a migration.
+ */
+export interface NutritionCategorySection {
+  id: number;
+  category: NutritionCategory;
+  label: string;
+}
+
+/**
+ * Copy and configuration for the nutrition table. Carries no nutrient values.
+ *
+ * This is the first block whose content *names* data rather than containing
+ * it: the rows live in the `nutrition-item` collection and are resolved
+ * separately, so adding a menu item never means editing this page. The block
+ * component therefore resolves something, which is the one place P22's "`ui`
+ * blocks never resolve" rule is knowingly bent — recorded as a finding rather
+ * than drifted into.
+ */
+export interface NutritionTableContent {
+  heading: string;
+  intro: string | null;
+  categories: NutritionCategorySection[];
+  /** `null` until marketing uploads the printable guide. */
+  pdf: StrapiMedia | null;
+  pdfLabel: string | null;
+  footnote: string | null;
+}
+
 /* -------------------------------------------------------------------------
  * Blocks — the dynamic-zone envelope
  * ---------------------------------------------------------------------- */
@@ -190,6 +227,11 @@ export interface HeroDarkImageBackgroundBlock
   __component: 'hero.dark-image-background';
 }
 
+export interface NutritionTableBlock
+  extends ContentBlockEnvelope<NutritionTableContent> {
+  __component: 'nutrition.nutrition-table';
+}
+
 /**
  * Discriminated on Strapi's own `__component`, so the block registry switches
  * on it with no translation step.
@@ -201,14 +243,25 @@ export type HeroSlideBlock =
   | HeroDarkImageBackgroundBlock;
 
 /**
+ * Every block any dynamic zone can carry.
+ *
+ * Distinct from `HeroSlideBlock`, which stays scoped to what
+ * `landing-page.heroSlides` accepts. The two zones are allowed to diverge —
+ * `page.blocks` already carries a block the landing page does not — so one
+ * union per zone plus this union of all of them keeps "what can appear here"
+ * and "what can this build render" as separate questions.
+ */
+export type ContentBlock = HeroSlideBlock | NutritionTableBlock;
+
+/**
  * Maps every block key to the block it carries.
  *
  * This is the type the registry is built from: a mapped type over these keys
- * means a block added to `HeroSlideBlock` without a registered component is a
+ * means a block added to `ContentBlock` without a registered component is a
  * compile error, not a blank slide at runtime.
  */
 export type ContentBlockMap = {
-  [B in HeroSlideBlock as B['__component']]: B;
+  [B in ContentBlock as B['__component']]: B;
 };
 
 export type ContentBlockKey = keyof ContentBlockMap;
@@ -232,7 +285,7 @@ export type ContentBlockKey = keyof ContentBlockMap;
  * block on the page with it. One missing slide is a cheaper failure than a
  * blank homepage (PROVE-OUT P24).
  */
-export function toBlockInputs<B extends HeroSlideBlock>(
+export function toBlockInputs<B extends ContentBlock>(
   block: B,
 ): { content: NonNullable<B['content']>; settings: BlockSettings } | null {
   const content = block.content;

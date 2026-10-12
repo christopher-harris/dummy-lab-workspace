@@ -11,11 +11,7 @@
       "type": "enumeration",
       "required": true,
       "default": "full",
-      "enum": [
-        "full",
-        "contained",
-        "content-contained"
-      ]
+      "enum": ["full", "contained", "content-contained"]
     }
   }
 }

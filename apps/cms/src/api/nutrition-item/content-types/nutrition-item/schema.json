@@ -1,0 +1,60 @@
+{
+  "kind": "collectionType",
+  "collectionName": "nutrition_items",
+  "info": {
+    "singularName": "nutrition-item",
+    "pluralName": "nutrition-items",
+    "displayName": "Nutrition Item",
+    "description": "One row of the nutritional guide: a menu item in a category, with its serving size and nutrient values. A collection rather than rows inside the page block, because the numbers outlive the page that renders them — a menu surface wanting calories next to an item needs the same rows, and typed rows are the only thing that can emit real structured data. Every nutrient except `calories` is optional: the beverages table in the source PDF carries a different and much smaller column set than the food tables, and modelling that as two content types would duplicate everything to express one difference."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120,
+      "minLength": 1
+    },
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "classic-wings",
+        "boneless-wings",
+        "chicken-tenders",
+        "chicken-sandwich",
+        "sides",
+        "beverages"
+      ]
+    },
+    "servingSize": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "sortOrder": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "calories": { "type": "integer", "required": true, "min": 0 },
+    "totalFat": { "type": "decimal", "required": false },
+    "saturatedFat": { "type": "decimal", "required": false },
+    "transFat": { "type": "decimal", "required": false },
+    "cholesterol": { "type": "decimal", "required": false },
+    "sodium": { "type": "decimal", "required": false },
+    "totalCarbohydrate": { "type": "decimal", "required": false },
+    "dietaryFiber": { "type": "decimal", "required": false },
+    "totalSugars": { "type": "decimal", "required": false },
+    "addedSugars": { "type": "decimal", "required": false },
+    "protein": { "type": "decimal", "required": false },
+    "vitaminD": { "type": "decimal", "required": false },
+    "calcium": { "type": "decimal", "required": false },
+    "iron": { "type": "decimal", "required": false },
+    "potassium": { "type": "decimal", "required": false }
+  }
+}

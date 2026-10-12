@@ -497,6 +497,184 @@ export interface ApiLandingPageLandingPage extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiNutritionItemNutritionItem
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'nutrition_items';
+  info: {
+    description: 'One row of the nutritional guide: a menu item in a category, with its serving size and nutrient values. A collection rather than rows inside the page block, because the numbers outlive the page that renders them \u2014 a menu surface wanting calories next to an item needs the same rows, and typed rows are the only thing that can emit real structured data. Every nutrient except `calories` is optional: the beverages table in the source PDF carries a different and much smaller column set than the food tables, and modelling that as two content types would duplicate everything to express one difference.';
+    displayName: 'Nutrition Item';
+    pluralName: 'nutrition-items';
+    singularName: 'nutrition-item';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    addedSugars: Schema.Attribute.Decimal;
+    calcium: Schema.Attribute.Decimal;
+    calories: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    category: Schema.Attribute.Enumeration<
+      [
+        'classic-wings',
+        'boneless-wings',
+        'chicken-tenders',
+        'chicken-sandwich',
+        'sides',
+        'beverages',
+      ]
+    > &
+      Schema.Attribute.Required;
+    cholesterol: Schema.Attribute.Decimal;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    dietaryFiber: Schema.Attribute.Decimal;
+    iron: Schema.Attribute.Decimal;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::nutrition-item.nutrition-item'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+        minLength: 1;
+      }>;
+    potassium: Schema.Attribute.Decimal;
+    protein: Schema.Attribute.Decimal;
+    publishedAt: Schema.Attribute.DateTime;
+    saturatedFat: Schema.Attribute.Decimal;
+    servingSize: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    sodium: Schema.Attribute.Decimal;
+    sortOrder: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    totalCarbohydrate: Schema.Attribute.Decimal;
+    totalFat: Schema.Attribute.Decimal;
+    totalSugars: Schema.Attribute.Decimal;
+    transFat: Schema.Attribute.Decimal;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    vitaminD: Schema.Attribute.Decimal;
+  };
+}
+
+export interface ApiPagePage extends Struct.CollectionTypeSchema {
+  collectionName: 'pages';
+  info: {
+    description: "A marketing page addressed by its full URL path. `blocks` is a dynamic zone: its order is the render order, and each entry names its own block type via the `__component` discriminator \u2014 the same contract `landing-page.heroSlides` uses, so the frontend's block registry carries over unchanged. One queryable row per URL is the point: `GET /api/pages?fields[0]=path` is both the sitemap and the prerender manifest.";
+    displayName: 'Page';
+    pluralName: 'pages';
+    singularName: 'page';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    blocks: Schema.Attribute.DynamicZone<
+      [
+        'hero.centered-product-image',
+        'hero.right-aligned-image',
+        'hero.light-image-background',
+        'hero.dark-image-background',
+        'nutrition.nutrition-table',
+      ]
+    > &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 20;
+        },
+        number
+      >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::page.page'> &
+      Schema.Attribute.Private;
+    path: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false> &
+      Schema.Attribute.Required;
+    title: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+        minLength: 1;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiRedirectRedirect extends Struct.CollectionTypeSchema {
+  collectionName: 'redirects';
+  info: {
+    description: 'A source path that should resolve somewhere else. Exists because `path` is editable: the first time marketing renames a page, every inbound link and every indexed URL points at a 404 unless something issues a redirect. A client-side router redirect does not pass link equity and is invisible to a crawler that never runs JS, so this is consumed by the server/edge layer, not by the Angular router. Published state is the on/off switch \u2014 unpublish to disable a redirect without losing the record of it.';
+    displayName: 'Redirect';
+    pluralName: 'redirects';
+    singularName: 'redirect';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    from: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::redirect.redirect'
+    > &
+      Schema.Attribute.Private;
+    permanent: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    publishedAt: Schema.Attribute.DateTime;
+    to: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 2048;
+      }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1009,6 +1187,9 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::landing-page.landing-page': ApiLandingPageLandingPage;
+      'api::nutrition-item.nutrition-item': ApiNutritionItemNutritionItem;
+      'api::page.page': ApiPagePage;
+      'api::redirect.redirect': ApiRedirectRedirect;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

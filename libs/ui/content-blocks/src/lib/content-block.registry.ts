@@ -1,7 +1,11 @@
 import type { ContentBlockKey } from '@dummy-lab/shared-models';
 
-import type { ContentBlockEntry, ContentBlockRegistry } from './content-block.types';
+import type {
+  ContentBlockEntry,
+  ContentBlockRegistry,
+} from './content-block.types';
 import { HERO_BLOCK_REGISTRY } from './hero/hero-block.registry';
+import { NUTRITION_BLOCK_REGISTRY } from './nutrition/nutrition-block.registry';
 
 /**
  * Every renderable content block, keyed by Strapi component uid.
@@ -11,6 +15,7 @@ import { HERO_BLOCK_REGISTRY } from './hero/hero-block.registry';
  */
 export const CONTENT_BLOCK_REGISTRY: ContentBlockRegistry = {
   ...HERO_BLOCK_REGISTRY,
+  ...NUTRITION_BLOCK_REGISTRY,
 };
 
 /**
@@ -24,7 +29,10 @@ export const CONTENT_BLOCK_REGISTRY: ContentBlockRegistry = {
 export function getContentBlockEntry(
   key: string | null | undefined,
 ): ContentBlockEntry | null {
-  if (!key || !Object.prototype.hasOwnProperty.call(CONTENT_BLOCK_REGISTRY, key)) {
+  if (
+    !key ||
+    !Object.prototype.hasOwnProperty.call(CONTENT_BLOCK_REGISTRY, key)
+  ) {
     return null;
   }
 

@@ -25,7 +25,7 @@ export const cmsInterceptor: HttpInterceptorFn = (req, next) => {
   return next(
     req.clone({
       setHeaders: {
-        Authorization: `Bearer 7374df3e82cc8146dbb5c3c728ed2e74d6ff838fa86a1c66007b498f6c330cfc6b1df23989e514fe9bb6076dce609e5c5a0e4c9d2754bf1756fe02083253e86c069a31684243d00bf0daa0b602ef03c49c26b4840d1e2060bc01d498a120ec0a715b2120786a768d7a78e82bf7942592ecd05af0853b12459fcbc4b8a90ba74d`,
+        Authorization: `Bearer ${token}`,
       },
     }),
   );

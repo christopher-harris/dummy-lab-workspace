@@ -1,0 +1,131 @@
+<section class="px-4 py-12 sm:py-16">
+  <div [class]="containerClass()">
+    <h2 class="text-3xl font-semibold tracking-tight sm:text-4xl">
+      {{ content().heading }}
+    </h2>
+
+    @if (content().intro; as intro) {
+      <p class="mt-4 max-w-3xl text-base/7 opacity-80">{{ intro }}</p>
+    }
+
+    @if (pdfHref(); as href) {
+      <a
+        pButton
+        class="mt-6"
+        severity="secondary"
+        [outlined]="true"
+        [href]="href"
+        target="_blank"
+        rel="noopener"
+      >
+        <i pButtonIcon class="pi pi-file-pdf"></i>
+        <span>{{
+          content().pdfLabel ?? 'Download the nutritional guide (PDF)'
+        }}</span>
+      </a>
+    }
+
+    @if (hasError()) {
+      <!--
+        No table at all rather than a partial one. Nutrition information is the
+        one thing on this site a guest may be making a medical decision with,
+        so "we could not load it" is the only honest failure — and the PDF link
+        above stays reachable regardless.
+      -->
+      <p-message severity="error" icon="pi pi-times-circle" class="mt-10 block">
+        Nutrition information could not be loaded right now. The printable
+        guide above has the same values.
+      </p-message>
+    } @else if (isTruncated()) {
+      <!--
+        The collection reported more rows than it returned — see
+        `rowsTruncated`. Rendering what arrived would look complete and not be.
+      -->
+      <p-message
+        severity="warn"
+        icon="pi pi-exclamation-triangle"
+        class="mt-10 block"
+      >
+        This guide is incomplete right now. Please use the printable guide
+        above for the full list.
+      </p-message>
+    } @else {
+      @for (section of sections(); track section.category) {
+        <!--
+          One `p-table` per category rather than a single table with
+          `rowGroupMode="subheader"`. Two reasons: the section order is the
+          editor's (`content().categories`), and `groupRowsBy` would want the
+          rows sorted by the group field instead; and six captioned tables
+          announce themselves to a screen reader far better than one table
+          whose sections are `colspan` rows.
+
+          `[scrollable]` gives each table its own horizontal scroll container —
+          seventeen columns never fit a phone, and the page itself must not
+          scroll sideways.
+        -->
+        <p-table
+          class="mt-10 block"
+          [value]="section.rows"
+          [loading]="isLoading()"
+          [scrollable]="true"
+          [tableStyle]="{ 'min-width': '72rem' }"
+          [rowHover]="true"
+          stripedRows
+          size="small"
+          dataKey="id"
+        >
+          <ng-template #caption>
+            <span class="text-xl font-semibold">{{ section.label }}</span>
+          </ng-template>
+
+          <ng-template #header>
+            <tr>
+              <th scope="col" style="min-width: 16rem">Item</th>
+              <th scope="col" style="min-width: 8rem">Serving</th>
+              @for (column of columns; track column.key) {
+                <th scope="col" class="text-right" style="min-width: 8rem">
+                  {{ column.label }}
+                </th>
+              }
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-row>
+            <tr>
+              <!--
+                `th scope="row"` rather than `td`: the item name is the row's
+                header, which is what lets a screen reader announce "Atomic,
+                Sodium, 1130mg" instead of reading a bare number.
+              -->
+              <th scope="row" class="font-medium">{{ row.name }}</th>
+              <td>{{ row.servingSize }}</td>
+              @for (column of columns; track column.key) {
+                <td class="text-right">
+                  {{ format(row[column.key], column.unit) }}
+                </td>
+              }
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <!--
+              Reached when the block names a category the collection has no
+              published rows for. Items publish independently of the page, so
+              a flavour left in draft silently disappears and nothing else
+              would say so.
+            -->
+            <tr>
+              <td [attr.colspan]="columns.length + 2">
+                Nothing is currently available in this category.
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      }
+    }
+
+    @if (content().footnote; as footnote) {
+      <p class="mt-10 max-w-3xl text-sm opacity-70">{{ footnote }}</p>
+    }
+  </div>
+</section>

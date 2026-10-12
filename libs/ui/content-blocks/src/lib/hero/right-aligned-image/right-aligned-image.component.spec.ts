@@ -72,9 +72,9 @@ describe('RightAlignedImageComponent', () => {
 
     expect(copyColumn()?.className).toContain('max-w-7xl');
     expect(root().className).not.toMatch(/\bmax-w-/);
-    expect(
-      fixture.nativeElement.querySelector('img')?.className,
-    ).not.toMatch(/\bmax-w-/);
+    expect(fixture.nativeElement.querySelector('img')?.className).not.toMatch(
+      /\bmax-w-/,
+    );
   });
 
   it('resolves the artwork against the CMS origin and takes alt text off the asset', () => {

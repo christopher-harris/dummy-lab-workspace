@@ -35,7 +35,9 @@ export class RightAlignedImageComponent {
    * `contained` land on the same rendering and only `content-contained` is
    * visible. Known limitation, not a bug.
    */
-  readonly containerClass = computed(() => blockContainerClass(this.settings()));
+  readonly containerClass = computed(() =>
+    blockContainerClass(this.settings()),
+  );
 
   readonly image = computed(() => {
     const media = this.content().image;

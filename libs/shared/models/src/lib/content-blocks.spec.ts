@@ -80,6 +80,8 @@ describe('toBlockInputs', () => {
     // The host always passes the `settings` key, so the component-level
     // default never fires. This is the only thing standing between a block
     // whose settings were never filled and a `null` in the signal.
-    expect(toBlockInputs(darkBlock(null)).settings).toBe(DEFAULT_BLOCK_SETTINGS);
+    expect(toBlockInputs(darkBlock(null)).settings).toBe(
+      DEFAULT_BLOCK_SETTINGS,
+    );
   });
 });

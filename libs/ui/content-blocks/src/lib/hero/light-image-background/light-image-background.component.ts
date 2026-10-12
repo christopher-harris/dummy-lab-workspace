@@ -45,7 +45,9 @@ export class LightImageBackgroundComponent {
   readonly settings = input<BlockSettings>(DEFAULT_BLOCK_SETTINGS);
 
   /** Constrains the copy column only; the photo layer below stays full-bleed. */
-  readonly containerClass = computed(() => blockContainerClass(this.settings()));
+  readonly containerClass = computed(() =>
+    blockContainerClass(this.settings()),
+  );
 
   readonly links = computed(() =>
     this.content().links.map((link) => ({

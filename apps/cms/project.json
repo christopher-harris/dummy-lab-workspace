@@ -26,10 +26,7 @@
       "cache": false,
       "options": {
         "cwd": "apps/cms",
-        "commands": [
-          "docker compose down -v",
-          "docker compose up -d --wait"
-        ],
+        "commands": ["docker compose down -v", "docker compose up -d --wait"],
         "parallel": false
       }
     },

@@ -9,15 +9,15 @@
 
 ADR-0004 currently says "a domain library does not depend on another domain's store." That
 framing breaks down as soon as the facade is itself a SignalStore, because a composition store
-injecting two domain stores *is* a `data-access` → `data-access` edge in the Nx graph.
+injecting two domain stores _is_ a `data-access` → `data-access` edge in the Nx graph.
 
 The likely correct framing is **directional layering** rather than prohibition:
 
-| Layer | May depend on | Depended on by |
-| ----- | ------------- | -------------- |
-| **ambient** — session, locale, flags, location | util | anything |
-| **domain** — products, carts, orders | util, ambient | composition, feature, app |
-| **composition** — surface-scoped read models | util, ambient, domain | the one surface that owns it |
+| Layer                                          | May depend on         | Depended on by               |
+| ---------------------------------------------- | --------------------- | ---------------------------- |
+| **ambient** — session, locale, flags, location | util                  | anything                     |
+| **domain** — products, carts, orders           | util, ambient         | composition, feature, app    |
+| **composition** — surface-scoped read models   | util, ambient, domain | the one surface that owns it |
 
 Acyclic by construction: edges only ever point down the table, so the cycle ceiling never arrives.
 
@@ -40,10 +40,10 @@ So the products surface needs cart state, and the cart surface needs product sta
 
 ```ts
 // products/store.ts
-withProps(() => ({ cart: inject(CartStore) }))
+withProps(() => ({ cart: inject(CartStore) }));
 
 // carts/store.ts
-withProps(() => ({ products: inject(ProductsStore) }))
+withProps(() => ({ products: inject(ProductsStore) }));
 ```
 
 **Outcome:** `NG0200` at runtime, and `@nx/enforce-module-boundaries` fails the build on the
@@ -67,11 +67,13 @@ export const ProductCatalogViewStore = signalStore(
       const lines = new Map(
         (cart.cart()?.products ?? []).map((p) => [p.id, p.quantity]),
       );
-      return products.allProducts.value()?.products.map((product) => ({
-        ...product,
-        inCart: lines.has(product.id),
-        quantity: lines.get(product.id) ?? 0,
-      })) ?? [];
+      return (
+        products.allProducts.value()?.products.map((product) => ({
+          ...product,
+          inCart: lines.has(product.id),
+          quantity: lines.get(product.id) ?? 0,
+        })) ?? []
+      );
     }),
   })),
 );
@@ -89,7 +91,7 @@ Products publishes `productsLoaded`; cart keeps a local projection of what it ne
 handlers.
 
 Decouples completely, and duplicates state. Probably wrong for derived read state, probably right
-for *reactions* (cart clears on `sessionExpired`). Worth writing out once to confirm it feels as
+for _reactions_ (cart clears on `sessionExpired`). Worth writing out once to confirm it feels as
 bad as it sounds.
 
 ---
@@ -161,12 +163,12 @@ domains consume, and nothing will ever read a cart to decide something about the
 **Cart state does not move into the feature lib as `+state`.** It has four consumers across three
 surfaces, three of them outside the cart feature:
 
-| Consumer | Imports | Where |
-| -------- | ------- | ----- |
-| `navbar.component.ts` | `SessionCartStore` + `sessionCartEvents` | app layout — **eager** |
-| `products-list.page.ts` | `sessionCartEvents` | app, products route |
-| `product-detail.page.ts` | `sessionCartEvents` | app, products route |
-| `cart-drawer.component.ts` | both | the cart feature lib |
+| Consumer                   | Imports                                  | Where                  |
+| -------------------------- | ---------------------------------------- | ---------------------- |
+| `navbar.component.ts`      | `SessionCartStore` + `sessionCartEvents` | app layout — **eager** |
+| `products-list.page.ts`    | `sessionCartEvents`                      | app, products route    |
+| `product-detail.page.ts`   | `sessionCartEvents`                      | app, products route    |
+| `cart-drawer.component.ts` | both                                     | the cart feature lib   |
 
 `+state` is for state with exactly one consuming surface. Keep it as a sanctioned option for state
 that genuinely is — a wizard's step state, a filter panel's draft selections — and use the consumer
@@ -187,15 +189,15 @@ needs no platform guard.
 
 The mechanism does not currently enforce that intent. **The navbar injects `SessionCartStore`** for
 the badge count and the drawer toggle, and the navbar is in the eager layout shell, so it renders on
-every route. If a marketing route is server-rendered *in the same application*, the shared shell
+every route. If a marketing route is server-rendered _in the same application_, the shared shell
 renders, the navbar constructs the cart store, `withStorageSync` reaches for `localStorage`, and it
 throws on the server. The persisted auth session has the same shape.
 
 Whether that matters depends on a decision not yet made:
 
-| Topology | Consequence |
-| -------- | ----------- |
-| Marketing as a **separate Nx app** | Structurally safe. Different shell, and the cart/auth libs are not in that graph. Nothing to enforce |
+| Topology                            | Consequence                                                                                                                                                                                                     |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Marketing as a **separate Nx app**  | Structurally safe. Different shell, and the cart/auth libs are not in that graph. Nothing to enforce                                                                                                            |
 | **One app**, per-route render modes | Shared shell. Needs a `platform:universal` / `platform:browser-only` tag axis plus a `depConstraints` rule stopping the server-rendered graph from reaching a browser-only lib — and a cart-free navbar variant |
 
 This is the failure class that stays invisible until someone enables SSR months later and the stack

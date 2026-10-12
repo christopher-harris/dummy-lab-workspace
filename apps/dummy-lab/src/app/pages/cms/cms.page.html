@@ -1,0 +1,48 @@
+<dl-navbar />
+
+<main class="min-h-[60vh]">
+  @if (pages.pageIsLoading()) {
+    <p class="p-8 text-center text-surface-500" role="status" aria-live="polite">
+      Loading…
+    </p>
+  } @else if (pages.pageError()) {
+    <!--
+      The CMS being unreachable is a distinct failure from the page not
+      existing, and they must not collapse into one "not found" screen —
+      PROVE-OUT P24 is the policy question behind which of the two this
+      should become (stale content, a baked fallback, or this).
+    -->
+    <div class="p-8 text-center">
+      <h1 class="text-2xl font-semibold">This page isn’t available</h1>
+      <p class="mt-2 text-surface-500">
+        The content service didn’t respond. Try again shortly.
+      </p>
+    </div>
+  } @else if (pages.pageNotFound()) {
+    <div class="p-8 text-center">
+      <h1 class="text-2xl font-semibold">Page not found</h1>
+      <p class="mt-2 text-surface-500">
+        No page is published at this address.
+      </p>
+    </div>
+  } @else if (blocks().length > 0) {
+    @for (block of blocks(); track block.id) {
+      <ng-container
+        [ngComponentOutlet]="block.component"
+        [ngComponentOutletInputs]="block.inputs"
+      />
+    }
+  } @else if (pages.currentPage()) {
+    <!--
+      A published page with an empty dynamic zone. `blocks` is optional in
+      Strapi so a route can be registered before its content exists — this is
+      that state, and it is deliberately not an error.
+    -->
+    <div class="p-8 text-center text-surface-500">
+      <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">
+        {{ pages.currentPage()?.title }}
+      </h1>
+      <p class="mt-2">This page has no content blocks yet.</p>
+    </div>
+  }
+</main>

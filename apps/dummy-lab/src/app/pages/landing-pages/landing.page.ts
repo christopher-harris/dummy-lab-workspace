@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LandingAnnouncementBarComponent } from './components/landing-announcement-bar/landing-announcement-bar.component';
 import { NavbarComponent } from '../../components/layout/navbar/navbar.component';
 import { LandingHeroComponent } from './components/landing-hero/landing-hero.component';
@@ -9,7 +9,7 @@ import { LandingTrustedByComponent } from './components/landing-trusted-by/landi
 import { LandingArticlesComponent } from './components/landing-articles/landing-articles.component';
 import { LandingPricingComponent } from './components/landing-pricing/landing-pricing.component';
 import { LandingContactComponent } from './components/landing-contact/landing-contact.component';
-import {ContentStore} from "@dummy-lab/data-access-content";
+import { ContentStore } from '@dummy-lab/data-access-content';
 
 @Component({
   selector: 'dl-landing',

@@ -1,4 +1,7 @@
-import type { BlockContainerWidth, BlockSettings } from '@dummy-lab/shared-models';
+import type {
+  BlockContainerWidth,
+  BlockSettings,
+} from '@dummy-lab/shared-models';
 
 /**
  * What each container width actually measures.

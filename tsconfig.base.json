@@ -51,7 +51,11 @@
       "@dummy-lab/data-access-content": [
         "./libs/data-access/content/src/index.ts"
       ],
-      "@dummy-lab/ui-content-blocks": ["./libs/ui/content-blocks/src/index.ts"]
+      "@dummy-lab/ui-content-blocks": ["./libs/ui/content-blocks/src/index.ts"],
+      "@dummy-lab/data-access-nutrition": [
+      "./libs/data-access/nutrition/src/index.ts"
+    ],
+    "@dummy-lab/data-access-pages": ["./libs/data-access/pages/src/index.ts"]
     },
     "strict": false,
     "noUncheckedSideEffectImports": false,

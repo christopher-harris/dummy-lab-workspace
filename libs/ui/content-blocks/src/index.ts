@@ -3,6 +3,8 @@ export * from './lib/cms-media-url';
 export * from './lib/content-block.registry';
 export * from './lib/content-block.types';
 export * from './lib/hero/hero-block.registry';
+export * from './lib/nutrition/nutrition-block.registry';
+export * from './lib/nutrition/nutrition-table/nutrition-table.component';
 export * from './lib/hero/centered-product-image/centered-product-image.component';
 export * from './lib/hero/dark-image-background/dark-image-background.component';
 export * from './lib/hero/light-image-background/light-image-background.component';

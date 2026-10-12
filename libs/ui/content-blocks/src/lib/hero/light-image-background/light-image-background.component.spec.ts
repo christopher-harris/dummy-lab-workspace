@@ -15,7 +15,9 @@ const content: HeroLightImageBackgroundContent = {
   description: 'Save your go-to flavors.',
   ctaLabel: 'Get the App',
   availabilityNote: 'Available on iOS and Android',
-  links: [{ id: 1, icon: 'apple', href: 'https://apple.com', label: 'App Store' }],
+  links: [
+    { id: 1, icon: 'apple', href: 'https://apple.com', label: 'App Store' },
+  ],
   backgroundImage: testMedia('light-bg'),
 };
 

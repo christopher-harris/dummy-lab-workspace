@@ -1,6 +1,6 @@
 # 🤖 Prove-Out Backlog — what's left before "this is the example"
 
-**Drafted:** 22 Sept 2026 · **Updated:** 5 Oct 2026 · **Audience:** Chris · **Status:** decision
+**Drafted:** 22 Sept 2026 · **Updated:** 9 Oct 2026 · **Audience:** Chris · **Status:** decision
 instrument, not a plan
 
 Measured directly against this tree and against four sources in `ngfe-web`:
@@ -16,7 +16,15 @@ decision: partial work is deliberately not marked proven.
 measured against the four `ngfe-web` sources above, because a headless CMS does not appear in any of
 them. They came out of a live planning conversation and should be read as scoping, not as an audit
 finding. Numbering is append-only so existing references stay stable — which is why Tier 2's items
-are P5–P10 and P21–P24.
+are P5–P10 and P21–P26.
+
+**Addendum, 9 Oct 2026 — the SSR/prerender spike.** P11, P20, P21 and P23 now carry measured
+results rather than predictions, and two new items were appended: **P25** (the content-triggered
+build pipeline) and **P26** (cross-tab auth state, which contains a live defect). The topology
+question those raised is written up separately as
+[ADR-0005](./docs/ADR/ADR-0005-application-topology-and-render-modes.md) — the first ADR here that
+amends another. §5 carries a revised ordering. Session detail is in `HANDOFF-SEO-PRERENDER.md`
+(untracked).
 
 ---
 
@@ -61,7 +69,7 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Figma → token pipeline                                    | 🟡 Partial | export is committed, not built: no in-repo regeneration step and no CI check that `theme/` matches Figma; `primary` still maps to Aura blue (`theme/ts/base.ts:309`); Tailwind `@theme` carries no colour tokens                |
 | **Tags / module boundaries**                              | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed                                                                           |
 | Deploy topology (marketing / ordering / account)          | ❌ Absent  | one app                                                                                                                                                                                                                         |
-| SSR / SSG                                                 | ❌ Absent  | no `@angular/ssr`, no server entry, no prerender                                                                                                                                                                                |
+| SSR / SSG                                                 | 🟡 Partial | **9 Oct 2026** — `@angular/ssr` 22.1.9, `outputMode: 'static'`, server entry, per-route `RenderMode` table. `/` and `/nutrition` prerender with Strapi-sourced `<title>`/`og:*` in the served HTML; CMS routes come from `getPrerenderParams()`, none hardcoded. Production configuration only — dev serve is unchanged CSR. No sitemap, no canonical, no redirects, no second app — see P11, P25, ADR-0005 |
 | CI                                                        | ✅ Proven  | `.github/workflows/ci.yml`                                                                                                                                                                                                      |
 | Interceptors / HttpClient discipline                      | 🟡 Partial | functional auth interceptor registered with `provideHttpClient(withFetch(), withInterceptors(...))`; raw `fetch()` remains in every `api.ts`                                                                                    |
 | DTO → domain mapping                                      | ❌ Absent  | DummyJSON shapes are the state                                                                                                                                                                                                  |
@@ -72,10 +80,10 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | MSW / test factories                                      | ❌ Absent  | 9 of 12 lib specs are `expect(true).toBe(true)`                                                                                                                                                                                 |
 | Error taxonomy / `ErrorHandler` / fallback UI             | ❌ Absent  | `provideBrowserGlobalErrorListeners()` only                                                                                                                                                                                     |
 | Accessibility                                             | 🟡 Partial | Lighthouse a11y **97** desktop on the promoted prod artifact (one failure: `color-contrast`); but still no axe, no a11y lint rules, no stated WCAG target                                                                       |
-| Performance baseline                                      | 🟡 Partial | measured on prod 2026-10-01 — desktop **95**, mobile **86**; single runs, no budget assertions, no post-SSR comparison point — see P19                                                                                          |
-| CMS / content layer                                       | ❌ Absent  | landing content hardcoded in `pages/landing-pages/components/`; no content source, block registry, preview path, or failure policy — P21–P24                                                   |
+| Performance baseline                                      | 🟡 Partial | measured on prod 2026-10-01 — desktop **95**, mobile **86**; single runs, no budget assertions. First post-SSR bundle delta now exists (9 Oct): initial JS 217.64 → **224.63 kB gzip**, document 4.96 → **37.46 kB gzip**, two Strapi round trips removed, 397 lazy chunks unchanged. Budgets are **not** meaningful today — the 500 kB warning is exceeded by 483 kB, and the 1 MB error was raised to 1.1 mb to absorb hydration — see P19 |
+| CMS / content layer                                       | 🟡 Partial | Strapi on `strapi-spike`: `Page` keyed by unique `path`, required `shared.seo`, `Redirect` collection, `nutrition-item` collection, deep dynamic-zone populate, `**` catch-all route, block registry, preview flag. Build-time resolution proven for one route family. Missing: sitemap, canonical emission, redirect execution, failure policy, scheduled publish — P21–P25                     |
 | Observability / analytics / flags                         | ❌ Absent  | none                                                                                                                                                                                                                            |
-| ADRs                                                      | ❌ Absent  | none                                                                                                                                                                                                                            |
+| ADRs                                                      | 🟡 Partial | five drafted — ADR-0001 Nx workspace, 0002 PrimeNG+Tailwind, 0003 runtime config, 0004 SignalStore structure, **0005 application topology and render modes (9 Oct)**. All **Proposed**; none accepted, none enforced by a failing build — P18                     |
 
 ---
 
@@ -106,6 +114,26 @@ grandfathers `scope:legacy` across 94% of the code).
 commit a fixture that violates a constraint and a check that asserts lint fails on it.
 
 **Cost:** ~0.5 day. Highest leverage item in this document by a wide margin.
+
+**Second, independent argument — added 9 Oct 2026, and it is now blocking.** The SSR spike proved
+that a browser global in one library kills the **entire** server build, not just the routes that
+use it:
+
+```
+ReferenceError: localStorage is not defined
+    at async extractRoutes (.../routes-extractor-worker.js)
+```
+
+Raised by `data-access/auth` during **route extraction** — before any route rendered, on a build
+where no authenticated route was server-rendered at all. Narrow cause: `withStorageSync` is
+SSR-safe at runtime but resolving its default strategy touches `localStorage` at module load.
+Fixed by passing `withLocalStorage()` explicitly, as `theme` and `session-cart` already did.
+
+This needs a **`platform:universal` / `platform:browser-only` tag axis** in addition to the
+`type:*` and `scope:*` work above. ADR-0005 lists it as the load-bearing control for the
+marketing/ordering split: without it nothing stops a browser-only lib entering the prerendered
+graph, and the failure surfaces as an opaque build error months later. **ADR-0005 should not be
+implemented before this lands.**
 
 ---
 
@@ -321,7 +349,22 @@ A failed content fetch costs the homepage.
 
 ---
 
-### ☐ P21 — Content/render + cache boundary
+### ◐ P21 — Content/render + cache boundary
+
+**Answered for one route family, 9 Oct 2026 — build time.** `/nutrition` resolves its content
+during the build and ships as static HTML. The remaining two answers (edge, client) are untaken,
+and the hero (P20) is the case that may still force one. See ADR-0005 for the topology this
+implies and P25 for the pipeline it requires.
+
+**What choosing build time actually costs, now that it has been chosen once:**
+
+- **It voids ADR-0003 for the marketing app.** Prerendered HTML carries content from the CMS the
+  build pointed at, so the artifact is environment-specific and cannot be promoted stage → prod.
+  ADR-0005 amends ADR-0003 rather than pretending both hold.
+- **CMS availability becomes *build* availability.** Better than the request-time coupling this
+  item warns about — Strapi can be down and the site still serves — but a CMS outage now blocks
+  deploys, including unrelated code deploys.
+- **Content freshness becomes deploy cadence.** No ISR equivalent exists in Angular.
 
 **Today:** no CMS, no content layer. Every landing surface in
 `apps/dummy-lab/src/app/pages/landing-pages/components/` — hero, announcement bar, articles,
@@ -395,6 +438,18 @@ the build. Extract the existing landing components as the block library.
 
 ### ☐ P23 — Preview, draft, and the one-artifact promise
 
+**Update, 9 Oct 2026 — the pressure this item predicted has arrived, from the other direction.**
+It is not preview that broke the one-artifact promise first; it is prerendering. Build-time
+content resolution makes the marketing artifact environment-specific on its own, before draft
+state enters the picture (P21, ADR-0005). The preview concern below is unchanged and still
+unaddressed — `?preview=true` is still decided in the browser with a draft-capable token in the
+bundle — but it is no longer the thing holding P8's claim together.
+
+The scheduled-publish problem named later in this item is now concrete rather than hypothetical:
+with build-time resolution, a Strapi scheduled publish goes live **when a build runs**, not at the
+scheduled time. That needs a cron-triggered build or a server fallback, and it will land the first
+time marketing schedules a 9am campaign.
+
 **Today:** P8 proved "vary configuration, not the artifact" and it is the cleanest win in this
 document. A CMS with draft/publish is the first thing that will pressure it.
 
@@ -444,13 +499,93 @@ and prove it by killing the origin; record the on-call answer in P18's ADR.
 
 ---
 
+### ☐ P25 — The content-triggered build pipeline
+
+**Added 9 Oct 2026.** Prerendering is only half a content system. The other half is what turns a
+publish into a deploy, and none of it exists.
+
+**The blocker nobody would guess.** A CMS publish changes **no input Nx can observe**, so a
+webhook-triggered `nx build` is a **cache hit** and redeploys the previous HTML. Every correct
+result in the SSR spike required `--skip-nx-cache`. Left unhandled, the symptom is "the webhook
+doesn't work" while the webhook is firing perfectly. This is the same root cause as the known
+"cache hides new spec files" behaviour, in a far more damaging place.
+
+**Five things, none optional:**
+
+| Piece                       | Failure if skipped                                                                                             |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Cache bypass on content builds | Stale HTML deployed, build green                                                                                |
+| Webhooks on **every** rendered content type | `page` alone is the trap — new `nutrition-item` rows never appear, site looks healthy          |
+| Debounce / concurrency      | An editor publishing twelve items fires twelve builds                                                           |
+| Build-per-environment       | Promotion ships stage content to prod (P21, ADR-0005)                                                           |
+| A published latency figure  | "How long until my change is live?" is the first question marketing asks, and it has a measurable answer       |
+
+**Also missing, and cheap:** `<link rel="canonical">` is never emitted although `shared.seo`
+stores `canonicalPath`; there is no `sitemap.xml` despite `pagePathsUrl()` already fetching
+`seo.noindex` precisely so it could filter one; and the `Redirect` collection has no consumer, so
+renaming a page still 404s every inbound link.
+
+**Proving it buys:** the difference between "prerendering works" and "marketing can publish." The
+spike proved the former. Product will assume it proved the latter.
+
+**Cost:** ~1–2 days. Canonical and sitemap are hours; the pipeline is the rest.
+
+---
+
+### ☐ P26 — Cross-tab auth state, and the persisted shape as a contract
+
+**Added 9 Oct 2026. Contains a live defect, not a design gap.**
+
+`withStorageSync` reads storage **once** at init, writes the **whole state** on every change, and
+the library contains zero `storage` listeners and zero `BroadcastChannel` usage — across every
+strategy, IndexedDB included. Verified against the installed source.
+
+**The bug, reachable today with one app and two tabs:**
+
+1. Tab A and Tab B both logged in.
+2. User logs out in Tab B → credentials cleared → written to storage.
+3. Tab A never hears about it; its in-memory state still holds credentials.
+4. Any state change in Tab A triggers a whole-state write → **the logged-out session is restored.**
+5. Tab B refreshes and is logged back in.
+
+**Why it escalates under ADR-0005.** A split makes full page loads routine rather than occasional,
+and cross-app links are exactly what people open in a new tab. Worse, the persisted shape becomes
+a contract between two **independently deployed** artifacts: marketing can run the old
+serialisation while ordering runs the new one, for an interval nobody controls.
+`data-access/auth/src/lib/store.ts` persists with no schema check and no version key, and its own
+comment says so. That note graduates from cleanup to blocker.
+
+**Shape:** a `storage`/`BroadcastChannel` listener that rehydrates or clears (fixes the live bug);
+a version key with a rejecting read path (makes the contract safe to share); then decide
+`localStorage` versus an httpOnly cookie — the cookie is what removes the class of problem, since
+a stale client stops being authoritative and simply gets 401s.
+
+**Cost:** ~0.5 day for the listener and version key. The cookie move is a backend conversation.
+
+---
+
 ## 4. Tier 3 — completes the picture
 
-### ☐ P11 — SSR / SSG
+### ◐ P11 — SSR / SSG
 
-No `@angular/ssr`, no server entry, no prerender. Epic `22` story 2 is "SSG/SSR decision per route
-family," and `ideal-architecture.md` wants an incremental-hydration decision per route type. Natural
-companion to P4 — marketing is the SSG app.
+**Partly proven, 9 Oct 2026.** `@angular/ssr` 22.1.9 with `outputMode: 'static'`, a server entry,
+and a per-route `RenderMode` table in `apps/dummy-lab/src/app/app.routes.server.ts`. `/` and
+`/nutrition` prerender; every authenticated route is `RenderMode.Client`; the CMS route list comes
+from `getPrerenderParams()` querying Strapi, so no path is hardcoded. Scoped to the production
+configuration, so `nx serve` is unchanged CSR and needs no CMS.
+
+**What that settles:** Epic `22` story 2's "SSG/SSR decision per route family" is now expressible
+and executable in this repo, and the content-resolution half of it (P21) is answered for one route
+family. Metadata written in a component `effect` **does** reach the serialised `<head>`, and a
+two-hop fetch waterfall completes before serialisation.
+
+**What it does not settle:** no sitemap, no `<link rel="canonical">` despite the field existing in
+`shared.seo`, no redirect execution, no second app, no incremental-hydration decision, and no
+route-specific `modulepreload` — so paint improves and time-to-interactive does not. Topology is
+now ADR-0005; the remaining mechanics are P25.
+
+Epic `22` story 2 is "SSG/SSR decision per route family," and `ideal-architecture.md` wants an
+incremental-hydration decision per route type. Natural companion to P4 — marketing is the SSG app.
 
 **The CMS adds the second axis.** "SSG/SSR per route family" cannot be decided without also deciding
 where content resolves — build time, edge, or client. P21 is that decision. They are one decision
@@ -606,14 +741,28 @@ contribution this lab makes back to the plan.
 
 ---
 
-### ☐ P18 — ADRs
+### ◐ P18 — ADRs
+
+**Five drafted, none accepted.** ADR-0001 (Nx workspace), ADR-0002 (PrimeNG + Tailwind),
+ADR-0003 (runtime config), ADR-0004 (SignalStore structure), and **ADR-0005 (application topology
+and render modes, 9 Oct 2026)**. All carry **Proposed — for discussion, not for approval**.
+
+**ADR-0005 is the first one that amends another.** It reduces ADR-0003's "promote one artifact"
+guarantee for the marketing app, because prerendered HTML carries build-time content and cannot be
+environment-neutral. That cross-reference is the thing that makes a decision record worth keeping:
+without it, two documents make contradictory claims and the newer one wins by accident.
 
 ROADMAP card `24`: ADRs for the ~8 decisions currently recorded only in untracked files. This lab is
 where several of those decisions are actually being made — events-vs-`withRedux`, guards-vs-redirects,
 DTO mapping, where custom styling is allowed, one-artifact-per-env. Recording them here costs
 almost nothing and is the difference between a lab and a reference.
 
-**Cost:** ~0.5 day.
+**Still missing:** an acceptance process. Five Proposed ADRs with no path to Accepted is a filing
+cabinet, not a decision record. Also note the numbering hazard — ADR numbers are claimed on
+unmerged branches in the separate documentation repo, so `0005` should be confirmed unclaimed
+before this leaves `strapi-spike`.
+
+**Cost:** ~0.5 day for the remainder.
 
 ---
 
@@ -713,6 +862,21 @@ TTFB. See P21 for the cache boundary and P24 for what happens when that fetch fa
 - `libs/data-access/auth` — same, persists `accessToken`/`refreshToken`
 - `libs/data-access/location` — `navigator.permissions` / geolocation, inherently browser-only
 
+**Two of these are now resolved, and the list was right to exist — 9 Oct 2026.** The SSR spike hit
+both predicted failures on the first build:
+
+- `runtime-config.ts` — fixed with a `RUNTIME_CONFIG_SEED` token the loader checks **before**
+  reaching for `document`, seeded on the server from the same `RUNTIME_CONFIG_JSON` shape the Pages
+  Function serves. ADR-0003 flagged exactly this ("the loader reads a browser global… if
+  server-side rendering is adopted, this loader needs a server path") and was correct.
+- `data-access/auth` — fixed by passing `withLocalStorage()` explicitly. The subtlety worth
+  recording: `withStorageSync` **is** SSR-safe at runtime, but resolving its *default* strategy
+  evaluates `config.storage() === localStorage` at module load, so merely importing the file threw
+  during route extraction. `theme` and `session-cart` already passed the strategy and were fine.
+
+`data-access/location` is untouched and remains inherently browser-only. The tag axis this item
+asks for is now **blocking** rather than advisable — see P1 and ADR-0005.
+
 SSR is per-**application**, never per-library — but a lib can break it. Enforce with a
 `platform:universal` / `platform:browser-only` tag axis plus a `depConstraints` rule so anything in
 the server-rendered graph cannot import a browser-only lib. That is a second, independent argument
@@ -751,6 +915,26 @@ Then **P5 + P7 + P10** as the block that decides whether a real domain migration
 If the CMS lands this quarter, **P22 jumps the queue** — not because it outranks P5/P7/P10 on risk,
 but because its rules are unwinnable arguments once a content model ships. P21 and P24 can follow
 the normal order.
+
+### Revision, 9 Oct 2026 — the SSR spike reordered the front of this list
+
+**P1 is now a hard prerequisite, not merely the highest-leverage item.** ADR-0005 proposes
+splitting marketing from ordering, and the control that makes that split safe is a
+`platform:browser-only` tag rule. The spike proved the failure it prevents is real and total: one
+library's module-level `localStorage` reference killed the entire server build during route
+extraction. **Do P1 before implementing ADR-0005**, not alongside it.
+
+**P26 contains a live defect** — cross-tab session resurrection, reachable today with one app and
+two tabs. It is ~0.5 day and it is a bug in shipping code, so it does not belong in a tier
+discussion at all. Fix it.
+
+**P25 is what product thinks already exists.** The spike proved prerendering works; it did not
+prove marketing can publish. The gap is a webhook pipeline with a cache bypass, plus canonical and
+sitemap, which are hours of work each.
+
+Revised single pass: **P26 (bug) → P1 (blocker) → P25 (the half product assumes) → P2 + P4
+(the split ADR-0005 describes) → P3 + P14.** The CMS work has jumped the Tier 1 queue twice now;
+this is the point to stop letting it.
 
 ---
 

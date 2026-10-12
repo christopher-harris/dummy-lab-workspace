@@ -3,6 +3,7 @@ import {
   httpMutation,
   withDevtools,
   withMutations,
+  withLocalStorage,
   withStorageSync,
 } from '@ngrx-toolkit/core';
 import {
@@ -45,7 +46,16 @@ export const AuthStore = signalStore(
   // NOTE: this persists `accessToken`/`refreshToken` to localStorage and reads
   // them back with no schema check and no version key. See ARCHITECTURE-COMPARISON.md
   // §3.4 — this needs a validated, versioned read path before it goes anywhere real.
-  withStorageSync('dummy-lab-auth'),
+  // `withLocalStorage()` is passed explicitly, and it is not a style choice.
+  // Without a strategy argument, `withStorageSync` resolves one by evaluating
+  // `config.storage() === localStorage` — at module load, where its default
+  // `storage` reads the global directly. On a server there is no
+  // `localStorage`, so *importing this file* throws a `ReferenceError` and
+  // takes down route extraction for the whole application, long before any
+  // route that touches auth is rendered. Everything downstream of the feature
+  // is already SSR-safe (it stubs the read/write methods via `PLATFORM_ID`);
+  // only the resolution of the strategy is not.
+  withStorageSync({ key: 'dummy-lab-auth' }, withLocalStorage()),
   withComputed(({ credentials }) => ({
     isLoggedIn: computed(() => !!credentials()),
   })),

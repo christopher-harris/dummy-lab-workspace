@@ -30,7 +30,9 @@ const media = (name: string): StrapiMedia => ({
   formats: null,
 });
 
-const settings = (containerWidth: BlockSettings['containerWidth']): BlockSettings => ({
+const settings = (
+  containerWidth: BlockSettings['containerWidth'],
+): BlockSettings => ({
   containerWidth,
 });
 

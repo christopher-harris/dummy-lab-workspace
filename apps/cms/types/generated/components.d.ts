@@ -220,6 +220,88 @@ export interface HeroRightAlignedImage extends Struct.ComponentSchema {
   };
 }
 
+export interface NutritionContentNutritionTable extends Struct.ComponentSchema {
+  collectionName: 'components_nutrition_content_nutrition_tables';
+  info: {
+    description: 'Copy and configuration for the nutrition table. Carries no nutrient values: the rows live in the `nutrition-item` collection and the block names which categories to render, so adding a menu item never means editing this page. `categories` is a repeatable enumeration rather than a relation \u2014 relations cannot be ordered from the owning side here, and the order of this list is the order the sections render in.';
+    displayName: 'Nutrition Content \u2014 Table';
+    icon: 'chartBubble';
+  };
+  attributes: {
+    categories: Schema.Attribute.Component<'nutrition.category-section', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
+    footnote: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    heading: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 400;
+      }>;
+    pdf: Schema.Attribute.Media<'files'>;
+    pdfLabel: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+  };
+}
+
+export interface NutritionCategorySection extends Struct.ComponentSchema {
+  collectionName: 'components_nutrition_category_sections';
+  info: {
+    description: 'One section of the nutrition table: which `nutrition-item` category to render and what to call it. A component wrapping a single enum because Strapi has no repeatable-enumeration field, and the list has to be ordered \u2014 its order is the render order. `label` is here rather than derived from the enum so marketing can rename a section without a migration.';
+    displayName: 'Nutrition Category Section';
+    icon: 'bulletList';
+  };
+  attributes: {
+    category: Schema.Attribute.Enumeration<
+      [
+        'classic-wings',
+        'boneless-wings',
+        'chicken-tenders',
+        'chicken-sandwich',
+        'sides',
+        'beverages',
+      ]
+    > &
+      Schema.Attribute.Required;
+    label: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+  };
+}
+
+export interface NutritionNutritionTable extends Struct.ComponentSchema {
+  collectionName: 'components_nutrition_nutrition_tables';
+  info: {
+    description: 'The nutritional guide as a real HTML table. Split into content and settings like every other block. The first data-bound block in this workspace: its `content` names what to show, and the rows themselves are resolved separately from `nutrition-item` \u2014 which is why it renders through a `feature` component rather than a bare `ui` one (PROVE-OUT P22).';
+    displayName: 'Nutrition Table';
+    icon: 'chartBubble';
+  };
+  attributes: {
+    content: Schema.Attribute.Component<
+      'nutrition-content.nutrition-table',
+      false
+    > &
+      Schema.Attribute.Required;
+    settings: Schema.Attribute.Component<'shared.block-settings', false>;
+  };
+}
+
 export interface SharedBlockSettings extends Struct.ComponentSchema {
   collectionName: 'components_shared_block_settings';
   info: {
@@ -261,6 +343,37 @@ export interface SharedIconLink extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedSeo extends Struct.ComponentSchema {
+  collectionName: 'components_shared_seos';
+  info: {
+    description: 'Per-page crawler and unfurl metadata. Required on every page rather than optional, because an optional SEO component is an empty SEO component: the title and description are what a server-rendered page exists to emit, and a page that ships without them renders a blank social card forever. Deliberately has no raw-JSON structured-data field \u2014 arbitrary JSON-LD is the same hole through the taxonomy that raw HTML is (PROVE-OUT P22), and meaningful schema.org markup comes from typed content, not from a textarea.';
+    displayName: 'SEO';
+    icon: 'search';
+  };
+  attributes: {
+    canonicalPath: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 200;
+      }>;
+    metaDescription: Schema.Attribute.Text &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+        minLength: 1;
+      }>;
+    metaTitle: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+        minLength: 1;
+      }>;
+    noindex: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    ogImage: Schema.Attribute.Media<'images'>;
+  };
+}
+
 declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
@@ -272,8 +385,12 @@ declare module '@strapi/strapi' {
       'hero.dark-image-background': HeroDarkImageBackground;
       'hero.light-image-background': HeroLightImageBackground;
       'hero.right-aligned-image': HeroRightAlignedImage;
+      'nutrition-content.nutrition-table': NutritionContentNutritionTable;
+      'nutrition.category-section': NutritionCategorySection;
+      'nutrition.nutrition-table': NutritionNutritionTable;
       'shared.block-settings': SharedBlockSettings;
       'shared.icon-link': SharedIconLink;
+      'shared.seo': SharedSeo;
     }
   }
 }

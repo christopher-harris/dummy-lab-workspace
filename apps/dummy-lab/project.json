@@ -29,7 +29,7 @@
             {
               "type": "initial",
               "maximumWarning": "500kb",
-              "maximumError": "1mb"
+              "maximumError": "1.1mb"
             },
             {
               "type": "anyComponentStyle",
@@ -37,7 +37,9 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "server": "apps/dummy-lab/src/main.server.ts",
+          "outputMode": "static"
         },
         "development": {
           "optimization": false,

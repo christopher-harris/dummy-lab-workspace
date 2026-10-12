@@ -1,0 +1,45 @@
+{
+  "collectionName": "components_nutrition_content_nutrition_tables",
+  "info": {
+    "displayName": "Nutrition Content — Table",
+    "icon": "chartBubble",
+    "description": "Copy and configuration for the nutrition table. Carries no nutrient values: the rows live in the `nutrition-item` collection and the block names which categories to render, so adding a menu item never means editing this page. `categories` is a repeatable enumeration rather than a relation — relations cannot be ordered from the owning side here, and the order of this list is the order the sections render in."
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    },
+    "intro": {
+      "type": "text",
+      "required": false,
+      "maxLength": 400
+    },
+    "categories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "nutrition.category-section",
+      "required": true,
+      "min": 1,
+      "max": 10
+    },
+    "pdf": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["files"]
+    },
+    "pdfLabel": {
+      "type": "string",
+      "required": false,
+      "maxLength": 60
+    },
+    "footnote": {
+      "type": "text",
+      "required": false,
+      "maxLength": 400
+    }
+  }
+}

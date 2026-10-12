@@ -29,7 +29,9 @@ export class CenteredProductImageComponent {
    */
   readonly settings = input<BlockSettings>(DEFAULT_BLOCK_SETTINGS);
 
-  readonly containerClass = computed(() => blockContainerClass(this.settings()));
+  readonly containerClass = computed(() =>
+    blockContainerClass(this.settings()),
+  );
 
   /**
    * This is the page's LCP element, so it renders as a single `<img>` rather

@@ -81,8 +81,9 @@ describe('SessionCartStore', () => {
 
     patchState(store, { cart });
 
-    expect(JSON.parse(localStorage.getItem(SESSION_CART_STORAGE_KEY) ?? '{}'))
-      .toEqual({ cart, cartDrawerVisible: false });
+    expect(
+      JSON.parse(localStorage.getItem(SESSION_CART_STORAGE_KEY) ?? '{}'),
+    ).toEqual({ cart, cartDrawerVisible: false });
   });
 
   it('rehydrates a saved cart on initialization', () => {

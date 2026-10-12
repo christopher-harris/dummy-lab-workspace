@@ -6,7 +6,7 @@
 | **Date**       | 2026-09-28                                                                                    |
 | **Deciders**   | Wingstop internal development leadership; Design; Procurement (see [Licensing](#licensing))   |
 | **Applies to** | `ngfe-web`                                                                                    |
-| **Prototype**  | A prototype workspace — PrimeNG 22 + Tailwind v4, Figma-generated preset — _link TBD_          |
+| **Prototype**  | A prototype workspace — PrimeNG 22 + Tailwind v4, Figma-generated preset — _link TBD_         |
 | **Blocked on** | A licensing decision and a migration plan. See [Acceptance criteria](#acceptance-criteria).   |
 | **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which listed this as an unproven spike |
 

@@ -30,7 +30,9 @@ export class DarkImageBackgroundComponent {
   readonly settings = input<BlockSettings>(DEFAULT_BLOCK_SETTINGS);
 
   /** Constrains the copy column only; the gradient stack stays full-bleed. */
-  readonly containerClass = computed(() => blockContainerClass(this.settings()));
+  readonly containerClass = computed(() =>
+    blockContainerClass(this.settings()),
+  );
 
   /**
    * The typed address is this block's own state, not content. Where it gets

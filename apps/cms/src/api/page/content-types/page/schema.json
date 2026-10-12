@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page",
+    "description": "A marketing page addressed by its full URL path. `blocks` is a dynamic zone: its order is the render order, and each entry names its own block type via the `__component` discriminator \u2014 the same contract `landing-page.heroSlides` uses, so the frontend's block registry carries over unchanged. One queryable row per URL is the point: `GET /api/pages?fields[0]=path` is both the sitemap and the prerender manifest."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true,
+      "maxLength": 80,
+      "minLength": 1
+    },
+    "path": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 200,
+      "regex": "^/$|^(/[a-z0-9]+(-[a-z0-9]+)*)+$"
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo",
+      "required": true
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "required": false,
+      "max": 20,
+      "components": [
+        "hero.centered-product-image",
+        "hero.right-aligned-image",
+        "hero.light-image-background",
+        "hero.dark-image-background",
+        "nutrition.nutrition-table"
+      ],
+      "description": "Optional so a route can exist before its content does: an editor registers the path, SEO and publish state first, and the page prerenders as an empty shell rather than being unsavable. The frontend must therefore treat an empty `blocks` as a valid page, not as a fetch failure."
+    }
+  }
+}

@@ -1,13 +1,13 @@
 # 🤖 ADR-0003 — Load environment configuration at runtime; promote one build artifact
 
-|                |                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| **Status**     | Proposed — **for discussion, not for approval**                                             |
-| **Date**       | 2026-10-05                                                                                  |
-| **Deciders**   | Wingstop internal development leadership; Release engineering                               |
-| **Applies to** | `ngfe-web`                                                                                  |
-| **Prototype**  | A prototype workspace — runtime config + promoted artifact, measured — _link TBD_           |
-| **Blocked on** | A hosting decision for the configuration document. See [Acceptance criteria](#acceptance-criteria). |
+|                |                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Status**     | Proposed — **for discussion, not for approval**                                                                          |
+| **Date**       | 2026-10-05                                                                                                               |
+| **Deciders**   | Wingstop internal development leadership; Release engineering                                                            |
+| **Applies to** | `ngfe-web`                                                                                                               |
+| **Prototype**  | A prototype workspace — runtime config + promoted artifact, measured — _link TBD_                                        |
+| **Blocked on** | A hosting decision for the configuration document. See [Acceptance criteria](#acceptance-criteria).                      |
 | **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — the build-configuration count is a stated input to that migration |
 
 > **Purpose.** This document exists to put a mechanism on the record, and to price it honestly.
@@ -34,12 +34,12 @@ restructuring phase that follows.
 The problem is not the configuration values. It is that **the environment is a property of the
 build**, which produces four structural effects:
 
-| Effect | Why it matters |
-| ------ | -------------- |
-| The artifact tested is never the artifact shipped | Stage and prod run different bytes. Every promotion is an untested build, however small the delta |
-| Configuration changes require a rebuild and redeploy | Changing one URL means a full CI cycle, not a configuration change |
-| Build configurations multiply combinatorially | Every new environment, region or toggle multiplies against every existing one |
-| The count itself becomes migration scope | 27 configurations must be understood and mapped before the workspace can be restructured |
+| Effect                                               | Why it matters                                                                                    |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| The artifact tested is never the artifact shipped    | Stage and prod run different bytes. Every promotion is an untested build, however small the delta |
+| Configuration changes require a rebuild and redeploy | Changing one URL means a full CI cycle, not a configuration change                                |
+| Build configurations multiply combinatorially        | Every new environment, region or toggle multiplies against every existing one                     |
+| The count itself becomes migration scope             | 27 configurations must be understood and mapped before the workspace can be restructured          |
 
 The fourth is why this ADR exists now rather than later. The build-configuration count is an
 input to ADR-0001's migration plan, and the cheapest way to shrink it is to stop encoding the
@@ -183,16 +183,16 @@ artifact, but for the wrong reason.
 
 A decision with no failing build behind it is a preference. This ADR is implemented when:
 
-| Mechanism | Notes |
-| --------- | ------ |
-| A check failing the build if any `fileReplacements` block exists | This is Decision 1. Without it the mechanism regrows one configuration at a time |
-| A check failing the build if an environment-named source module is added | Blocks the same pattern under a different spelling |
-| An assertion that build configurations number three or fewer | Makes Decision 8 a gate rather than an aspiration |
-| A test asserting bootstrap **fails** on a missing or malformed document | Otherwise Decision 5's fail-closed behaviour is unverified, and a silent fallback will be added the first time it is inconvenient |
-| Host-side validation returning an error status rather than a bad document | Two independent validators; neither is permitted to pass through unvalidated input |
-| A type-level or review rule keeping secrets out of the configuration shape | The document is public. This is the control that keeps it safe to be public |
-| Promotion verifying a checksum manifest before deploying | Makes "the same artifact" checkable rather than asserted |
-| No direct consumption of the loader or the document URL outside the provider | Preserves Decision 3, which is what makes alternatives C and D cheap to adopt later |
+| Mechanism                                                                    | Notes                                                                                                                             |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| A check failing the build if any `fileReplacements` block exists             | This is Decision 1. Without it the mechanism regrows one configuration at a time                                                  |
+| A check failing the build if an environment-named source module is added     | Blocks the same pattern under a different spelling                                                                                |
+| An assertion that build configurations number three or fewer                 | Makes Decision 8 a gate rather than an aspiration                                                                                 |
+| A test asserting bootstrap **fails** on a missing or malformed document      | Otherwise Decision 5's fail-closed behaviour is unverified, and a silent fallback will be added the first time it is inconvenient |
+| Host-side validation returning an error status rather than a bad document    | Two independent validators; neither is permitted to pass through unvalidated input                                                |
+| A type-level or review rule keeping secrets out of the configuration shape   | The document is public. This is the control that keeps it safe to be public                                                       |
+| Promotion verifying a checksum manifest before deploying                     | Makes "the same artifact" checkable rather than asserted                                                                          |
+| No direct consumption of the loader or the document URL outside the provider | Preserves Decision 3, which is what makes alternatives C and D cheap to adopt later                                               |
 
 ## Acceptance criteria
 
@@ -229,12 +229,12 @@ Deliberately unresolved; each is a follow-on decision:
 Measured on the prototype, 2026-10-01, Lighthouse 13.5.0, production-equivalent promoted artifact,
 single runs:
 
-| Observation | Value |
-| ----------- | ----- |
-| Initial chunks complete | 211 ms |
-| Configuration request | 228 → 332 ms |
-| First lazy route chunk begins | 340 ms |
-| Serialised cost attributable to the configuration fetch | **~130 ms** |
+| Observation                                             | Value        |
+| ------------------------------------------------------- | ------------ |
+| Initial chunks complete                                 | 211 ms       |
+| Configuration request                                   | 228 → 332 ms |
+| First lazy route chunk begins                           | 340 ms       |
+| Serialised cost attributable to the configuration fetch | **~130 ms**  |
 
 Both the dev and production environments were confirmed serving the identical entry bundle
 filename, so these figures describe the same bytes production serves. Lighthouse performance on

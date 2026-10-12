@@ -111,8 +111,33 @@ export function parseRuntimeConfig(value: unknown): RuntimeConfig {
   });
 }
 
+/**
+ * A pre-resolved configuration, supplied by a host that has one already.
+ *
+ * Exists for the server: `fetchConfig` reaches for `document.baseURI`, and
+ * there is no document during prerendering or SSR, so the browser path is not
+ * merely slow there — it throws before bootstrap and takes every route with
+ * it. A build cannot fetch its own static asset either; nothing is serving it
+ * yet.
+ *
+ * Deliberately a seed for the *existing* loader rather than a second
+ * `RUNTIME_CONFIG` provider. `provideRuntimeConfig()` registers an app
+ * initializer, and initializers are multi-providers: a server config that
+ * merely re-provided `RUNTIME_CONFIG` would still run the browser initializer
+ * underneath it and still throw. Short-circuiting the loader is what actually
+ * removes the browser dependency.
+ *
+ * `null` by default, so the browser is unaffected and no caller has to know
+ * this token exists.
+ */
+export const RUNTIME_CONFIG_SEED = new InjectionToken<RuntimeConfig | null>(
+  'RUNTIME_CONFIG_SEED',
+  { providedIn: 'root', factory: () => null },
+);
+
 @Injectable()
 export class RuntimeConfigLoader {
+  private readonly seed = inject(RUNTIME_CONFIG_SEED);
   private configValue: RuntimeConfig | undefined;
   private loadPromise: Promise<RuntimeConfig> | undefined;
 
@@ -132,6 +157,13 @@ export class RuntimeConfigLoader {
   }
 
   private async fetchConfig(): Promise<RuntimeConfig> {
+    // Checked before anything touches `document`, which is the entire point:
+    // on the server this returns before the browser path is reachable.
+    if (this.seed) {
+      this.configValue = this.seed;
+      return this.seed;
+    }
+
     const configUrl = new URL('runtime-config.json', document.baseURI);
     let response: Response;
 
@@ -182,5 +214,26 @@ export function provideRuntimeConfig(): EnvironmentProviders {
       deps: [RuntimeConfigLoader],
     },
     provideAppInitializer(() => inject(RuntimeConfigLoader).load()),
+  ]);
+}
+
+/**
+ * Supplies configuration the host already holds, instead of fetching it.
+ *
+ * Merged over `provideRuntimeConfig()` by a server config — it seeds the same
+ * loader rather than replacing it, so `RUNTIME_CONFIG` resolves through one
+ * code path on both platforms and consumers stay unaware of which they are
+ * running on.
+ *
+ * Validates rather than trusting: a server reading this out of an environment
+ * variable has exactly the same reason to parse it as the browser does
+ * reading it off the network, and a malformed value should fail the build
+ * loudly rather than prerender a site pointed at `undefined`.
+ */
+export function provideServerRuntimeConfig(
+  config: unknown,
+): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    { provide: RUNTIME_CONFIG_SEED, useValue: parseRuntimeConfig(config) },
   ]);
 }

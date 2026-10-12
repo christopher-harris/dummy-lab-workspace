@@ -1,13 +1,13 @@
 # 🤖 ADR-0004 — Structure `data-access` libraries around a SignalStore with an event-driven public API
 
-|                |                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| **Status**     | **Draft** — rough cut for refinement, not yet ready for discussion                          |
-| **Date**       | 2026-10-05                                                                                  |
-| **Deciders**   | Wingstop internal development leadership                                                    |
-| **Applies to** | `ngfe-web`                                                                                  |
-| **Prototype**  | A prototype workspace — 12 `data-access` libraries on SignalStore — _link TBD_              |
-| **Blocked on** | A generator, an event-granularity convention, and bringing the prototype in line. See [Acceptance criteria](#acceptance-criteria). |
+|                |                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Status**     | **Draft** — rough cut for refinement, not yet ready for discussion                                                                               |
+| **Date**       | 2026-10-05                                                                                                                                       |
+| **Deciders**   | Wingstop internal development leadership                                                                                                         |
+| **Applies to** | `ngfe-web`                                                                                                                                       |
+| **Prototype**  | A prototype workspace — 12 `data-access` libraries on SignalStore — _link TBD_                                                                   |
+| **Blocked on** | A generator, an event-granularity convention, and bringing the prototype in line. See [Acceptance criteria](#acceptance-criteria).               |
 | **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which decided that one `data-access` library per domain exists, but not what is inside it |
 
 > **Purpose.** ADR-0001 decided that domain data and state live in one `data-access` library per
@@ -122,7 +122,7 @@ type:data-access  →  type:util, scope:ambient
 Note that this is a **tightening**, not a new restriction. The rule as written today permits
 `type:data-access → type:data-access`, which allows every domain to import every other.
 
-**(c) Importing another library's *events* is not the same as injecting its *store*.** An event
+**(c) Importing another library's _events_ is not the same as injecting its _store_.** An event
 group is a set of types and a dispatch token. A store is state and behaviour. A domain may listen
 for another domain's event — `sessionExpired`, `checkoutCompleted` — without depending on how that
 domain works, which is what lets domains react to each other without coupling to each other.
@@ -185,14 +185,14 @@ a completed checkout never requires a reference to the thing that performed it.
 
 ### 5. Three mechanisms, three jobs — and they do not overlap
 
-| Mechanism | Owns | Rule |
-| --------- | ---- | ---- |
-| `withReducer(on(...))` | Synchronous state transitions | Pure. No I/O, no navigation, no injection |
-| `withEventHandlers` | Async orchestration and side effects | An event triggers a request, a navigation, or another event |
-| `withMutations` / `httpMutation` | Writes to the server | Declares the request; reports success and failure as events |
+| Mechanism                        | Owns                                 | Rule                                                        |
+| -------------------------------- | ------------------------------------ | ----------------------------------------------------------- |
+| `withReducer(on(...))`           | Synchronous state transitions        | Pure. No I/O, no navigation, no injection                   |
+| `withEventHandlers`              | Async orchestration and side effects | An event triggers a request, a navigation, or another event |
+| `withMutations` / `httpMutation` | Writes to the server                 | Declares the request; reports success and failure as events |
 
-A useful test: if removing the line would change *what the state is*, it belongs in a reducer. If
-it would change *what else happens*, it belongs in a handler.
+A useful test: if removing the line would change _what the state is_, it belongs in a reducer. If
+it would change _what else happens_, it belongs in a handler.
 
 ```ts
 withReducer(
@@ -264,7 +264,7 @@ coin-flip whose value is entirely in being settled.
 
 A store owning local user preference with no backend may expose methods — events would be pure
 ceremony. Any store that talks to a server uses events. The exception stays narrow by definition:
-*no server state at all*, not *only a little*.
+_no server state at all_, not _only a little_.
 
 ### Adding a new domain
 
@@ -349,18 +349,18 @@ architecture rests on.
 
 A decision with no failing build behind it is a preference. This ADR is implemented when:
 
-| Mechanism | Notes |
-| --------- | ------ |
-| **A generator scaffolding the layout and the public API** | The highest-leverage item here by a wide margin. A shape that lives only in an example does not survive contact with a second author |
-| `depConstraints` narrowed so `type:data-access` may depend only on `type:util` and `scope:ambient` | Decision 2. The current rule permits any domain to import any other |
-| A negative test proving a peer-domain import fails the build | Otherwise the tightening is unverified |
-| An owner for the `scope:ambient` tag, and a short list of what currently carries it | The carve-out is only as good as the discipline around who gets it |
-| A check rejecting any repository export from a `data-access` public API | Decision 1, the load-bearing one |
-| `@nx/enforce-module-boundaries` forbidding `type:ui` → `type:data-access` | Makes "components do not talk to API services" mechanical rather than aspirational |
-| A check rejecting raw `fetch()` inside `data-access` | Decision 7. Without it the interceptor chain is decorative |
-| A check rejecting `patchState` from outside the owning library | Keeps the write surface to the store's own reducers, handlers and mutations |
-| A naming check: `events.ts` exists, `actions.ts` does not | A settled coin-flip is only worth settling if it is kept |
-| Store tests that dispatch events and assert state, rather than calling internals | See Open questions — the shape of these tests is not yet settled |
+| Mechanism                                                                                          | Notes                                                                                                                                |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **A generator scaffolding the layout and the public API**                                          | The highest-leverage item here by a wide margin. A shape that lives only in an example does not survive contact with a second author |
+| `depConstraints` narrowed so `type:data-access` may depend only on `type:util` and `scope:ambient` | Decision 2. The current rule permits any domain to import any other                                                                  |
+| A negative test proving a peer-domain import fails the build                                       | Otherwise the tightening is unverified                                                                                               |
+| An owner for the `scope:ambient` tag, and a short list of what currently carries it                | The carve-out is only as good as the discipline around who gets it                                                                   |
+| A check rejecting any repository export from a `data-access` public API                            | Decision 1, the load-bearing one                                                                                                     |
+| `@nx/enforce-module-boundaries` forbidding `type:ui` → `type:data-access`                          | Makes "components do not talk to API services" mechanical rather than aspirational                                                   |
+| A check rejecting raw `fetch()` inside `data-access`                                               | Decision 7. Without it the interceptor chain is decorative                                                                           |
+| A check rejecting `patchState` from outside the owning library                                     | Keeps the write surface to the store's own reducers, handlers and mutations                                                          |
+| A naming check: `events.ts` exists, `actions.ts` does not                                          | A settled coin-flip is only worth settling if it is kept                                                                             |
+| Store tests that dispatch events and assert state, rather than calling internals                   | See Open questions — the shape of these tests is not yet settled                                                                     |
 
 ## Acceptance criteria
 
@@ -391,9 +391,9 @@ things happen on logout" is then spread across five libraries with nothing namin
 alternative is an application-level orchestration seam subscribed to the event bus. Neither is
 decided, and this is the one genuine gap left in the model.
 
-*(An earlier draft listed hydration here. It does not belong: a `providedIn: 'root'` store with a
+_(An earlier draft listed hydration here. It does not belong: a `providedIn: 'root'` store with a
 resource loads on first injection, and `withStorageSync` restores at construction. Hydration is
-already handled by the state model.)*
+already handled by the state model.)_
 
 ### What is the unit under test, and what replaces the network?
 
@@ -427,7 +427,7 @@ IndexedDB) is the easy part. The decision is policy:
 components is the goal, and the event bus already supports a global listener. The trap is coupling
 the analytics schema to internal event names — rename a domain event, and a dashboard silently
 goes to zero. Candidate shapes, in preference order: a global listener with an explicit typed
-mapping table (the mapping *is* the contract, and a rename breaks it at compile time); stores
+mapping table (the mapping _is_ the contract, and a rename breaks it at compile time); stores
 dual-emitting explicit analytics events; or direct subscription with no mapping.
 
 ## Evidence
@@ -435,14 +435,14 @@ dual-emitting explicit analytics events; or direct subscription with no mapping.
 **On propagation — the finding that shaped the Enforcement section.** Twelve `data-access`
 libraries exist in the prototype. Measured October 2026:
 
-| Property | Count |
-| -------- | ----- |
-| `data-access` libraries | 12 |
-| Public APIs exporting the repository | 8 |
-| Libraries declaring an event group | 4 |
-| `events.ts` / `actions.ts` split | 2 / 2 |
-| Libraries still using raw `fetch()` | 8 |
-| Libraries with events + reducer + handlers + mutations | 1 |
+| Property                                               | Count |
+| ------------------------------------------------------ | ----- |
+| `data-access` libraries                                | 12    |
+| Public APIs exporting the repository                   | 8     |
+| Libraries declaring an event group                     | 4     |
+| `events.ts` / `actions.ts` split                       | 2 / 2 |
+| Libraries still using raw `fetch()`                    | 8     |
+| Libraries with events + reducer + handlers + mutations | 1     |
 
 One library in twelve demonstrates the full shape — the most recently written one. The pattern
 improved as it was discovered and did not travel backwards to the libraries written before it.
