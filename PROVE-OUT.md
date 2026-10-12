@@ -1,6 +1,6 @@
 # 🤖 Prove-Out Backlog — what's left before "this is the example"
 
-**Drafted:** 22 Sept 2026 · **Updated:** 9 Oct 2026 · **Audience:** Chris · **Status:** decision
+**Drafted:** 22 Sept 2026 · **Updated:** 12 Oct 2026 · **Audience:** Chris · **Status:** decision
 instrument, not a plan
 
 Measured directly against this tree and against four sources in `ngfe-web`:
@@ -536,17 +536,27 @@ spike proved the former. Product will assume it proved the latter.
 
 **Added 9 Oct 2026. Contains a live defect, not a design gap.**
 
-`withStorageSync` reads storage **once** at init, writes the **whole state** on every change, and
-the library contains zero `storage` listeners and zero `BroadcastChannel` usage — across every
-strategy, IndexedDB included. Verified against the installed source.
+`withStorageSync` reads storage **once** at init, writes the **whole state of its own store** on every
+change to that store, and the library contains zero `storage` listeners and zero `BroadcastChannel`
+usage — across every strategy, IndexedDB included. Verified against the installed source.
 
-**The bug, reachable today with one app and two tabs:**
+Every tab is its own bootstrap and its own `AuthStore` instance (`providedIn: 'root'` is per
+application, not per origin). A new tab _looks_ shared because it reads the same `localStorage` key
+at init — same data, separate instance.
+
+**The bug, reachable today with one app and two tabs — a stale session:**
 
 1. Tab A and Tab B both logged in.
 2. User logs out in Tab B → credentials cleared → written to storage.
-3. Tab A never hears about it; its in-memory state still holds credentials.
-4. Any state change in Tab A triggers a whole-state write → **the logged-out session is restored.**
-5. Tab B refreshes and is logged back in.
+3. Tab A never hears about it. Without a reload it still renders as logged in, its devtools still
+   hold the credentials, and the interceptor keeps attaching a token for a session the user ended.
+4. Reloading Tab A re-reads storage and it is logged out.
+
+**Corrected 12 Oct 2026 — not a resurrection, yet.** An earlier draft claimed _any_ state change in
+Tab A would rewrite storage and restore the logged-out session. It cannot today: `AuthStore` only
+writes when its own state changes, and its only state is `credentials`, which changes only on login
+and logout. The resurrection case arrives with the first auth write that is neither — token refresh
+(P12) is the obvious one — at which point a stale tab writes the ended session back.
 
 **Why it escalates under ADR-0005.** A split makes full page loads routine rather than occasional,
 and cross-app links are exactly what people open in a new tab. Worse, the persisted shape becomes
@@ -561,6 +571,35 @@ a version key with a rejecting read path (makes the contract safe to share); the
 a stale client stops being authoritative and simply gets 401s.
 
 **Cost:** ~0.5 day for the listener and version key. The cookie move is a backend conversation.
+
+**Recommended direction — noted 12 Oct 2026, deliberately deferred.** Not spike work; settle the
+details when the re-architecture starts. Recorded so it is not lost:
+
+- **Principle.** The server is the source of truth; every client store is a cache. The cross-tab
+  listener is an interim fix — the parts worth investing in are the ones that survive the cookie
+  move.
+- **Order.**
+  1. **401 → one auth event.** The interceptor dispatches `authEvents.sessionEnded`; `AuthStore`
+     clears and redirects off guarded routes. Also catches plain expiry (`expiresInMins` is
+     carried on the session and enforced nowhere). The only step unchanged under httpOnly cookies.
+  2. **`storage` listener dispatching the same event.** `PLATFORM_ID`-guarded `onInit`, filtered to
+     the `dummy-lab-auth` key. One event, one handler — another tab's logout and a server 401
+     cannot diverge.
+  3. **Version envelope** `{ v: 1, credentials }` via `withStorageSync`'s existing
+     `parse`/`stringify` options; unknown version reads as logged out.
+  4. **Lint:** `AuthStore` is injected, never re-provided; only `data-access/auth` touches the key.
+     Folds into P1.
+  5. **httpOnly cookie** — backend conversation and an ADR. DummyJSON is bearer-only, so the lab
+     cannot prove this end to end; say so rather than fake it.
+- **Not `BroadcastChannel`.** Storage already holds the record; a second channel is a second thing
+  that can disagree with it.
+- **Trap.** Logout sets `credentials: undefined`, and `JSON.stringify` drops `undefined`, so storage
+  holds `{}`. A listener that just calls `readFromStorage()` patches `{}`, changes nothing, and the
+  stale tab stays logged in — a fix that looks done and isn't. Persist logout as `null` or let the
+  envelope make it explicit, and test exactly that case.
+- **Why it matters beyond the lab.** The `ngfe-web` "multiple sources of truth" bug is the same
+  class. Diagnose which kind it is before porting a fix: a second owner (lint, step 4), a
+  re-provided store shadowing root (lint, step 4), or separate runtimes disagreeing (steps 1–3, 5).
 
 ---
 
@@ -924,9 +963,10 @@ splitting marketing from ordering, and the control that makes that split safe is
 library's module-level `localStorage` reference killed the entire server build during route
 extraction. **Do P1 before implementing ADR-0005**, not alongside it.
 
-**P26 contains a live defect** — cross-tab session resurrection, reachable today with one app and
-two tabs. It is ~0.5 day and it is a bug in shipping code, so it does not belong in a tier
-discussion at all. Fix it.
+**P26 contains a live defect** — a stale session in other tabs after logout, reachable today with
+one app and two tabs. It becomes session resurrection the moment auth gains a non-login/logout write
+such as token refresh. It is ~0.5 day and it is a bug in shipping code, so it does not belong in a
+tier discussion at all. Fix it before P12 adds refresh.
 
 **P25 is what product thinks already exists.** The spike proved prerendering works; it did not
 prove marketing can publish. The gap is a webhook pipeline with a cache bypass, plus canonical and
