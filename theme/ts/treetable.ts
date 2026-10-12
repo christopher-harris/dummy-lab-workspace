@@ -31,7 +31,7 @@ import type { TreeTableDesignTokens } from '@primeuix/themes/types/treetable';
         }
     },
     columnTitle: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     row: {
         background: "{content.background}",
@@ -61,7 +61,7 @@ import type { TreeTableDesignTokens } from '@primeuix/themes/types/treetable';
         padding: "0.75rem 1rem"
     },
     columnFooter: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     footer: {
         background: "{content.background}",
@@ -92,7 +92,7 @@ import type { TreeTableDesignTokens } from '@primeuix/themes/types/treetable';
         hoverColor: "{text.color}",
         selectedHoverColor: "{primary.color}",
         size: "1.75rem",
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",

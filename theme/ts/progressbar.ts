@@ -12,6 +12,6 @@ import type { ProgressBarDesignTokens } from '@primeuix/themes/types/progressbar
     label: {
         color: "{primary.contrast.color}",
         fontSize: "0.75rem",
-        fontWeight: "600"
+        fontWeight: "800"
     }
 } satisfies ProgressBarDesignTokens;

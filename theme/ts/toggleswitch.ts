@@ -9,7 +9,7 @@ import type { ToggleSwitchDesignTokens } from '@primeuix/themes/types/toggleswit
         checkedHoverBackground: "{primary.hover.color}",
         width: "2.5rem",
         height: "1.5rem",
-        borderRadius: "30px",
+        borderRadius: "90px",
         gap: "0.25rem",
         shadow: "0 1px 2px 0 #1212170d",
         focusRing: {
@@ -38,7 +38,7 @@ import type { ToggleSwitchDesignTokens } from '@primeuix/themes/types/toggleswit
         hoverColor: "light-dark({text.color}, {surface.800})",
         checkedColor: "{primary.color}",
         checkedHoverColor: "{primary.hover.color}",
-        borderRadius: "0.5rem",
+        borderRadius: "1rem",
         size: "1rem"
     }
 } satisfies ToggleSwitchDesignTokens;

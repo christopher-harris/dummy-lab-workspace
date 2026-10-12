@@ -6,7 +6,7 @@ import type { ToolbarDesignTokens } from '@primeuix/themes/types/toolbar';
         borderColor: "{surface.0}",
         borderRadius: "0",
         color: "{surface.950}",
-        gap: "24px",
-        padding: "24px"
+        gap: "36px",
+        padding: "36px"
     }
 } satisfies ToolbarDesignTokens;

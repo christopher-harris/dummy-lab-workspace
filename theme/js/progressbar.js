@@ -10,6 +10,6 @@ export default {
     label: {
         color: "{primary.contrast.color}",
         fontSize: "0.75rem",
-        fontWeight: "600"
+        fontWeight: "800"
     }
 }

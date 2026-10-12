@@ -14,7 +14,7 @@ import type { AccordionDesignTokens } from '@primeuix/themes/types/accordion';
         activeColor: "{text.color}",
         activeHoverColor: "{text.color}",
         padding: "1.125rem",
-        fontWeight: "600",
+        fontWeight: "800",
         borderRadius: "0",
         borderWidth: "0",
         borderColor: "{content.border.color}",

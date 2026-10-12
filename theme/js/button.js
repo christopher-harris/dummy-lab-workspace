@@ -1,15 +1,15 @@
 export default {
     root: {
-        borderRadius: "4px",
-        roundedBorderRadius: "2.25rem",
+        borderRadius: "12px",
+        roundedBorderRadius: "4rem",
         gap: "0.625rem",
-        paddingX: "24px",
-        paddingY: "10px",
+        paddingX: "36px",
+        paddingY: "15px",
         iconOnlyWidth: "2.75rem",
         sm: {
-            fontSize: "{overlay.modal.border.radius}",
+            fontSize: "{border.radius.md}",
             paddingX: "{form.field.sm.padding.y}",
-            paddingY: "{form.field.border.radius}",
+            paddingY: "0.375rem",
             iconOnlyWidth: "2.25rem"
         },
         lg: {
@@ -19,7 +19,7 @@ export default {
             iconOnlyWidth: "2.75rem"
         },
         label: {
-            fontWeight: "600"
+            fontWeight: "800"
         },
         raisedShadow: "0 3px 1px -2px #00000033, 0 2px 2px 0 #00000024, 0 1px 5px 0 #0000001f",
         focusRing: {
@@ -32,10 +32,10 @@ export default {
         primary: {
             background: "{primary.color}",
             hoverBackground: "{primary.hover.color}",
-            activeBackground: "{emerald.900}",
-            borderColor: "{emerald.700}",
+            activeBackground: "{primary.active.color}",
+            borderColor: "{primary.color}",
             hoverBorderColor: "{primary.color}",
-            activeBorderColor: "{emerald.900}",
+            activeBorderColor: "{primary.active.color}",
             color: "{surface.0}",
             hoverColor: "{surface.0}",
             activeColor: "{surface.0}",
@@ -45,12 +45,12 @@ export default {
             }
         },
         secondary: {
-            background: "{yellow.500}",
-            hoverBackground: "{yellow.600}",
-            activeBackground: "{yellow.600}",
-            borderColor: "{yellow.500}",
-            hoverBorderColor: "{yellow.600}",
-            activeBorderColor: "{yellow.600}",
+            background: "{form.field.float.label.invalid.color}",
+            hoverBackground: "{form.field.float.label.invalid.color}",
+            activeBackground: "{form.field.float.label.invalid.color}",
+            borderColor: "{form.field.float.label.invalid.color}",
+            hoverBorderColor: "{form.field.float.label.invalid.color}",
+            activeBorderColor: "{form.field.float.label.invalid.color}",
             color: "{surface.950}",
             hoverColor: "{surface.950}",
             activeColor: "{surface.950}",
@@ -60,77 +60,77 @@ export default {
             }
         },
         info: {
-            background: "light-dark({sky.600}, {sky.500})",
-            hoverBackground: "light-dark({sky.700}, {sky.400})",
-            activeBackground: "light-dark({sky.800}, {sky.300})",
-            borderColor: "light-dark({sky.600}, {sky.500})",
-            hoverBorderColor: "light-dark({sky.700}, {sky.400})",
-            activeBorderColor: "light-dark({sky.800}, {sky.300})",
-            color: "light-dark(#fafafaff, {sky.900})",
-            hoverColor: "light-dark(#fafafaff, {sky.900})",
-            activeColor: "light-dark(#fafafaff, {sky.900})",
+            background: "light-dark({highlight.focus.color}, {primary.600})",
+            hoverBackground: "light-dark({primary.900}, {primary.500})",
+            activeBackground: "light-dark({primary.900}, {primary.300})",
+            borderColor: "light-dark({highlight.focus.color}, {primary.600})",
+            hoverBorderColor: "light-dark({primary.900}, {primary.500})",
+            activeBorderColor: "light-dark({primary.900}, {primary.300})",
+            color: "light-dark(#fafafaff, {primary.950})",
+            hoverColor: "light-dark(#fafafaff, {primary.950})",
+            activeColor: "light-dark(#fafafaff, {primary.950})",
             focusRing: {
-                color: "light-dark({sky.600}, {sky.500})",
+                color: "light-dark({highlight.focus.color}, {primary.600})",
                 shadow: "none"
             }
         },
         success: {
-            background: "light-dark({green.600}, {green.500})",
-            hoverBackground: "light-dark({green.700}, {green.400})",
-            activeBackground: "light-dark({green.800}, {green.300})",
-            borderColor: "light-dark({green.600}, {green.500})",
-            hoverBorderColor: "light-dark({green.700}, {green.400})",
-            activeBorderColor: "light-dark({green.800}, {green.300})",
-            color: "light-dark(#fafafaff, {green.900})",
-            hoverColor: "light-dark(#fafafaff, {green.900})",
-            activeColor: "light-dark(#fafafaff, {green.900})",
+            background: "light-dark({surface.600}, {primary.hover.color})",
+            hoverBackground: "light-dark({content.color}, {form.field.hover.border.color})",
+            activeBackground: "light-dark({content.color}, {form.field.disabled.color})",
+            borderColor: "light-dark({surface.600}, {primary.hover.color})",
+            hoverBorderColor: "light-dark({content.color}, {form.field.hover.border.color})",
+            activeBorderColor: "light-dark({content.color}, {form.field.disabled.color})",
+            color: "light-dark(#fafafaff, {content.hover.background})",
+            hoverColor: "light-dark(#fafafaff, {content.hover.background})",
+            activeColor: "light-dark(#fafafaff, {content.hover.background})",
             focusRing: {
-                color: "light-dark({green.600}, {green.500})",
+                color: "light-dark({surface.600}, {primary.hover.color})",
                 shadow: "none"
             }
         },
         warn: {
-            background: "light-dark({orange.600}, {orange.500})",
-            hoverBackground: "light-dark({orange.700}, {orange.400})",
-            activeBackground: "light-dark({orange.800}, {orange.300})",
-            borderColor: "light-dark({orange.600}, {orange.500})",
-            hoverBorderColor: "light-dark({orange.700}, {orange.400})",
-            activeBorderColor: "light-dark({orange.800}, {orange.300})",
-            color: "light-dark(#fafafaff, {orange.900})",
-            hoverColor: "light-dark(#fafafaff, {orange.900})",
-            activeColor: "light-dark(#fafafaff, {orange.900})",
+            background: "{form.field.float.label.invalid.color}",
+            hoverBackground: "{form.field.float.label.invalid.color}",
+            activeBackground: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})",
+            borderColor: "{form.field.float.label.invalid.color}",
+            hoverBorderColor: "{form.field.float.label.invalid.color}",
+            activeBorderColor: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})",
+            color: "light-dark(#fafafaff, {primary.950})",
+            hoverColor: "light-dark(#fafafaff, {primary.950})",
+            activeColor: "light-dark(#fafafaff, {primary.950})",
             focusRing: {
-                color: "light-dark({orange.600}, {orange.500})",
+                color: "{form.field.float.label.invalid.color}",
                 shadow: "none"
             }
         },
         help: {
-            background: "light-dark({purple.600}, {purple.500})",
-            hoverBackground: "light-dark({purple.700}, {purple.400})",
-            activeBackground: "light-dark({purple.800}, {purple.300})",
-            borderColor: "light-dark({purple.600}, {purple.500})",
-            hoverBorderColor: "light-dark({purple.700}, {purple.400})",
-            activeBorderColor: "light-dark({purple.800}, {purple.300})",
-            color: "light-dark(#fafafaff, {purple.900})",
-            hoverColor: "light-dark(#fafafaff, {purple.900})",
-            activeColor: "light-dark(#fafafaff, {purple.900})",
+            background: "{primary.300}",
+            hoverBackground: "light-dark({primary.400}, {primary.200})",
+            activeBackground: "light-dark({highlight.focus.color}, {primary.100})",
+            borderColor: "{primary.300}",
+            hoverBorderColor: "light-dark({primary.400}, {primary.200})",
+            activeBorderColor: "light-dark({highlight.focus.color}, {primary.100})",
+            color: "light-dark(#fafafaff, {primary.900})",
+            hoverColor: "light-dark(#fafafaff, {primary.900})",
+            activeColor: "light-dark(#fafafaff, {primary.900})",
             focusRing: {
-                color: "light-dark({purple.600}, {purple.500})",
+                color: "{primary.300}",
                 shadow: "none"
             }
         },
         danger: {
-            background: "light-dark({red.600}, {red.500})",
-            hoverBackground: "light-dark({red.700}, {red.400})",
-            activeBackground: "light-dark({red.800}, {red.300})",
-            borderColor: "light-dark({red.600}, {red.500})",
-            hoverBorderColor: "light-dark({red.700}, {red.400})",
-            activeBorderColor: "light-dark({red.800}, {red.300})",
-            color: "light-dark(#fafafaff, {red.900})",
-            hoverColor: "light-dark(#fafafaff, {red.900})",
-            activeColor: "light-dark(#fafafaff, {red.900})",
+            background: "{form.field.float.label.invalid.color}",
+            hoverBackground: "{form.field.float.label.invalid.color}",
+            activeBackground: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})",
+            borderColor: "{form.field.float.label.invalid.color}",
+            hoverBorderColor: "{form.field.float.label.invalid.color}",
+            activeBorderColor: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})",
+            color: "light-dark(#fafafaff, {primary.950})",
+            hoverColor: "light-dark(#fafafaff, {primary.950})",
+            activeColor: "light-dark(#fafafaff, {primary.950})",
             focusRing: {
-                color: "light-dark({red.600}, {red.500})",
+                color: "{form.field.float.label.invalid.color}",
                 shadow: "none"
             }
         },
@@ -152,10 +152,10 @@ export default {
     },
     outlined: {
         primary: {
-            hoverBackground: "{emerald.50}",
-            activeBackground: "{emerald.50}",
-            borderColor: "{emerald.700}",
-            color: "{emerald.700}"
+            hoverBackground: "{primary.hover.color}",
+            activeBackground: "{primary.active.color}",
+            borderColor: "{primary.color}",
+            color: "{primary.color}"
         },
         secondary: {
             hoverBackground: "light-dark({surface.100}, #fafafa0a)",
@@ -164,34 +164,34 @@ export default {
             color: "light-dark({surface.600}, {surface.500})"
         },
         success: {
-            hoverBackground: "light-dark({green.100}, #43df810a)",
-            activeBackground: "light-dark({green.50}, #43df8129)",
-            borderColor: "light-dark({green.300}, {button.primary.background})",
-            color: "light-dark({green.600}, {green.500})"
+            hoverBackground: "light-dark({content.border.color}, #43df810a)",
+            activeBackground: "light-dark({content.hover.background}, #43df8129)",
+            borderColor: "light-dark({form.field.hover.border.color}, {button.primary.background})",
+            color: "light-dark({surface.600}, {primary.hover.color})"
         },
         info: {
-            hoverBackground: "light-dark({sky.100}, #30b5f90a)",
-            activeBackground: "light-dark({sky.50}, #30b5f929)",
-            borderColor: "light-dark({sky.300}, {sky.800})",
-            color: "light-dark({sky.600}, {sky.500})"
+            hoverBackground: "light-dark({highlight.focus.background}, #30b5f90a)",
+            activeBackground: "light-dark({highlight.background}, #30b5f929)",
+            borderColor: "light-dark({primary.300}, {primary.900})",
+            color: "light-dark({highlight.focus.color}, {primary.600})"
         },
         warn: {
-            hoverBackground: "light-dark({orange.100}, #fc95340a)",
-            activeBackground: "light-dark({orange.50}, #fc953429)",
-            borderColor: "light-dark({orange.300}, {orange.800})",
-            color: "light-dark({orange.600}, {orange.500})"
+            hoverBackground: "light-dark({primary.contrast.color}, #fc95340a)",
+            activeBackground: "light-dark({primary.contrast.color}, #fc953429)",
+            borderColor: "light-dark({form.field.invalid.border.color}, {form.field.float.label.invalid.color})",
+            color: "{form.field.float.label.invalid.color}"
         },
         help: {
-            hoverBackground: "light-dark({purple.100}, #c17dfd0a)",
-            activeBackground: "light-dark({purple.50}, #c17dfd29)",
-            borderColor: "light-dark({purple.300}, {purple.800})",
-            color: "light-dark({purple.600}, {purple.500})"
+            hoverBackground: "light-dark({highlight.background}, #c17dfd0a)",
+            activeBackground: "light-dark({primary.contrast.color}, #c17dfd29)",
+            borderColor: "light-dark({highlight.focus.background}, {primary.800})",
+            color: "{primary.300}"
         },
         danger: {
-            hoverBackground: "light-dark({red.100}, #f96f6a0a)",
-            activeBackground: "light-dark({red.50}, #f96f6a29)",
-            borderColor: "light-dark({red.300}, {red.800})",
-            color: "light-dark({red.600}, {red.500})"
+            hoverBackground: "light-dark({highlight.background}, #f96f6a0a)",
+            activeBackground: "light-dark({primary.contrast.color}, #f96f6a29)",
+            borderColor: "light-dark({form.field.invalid.border.color}, {primary.950})",
+            color: "{form.field.float.label.invalid.color}"
         },
         contrast: {
             hoverBackground: "light-dark({surface.100}, {surface.900})",
@@ -210,7 +210,7 @@ export default {
         primary: {
             hoverBackground: "#00000000",
             activeBackground: "#00000000",
-            color: "{emerald.700}"
+            color: "{primary.color}"
         },
         secondary: {
             hoverBackground: "light-dark({surface.100}, {surface.900})",
@@ -218,29 +218,29 @@ export default {
             color: "light-dark({surface.600}, {surface.500})"
         },
         success: {
-            hoverBackground: "light-dark({green.100}, #43df810a)",
-            activeBackground: "light-dark({green.50}, #43df8129)",
-            color: "light-dark({green.600}, {green.500})"
+            hoverBackground: "light-dark({content.border.color}, #43df810a)",
+            activeBackground: "light-dark({content.hover.background}, #43df8129)",
+            color: "light-dark({surface.600}, {primary.hover.color})"
         },
         info: {
-            hoverBackground: "light-dark({sky.100}, #30b5f90a)",
-            activeBackground: "light-dark({sky.50}, #30b5f929)",
-            color: "light-dark({sky.600}, {sky.500})"
+            hoverBackground: "light-dark({highlight.focus.background}, #30b5f90a)",
+            activeBackground: "light-dark({highlight.background}, #30b5f929)",
+            color: "light-dark({highlight.focus.color}, {primary.600})"
         },
         warn: {
-            hoverBackground: "light-dark({orange.100}, #fc95340a)",
-            activeBackground: "light-dark({orange.50}, #fc953429)",
-            color: "light-dark({orange.600}, {orange.500})"
+            hoverBackground: "light-dark({primary.contrast.color}, #fc95340a)",
+            activeBackground: "light-dark({primary.contrast.color}, #fc953429)",
+            color: "{form.field.float.label.invalid.color}"
         },
         help: {
-            hoverBackground: "light-dark({purple.100}, #c17dfd0a)",
-            activeBackground: "light-dark({purple.50}, #c17dfd29)",
-            color: "light-dark({purple.600}, {purple.500})"
+            hoverBackground: "light-dark({highlight.background}, #c17dfd0a)",
+            activeBackground: "light-dark({primary.contrast.color}, #c17dfd29)",
+            color: "{primary.300}"
         },
         danger: {
-            hoverBackground: "light-dark({red.100}, #f96f6a0a)",
-            activeBackground: "light-dark({red.50}, #f96f6a29)",
-            color: "light-dark({red.600}, {red.500})"
+            hoverBackground: "light-dark({highlight.background}, #f96f6a0a)",
+            activeBackground: "light-dark({primary.contrast.color}, #f96f6a29)",
+            color: "{form.field.float.label.invalid.color}"
         },
         contrast: {
             hoverBackground: "light-dark({surface.100}, {surface.900})",

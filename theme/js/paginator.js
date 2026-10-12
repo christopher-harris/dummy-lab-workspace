@@ -16,7 +16,7 @@ export default {
         selectedColor: "{highlight.color}",
         width: "2.5rem",
         height: "2.5rem",
-        borderRadius: "1.25rem",
+        borderRadius: "2.5rem",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",

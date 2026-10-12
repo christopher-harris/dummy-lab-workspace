@@ -48,7 +48,7 @@ import type { MenubarDesignTokens } from '@primeuix/themes/types/menubar';
         borderColor: "{content.border.color}"
     },
     mobileButton: {
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         size: "1.75rem",
         color: "{text.muted.color}",
         hoverColor: "{text.hover.muted.color}",

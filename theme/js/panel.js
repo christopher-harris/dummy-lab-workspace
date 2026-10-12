@@ -17,7 +17,7 @@ export default {
         padding: "0.375rem 1.125rem"
     },
     title: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     content: {
         padding: "0 1.125rem 1.125rem"

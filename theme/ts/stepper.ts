@@ -29,7 +29,7 @@ import type { StepperDesignTokens } from '@primeuix/themes/types/stepper';
     stepTitle: {
         color: "{text.muted.color}",
         activeColor: "{primary.color}",
-        fontWeight: "500"
+        fontWeight: "700"
     },
     stepNumber: {
         background: "{content.background}",
@@ -40,8 +40,8 @@ import type { StepperDesignTokens } from '@primeuix/themes/types/stepper';
         activeColor: "{primary.color}",
         size: "2rem",
         fontSize: "1.143rem",
-        fontWeight: "500",
-        borderRadius: "1rem",
+        fontWeight: "700",
+        borderRadius: "2rem",
         shadow: "0 1px 0 0 #0000000f, 0 1px 1px 0 #0000001f"
     },
     steppanels: {

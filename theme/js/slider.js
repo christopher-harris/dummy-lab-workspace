@@ -13,11 +13,11 @@ export default {
     handle: {
         width: "20px",
         height: "20px",
-        borderRadius: "10px",
+        borderRadius: "30px",
         background: "{content.border.color}",
         hoverBackground: "{content.border.color}",
         content: {
-            borderRadius: "8px",
+            borderRadius: "24px",
             background: "light-dark({surface.0}, {surface.950})",
             hoverBackground: "{content.background}",
             width: "16px",

@@ -11,6 +11,6 @@ export default {
         gap: "0.25rem"
     },
     commandResponse: {
-        margin: "2px 0"
+        margin: "3px 0"
     }
 }

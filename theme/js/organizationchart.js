@@ -25,7 +25,7 @@ export default {
         color: "{text.muted.color}",
         hoverColor: "{text.color}",
         size: "1.5rem",
-        borderRadius: "0.75rem",
+        borderRadius: "1.5rem",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",
