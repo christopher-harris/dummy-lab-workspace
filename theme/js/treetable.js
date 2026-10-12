@@ -29,7 +29,7 @@ export default {
         }
     },
     columnTitle: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     row: {
         background: "{content.background}",
@@ -59,7 +59,7 @@ export default {
         padding: "0.75rem 1rem"
     },
     columnFooter: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     footer: {
         background: "{content.background}",
@@ -90,7 +90,7 @@ export default {
         hoverColor: "{text.color}",
         selectedHoverColor: "{primary.color}",
         size: "1.75rem",
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",

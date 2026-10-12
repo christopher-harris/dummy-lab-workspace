@@ -16,7 +16,7 @@ import type { CardDesignTokens } from '@primeuix/themes/types/card';
     },
     title: {
         fontSize: "1.25rem",
-        fontWeight: "500"
+        fontWeight: "700"
     },
     subtitle: {
         color: "{text.muted.color}"

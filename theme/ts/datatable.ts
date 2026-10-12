@@ -43,7 +43,7 @@ import type { DataTableDesignTokens } from '@primeuix/themes/types/datatable';
         }
     },
     columnTitle: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     row: {
         background: "{content.background}",
@@ -85,7 +85,7 @@ import type { DataTableDesignTokens } from '@primeuix/themes/types/datatable';
         }
     },
     columnFooter: {
-        fontWeight: "600"
+        fontWeight: "800"
     },
     footer: {
         background: "{content.background}",
@@ -125,7 +125,7 @@ import type { DataTableDesignTokens } from '@primeuix/themes/types/datatable';
         hoverColor: "{text.color}",
         selectedHoverColor: "{primary.color}",
         size: "1.75rem",
-        borderRadius: "12.25px",
+        borderRadius: "36.75px",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",

@@ -5,7 +5,7 @@ import type { TreeDesignTokens } from '@primeuix/themes/types/tree';
         background: "{content.background}",
         color: "{content.color}",
         padding: "1rem",
-        gap: "2px",
+        gap: "3px",
         indent: "1rem",
         transitionDuration: "{transition.duration}"
     },
@@ -32,7 +32,7 @@ import type { TreeDesignTokens } from '@primeuix/themes/types/tree';
         selectedColor: "{highlight.color}"
     },
     nodeToggleButton: {
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         size: "1.75rem",
         hoverBackground: "{content.hover.background}",
         selectedHoverBackground: "{content.background}",

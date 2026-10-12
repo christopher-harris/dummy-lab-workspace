@@ -18,7 +18,7 @@ export default {
     },
     title: {
         gap: "0.5rem",
-        fontWeight: "500"
+        fontWeight: "700"
     },
     dropdown: {
         background: "light-dark({surface.100}, {surface.800})",
@@ -72,7 +72,7 @@ export default {
     },
     weekDay: {
         padding: "0.25rem",
-        fontWeight: "500",
+        fontWeight: "700",
         color: "{content.color}"
     },
     date: {
@@ -85,7 +85,7 @@ export default {
         rangeSelectedColor: "{highlight.color}",
         width: "2rem",
         height: "2rem",
-        borderRadius: "1rem",
+        borderRadius: "2rem",
         padding: "0.25rem",
         focusRing: {
             width: "{focus.ring.width}",

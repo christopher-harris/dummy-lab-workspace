@@ -7,10 +7,10 @@ export default {
         transitionDuration: "{form.field.transition.duration}",
         positionX: "{form.field.padding.x}",
         positionY: "{form.field.padding.y}",
-        fontWeight: "500",
+        fontWeight: "700",
         active: {
             fontSize: "0.75rem",
-            fontWeight: "400"
+            fontWeight: "600"
         }
     },
     over: {

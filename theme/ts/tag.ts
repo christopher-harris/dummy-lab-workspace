@@ -3,7 +3,7 @@ import type { TagDesignTokens } from '@primeuix/themes/types/tag';
  export default {
     root: {
         fontSize: "0.875rem",
-        fontWeight: "700",
+        fontWeight: "900",
         padding: "0.25rem 0.5rem",
         gap: "0.25rem",
         borderRadius: "{content.border.radius}",
@@ -21,20 +21,20 @@ import type { TagDesignTokens } from '@primeuix/themes/types/tag';
         color: "light-dark({surface.600}, {surface.300})"
     },
     success: {
-        background: "light-dark({green.100}, #22c55e29)",
-        color: "light-dark({green.700}, {green.300})"
+        background: "light-dark({content.border.color}, #22c55e29)",
+        color: "light-dark({content.color}, {form.field.disabled.color})"
     },
     info: {
-        background: "light-dark({sky.100}, #0ea5e929)",
-        color: "light-dark({sky.700}, {sky.300})"
+        background: "light-dark({highlight.focus.background}, #0ea5e929)",
+        color: "light-dark({primary.900}, {primary.300})"
     },
     warn: {
-        background: "light-dark({orange.100}, #f9731629)",
-        color: "light-dark({orange.700}, {orange.300})"
+        background: "light-dark({primary.contrast.color}, #f9731629)",
+        color: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})"
     },
     danger: {
-        background: "light-dark({red.100}, #ef444429)",
-        color: "light-dark({red.700}, {red.300})"
+        background: "light-dark({highlight.background}, #ef444429)",
+        color: "light-dark({form.field.float.label.invalid.color}, {form.field.invalid.border.color})"
     },
     contrast: {
         background: "light-dark({surface.950}, {surface.0})",

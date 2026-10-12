@@ -2,7 +2,7 @@ export default {
     root: {
         background: "light-dark({surface.100}, {surface.800})",
         color: "light-dark({surface.800}, {surface.0})",
-        borderRadius: "16px",
+        borderRadius: "48px",
         paddingX: "0.75rem",
         paddingY: "0.5rem",
         gap: "0.5rem",

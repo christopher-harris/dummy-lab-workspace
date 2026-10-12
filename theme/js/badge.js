@@ -3,7 +3,7 @@ export default {
         borderRadius: "{border.radius.md}",
         padding: "0 0.5rem",
         fontSize: "0.75rem",
-        fontWeight: "700",
+        fontWeight: "900",
         minWidth: "1.5rem",
         height: "1.5rem"
     },
@@ -34,20 +34,20 @@ export default {
         color: "light-dark({surface.600}, {surface.300})"
     },
     success: {
-        background: "light-dark({green.500}, {green.400})",
-        color: "light-dark({surface.0}, {green.950})"
+        background: "light-dark({primary.hover.color}, {form.field.hover.border.color})",
+        color: "light-dark({surface.0}, {content.background})"
     },
     info: {
-        background: "light-dark({sky.500}, {sky.400})",
-        color: "light-dark({surface.0}, {sky.950})"
+        background: "light-dark({primary.600}, {primary.500})",
+        color: "light-dark({surface.0}, {primary.950})"
     },
     warn: {
-        background: "light-dark({orange.500}, {orange.400})",
+        background: "light-dark({form.field.invalid.border.color}, {form.field.float.label.invalid.color})",
         color: "light-dark({surface.0}, {surface.950})"
     },
     danger: {
-        background: "light-dark({red.500}, {red.400})",
-        color: "light-dark({surface.0}, {red.950})"
+        background: "{form.field.float.label.invalid.color}",
+        color: "light-dark({surface.0}, {content.background})"
     },
     contrast: {
         background: "light-dark({surface.950}, {surface.0})",

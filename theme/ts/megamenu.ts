@@ -65,7 +65,7 @@ import type { MegaMenuDesignTokens } from '@primeuix/themes/types/megamenu';
         borderColor: "{content.border.color}"
     },
     mobileButton: {
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         size: "1.75rem",
         color: "{text.muted.color}",
         hoverColor: "{text.hover.muted.color}",

@@ -14,12 +14,12 @@ export default {
     },
     eventMarker: {
         size: "1.125rem",
-        borderRadius: "7.875px",
+        borderRadius: "23.625px",
         borderWidth: "2px",
         background: "{content.background}",
         borderColor: "{content.border.color}",
         content: {
-            borderRadius: "2.625px",
+            borderRadius: "7.875px",
             size: "0.375rem",
             background: "{primary.color}",
             insetShadow: "0 1px 0 0 #0000000f, 0 1px 1px 0 #0000001f"

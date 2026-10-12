@@ -13,7 +13,7 @@ import type { ToggleButtonDesignTokens } from '@primeuix/themes/types/togglebutt
         padding: "0.25rem",
         borderRadius: "{content.border.radius}",
         gap: "0.5rem",
-        fontWeight: "500",
+        fontWeight: "700",
         disabledBackground: "{form.field.disabled.background}",
         disabledBorderColor: "{form.field.disabled.background}",
         disabledColor: "{form.field.disabled.color}",

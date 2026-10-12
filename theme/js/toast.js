@@ -20,17 +20,17 @@ export default {
         gap: "0.5rem"
     },
     summary: {
-        fontWeight: "500",
+        fontWeight: "700",
         fontSize: "1rem"
     },
     detail: {
-        fontWeight: "500",
+        fontWeight: "700",
         fontSize: "0.875rem"
     },
     closeButton: {
         width: "1.75rem",
         height: "1.75rem",
-        borderRadius: "0.875rem",
+        borderRadius: "1.75rem",
         focusRing: {
             width: "{focus.ring.width}",
             style: "{focus.ring.style}",
@@ -42,56 +42,56 @@ export default {
     },
     info: {
         background: "light-dark(#eff6fff2, #3b82f629)",
-        borderColor: "light-dark({blue.200}, #1d4ed85c)",
-        color: "light-dark({blue.600}, {blue.500})",
+        borderColor: "light-dark({primary.200}, #1d4ed85c)",
+        color: "light-dark({primary.600}, {primary.500})",
         detailColor: "light-dark({surface.700}, {surface.0})",
         shadow: "0 4px 8px 0 #02050a0a",
         closeButton: {
-            hoverBackground: "light-dark({blue.100}, #ffffff0d)",
+            hoverBackground: "light-dark({highlight.focus.background}, #ffffff0d)",
             focusRing: {
-                color: "light-dark({blue.600}, {blue.500})",
+                color: "light-dark({primary.600}, {primary.500})",
                 shadow: "none"
             }
         }
     },
     success: {
         background: "light-dark(#f0fdf4f2, #22c55e29)",
-        borderColor: "light-dark({green.200}, #15803d5c)",
-        color: "light-dark({green.600}, {green.500})",
+        borderColor: "light-dark({form.field.border.color}, #15803d5c)",
+        color: "light-dark({surface.600}, {primary.hover.color})",
         detailColor: "light-dark({surface.700}, {surface.0})",
         shadow: "0 4px 8px 0 #0108040a",
         closeButton: {
-            hoverBackground: "light-dark({green.100}, #ffffff0d)",
+            hoverBackground: "light-dark({content.border.color}, #ffffff0d)",
             focusRing: {
-                color: "light-dark({green.600}, {green.500})",
+                color: "light-dark({surface.600}, {primary.hover.color})",
                 shadow: "none"
             }
         }
     },
     warn: {
         background: "light-dark(#fefce8f2, #eab30829)",
-        borderColor: "light-dark({yellow.200}, #a162075c)",
-        color: "light-dark({yellow.600}, {yellow.500})",
+        borderColor: "light-dark({form.field.invalid.border.color}, #a162075c)",
+        color: "{form.field.float.label.invalid.color}",
         detailColor: "light-dark({surface.700}, {surface.0})",
         shadow: "0 4px 8px 0 #0907000a",
         closeButton: {
-            hoverBackground: "light-dark({yellow.100}, #ffffff0d)",
+            hoverBackground: "light-dark({content.border.color}, #ffffff0d)",
             focusRing: {
-                color: "light-dark({yellow.600}, {yellow.500})",
+                color: "{form.field.float.label.invalid.color}",
                 shadow: "none"
             }
         }
     },
     error: {
         background: "light-dark(#fef2f2f2, #ef444429)",
-        borderColor: "light-dark({red.200}, #b91c1c5c)",
-        color: "light-dark({red.600}, {red.500})",
+        borderColor: "light-dark({highlight.background}, #b91c1c5c)",
+        color: "{form.field.float.label.invalid.color}",
         detailColor: "light-dark({surface.700}, {surface.0})",
         shadow: "0 4px 8px 0 #0a03030a",
         closeButton: {
-            hoverBackground: "light-dark({red.100}, #ffffff0d)",
+            hoverBackground: "light-dark({highlight.background}, #ffffff0d)",
             focusRing: {
-                color: "light-dark({red.600}, {red.500})",
+                color: "{form.field.float.label.invalid.color}",
                 shadow: "none"
             }
         }

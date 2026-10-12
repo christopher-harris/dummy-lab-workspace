@@ -1,3 +1,3 @@
 export default {
-    wingstopGreen: "#006938ff"
+    wingstopGreen: "#ff0099ff"
 }

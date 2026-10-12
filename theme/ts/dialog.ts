@@ -14,7 +14,7 @@ import type { DialogDesignTokens } from '@primeuix/themes/types/dialog';
     },
     title: {
         fontSize: "1.25rem",
-        fontWeight: "600"
+        fontWeight: "800"
     },
     content: {
         padding: "0 {overlay.modal.padding} {overlay.modal.padding}"
