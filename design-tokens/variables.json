@@ -1,5 +1,5 @@
 {
-  "source": "primeui-figma-plugin-v4",
+  "source": "primeui-figma-plugin-v5",
   "aura/component/light": {
     "autocomplete": {
       "dropdown": {
@@ -7702,12 +7702,6 @@
       }
     },
     "mask": {
-      "transition": {
-        "duration": {
-          "$type": "number",
-          "$value": "0.3s"
-        }
-      },
       "background": {
         "$type": "color",
         "$value": "#00000066"
@@ -7846,7 +7840,7 @@
     "primary": {
       "color": {
         "$type": "color",
-        "$value": "{primary.500}"
+        "$value": "{wingstopGreen}"
       },
       "contrast": {
         "color": {
@@ -7857,7 +7851,7 @@
       "hover": {
         "color": {
           "$type": "color",
-          "$value": "{primary.600}"
+          "$value": "{green.500}"
         }
       },
       "active": {
@@ -8164,12 +8158,6 @@
       }
     },
     "mask": {
-      "transition": {
-        "duration": {
-          "$type": "number",
-          "$value": "0.3s"
-        }
-      },
       "background": {
         "$type": "color",
         "$value": "#00000099"
@@ -8308,7 +8296,7 @@
     "primary": {
       "color": {
         "$type": "color",
-        "$value": "{primary.400}"
+        "$value": "{wingstopGreen}"
       },
       "contrast": {
         "color": {
@@ -8319,7 +8307,7 @@
       "hover": {
         "color": {
           "$type": "color",
-          "$value": "{primary.300}"
+          "$value": "{green.500}"
         }
       },
       "active": {
