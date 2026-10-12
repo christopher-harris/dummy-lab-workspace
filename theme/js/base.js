@@ -318,9 +318,9 @@ export default {
             800: "{blue.800}",
             900: "{blue.900}",
             950: "{blue.950}",
-            color: "light-dark({primary.500}, {primary.400})",
+            color: "{wingstopGreen}",
             contrastColor: "light-dark(#ffffffff, {surface.900})",
-            hoverColor: "light-dark({primary.600}, {primary.300})",
+            hoverColor: "{green.500}",
             activeColor: "light-dark({primary.700}, {primary.200})"
         },
         surface: {
@@ -427,7 +427,6 @@ export default {
             hoverColor: "{text.hover.color}"
         },
         mask: {
-            transitionDuration: "0.3s",
             background: "light-dark(#00000066, #00000099)",
             color: "{surface.200}"
         },
