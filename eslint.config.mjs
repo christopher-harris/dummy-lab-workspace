@@ -23,18 +23,12 @@ export default [
             '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
             '^\\.\\./\\.\\./\\.\\./\\.\\./theme/ts$',
           ],
+          // The edge table in docs/ADR/ADR-0001 ("Allowed dependency edges").
+          // Change that table first, then this — not the other way round.
           depConstraints: [
             {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: ['*'],
-            },
-            {
-              sourceTag: 'type:data-access',
-              onlyDependOnLibsWithTags: [
-                'type:data-access',
-                'type:util',
-                'scope:shared',
-              ],
             },
             {
               sourceTag: 'type:feature',
@@ -42,12 +36,28 @@ export default [
                 'type:data-access',
                 'type:ui',
                 'type:util',
-                'scope:shared',
               ],
             },
+            // A domain never depends on a peer domain. `scope:shared` is the
+            // one way around that — request context such as auth — and the
+            // second rule stops it being a way around the layering as well.
+            {
+              sourceTag: 'type:data-access',
+              onlyDependOnLibsWithTags: ['type:util', 'scope:shared'],
+            },
+            {
+              sourceTag: 'type:data-access',
+              notDependOnLibsWithTags: ['type:app', 'type:feature', 'type:ui'],
+            },
+            // Presentational only: a `ui` lib never knows where its data
+            // comes from, so it cannot reach a store.
             {
               sourceTag: 'type:ui',
-              onlyDependOnLibsWithTags: ['*'],
+              onlyDependOnLibsWithTags: ['type:ui', 'type:util'],
+            },
+            {
+              sourceTag: 'type:util',
+              onlyDependOnLibsWithTags: ['type:util'],
             },
           ],
         },

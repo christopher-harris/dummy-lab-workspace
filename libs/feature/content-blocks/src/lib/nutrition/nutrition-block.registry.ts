@@ -1,7 +1,8 @@
 import type { NutritionTableBlock } from '@dummy-lab/shared-models';
 
-import type { ContentBlockRegistry } from '../content-block.types';
-import { NutritionTableComponent } from './nutrition-table/nutrition-table.component';
+import type { ContentBlockRegistry } from '@dummy-lab/ui-content-blocks';
+
+import { NutritionTableBlockComponent } from './nutrition-table-block.component';
 
 export type NutritionBlockKey = NutritionTableBlock['__component'];
 
@@ -19,6 +20,6 @@ export const NUTRITION_BLOCK_REGISTRY: Pick<
     key: 'nutrition.nutrition-table',
     family: 'nutrition',
     label: 'Nutrition Table',
-    component: NutritionTableComponent,
+    component: NutritionTableBlockComponent,
   },
 };

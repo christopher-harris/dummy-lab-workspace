@@ -3,12 +3,16 @@ import type { ContentBlockKey } from '@dummy-lab/shared-models';
 import type {
   ContentBlockEntry,
   ContentBlockRegistry,
-} from './content-block.types';
+} from '@dummy-lab/ui-content-blocks';
 import { HERO_BLOCK_REGISTRY } from './hero/hero-block.registry';
 import { NUTRITION_BLOCK_REGISTRY } from './nutrition/nutrition-block.registry';
 
 /**
  * Every renderable content block, keyed by Strapi component uid.
+ *
+ * Lives in this `feature` library rather than beside the components because
+ * it maps keys to the data-bound blocks as well as the presentational ones,
+ * and a `ui` library cannot import a `feature` one.
  *
  * An object rather than an array: lookup is a property read instead of a scan,
  * and the mapped type makes exhaustiveness the compiler's problem.

@@ -4,17 +4,17 @@
 | -------------- | --------------------------------------------------------------------------------------------- |
 | **Status**     | Proposed — **for discussion, not for approval**                                               |
 | **Date**       | 2026-09-28                                                                                    |
-| **Deciders**   | Wingstop internal development leadership; Design; Procurement (see [Licensing](#licensing))   |
+| **Revised**    | 2026-10-13 — PrimeNG 22 decided; tokens move to a published package; one theme library        |
+| **Deciders**   | Wingstop internal development leadership; Design; Product                                     |
 | **Applies to** | `ngfe-web`                                                                                    |
 | **Prototype**  | A prototype workspace — PrimeNG 22 + Tailwind v4, Figma-generated preset — _link TBD_         |
-| **Blocked on** | A licensing decision and a migration plan. See [Acceptance criteria](#acceptance-criteria).   |
+| **Blocked on** | A migration plan. See [Acceptance criteria](#acceptance-criteria).                            |
 | **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which listed this as an unproven spike |
 
 > **Purpose.** This document exists to start a conversation about the UI platform, and to put the
 > current styling situation on the record in numbers rather than impressions. It is deliberately
-> not approval-ready. Two things in particular are open: the PrimeNG licence is a procurement
-> decision this ADR cannot make, and the effort estimate depends on a spike that has not been run.
-> Read it as a proposal to argue with.
+> not approval-ready: the effort estimate depends on a spike that has not been run, and the
+> three-styling-systems transition has no owner yet. Read it as a proposal to argue with.
 
 ---
 
@@ -120,26 +120,16 @@ regenerated token file rather than a search across 240 stylesheets.
 
 ## Licensing
 
-**This is the decision that gates the ADR, and it is not an engineering one.**
+**Settled: PrimeNG 22 under a commercial PrimeUI licence. Procurement is underway.** Recorded here
+for the reader who finds the licence change on their own and wonders whether it was considered.
 
-PrimeNG changed licence at v22. Verified by inspecting the published packages:
+PrimeNG changed licence at v22 — ≤ 21.1.10 is MIT; ≥ 22.0.0 is the PrimeUI dual licence, and
+Wingstop is outside the Community tier's limits, so v22 is a per-developer commercial licence. Staying
+on 21 was considered and rejected (Alternative E).
 
-| Version   | Licence                                                   |
-| --------- | --------------------------------------------------------- |
-| ≤ 21.1.10 | **MIT**                                                   |
-| ≥ 22.0.0  | **PrimeUI dual licence** — Community (free) or Commercial |
-
-The Community tier requires **all** of: under $1M USD annual gross revenue, fewer than 5
-developers, fewer than 10 employees, under $3M in outside funding. Wingstop meets none of these.
-**PrimeNG 22 requires a paid commercial licence, per developer, renewed annually.**
-
-PrimeNG **21.1.10 is MIT and supports Angular 21** (`@angular/core: ^21.0.7`), which is what
-`ngfe-web` runs. It uses the same token-based theming introduced in v18.
-
-The prototype's licence key sits beside its `providePrimeNG` call in the shared platform
-library, which is where the PrimeNG configuration guide puts it — a PrimeUI key is client-side by
-design and belongs in that provider. It is a `dev`-tier key expiring late December 2026, so what this decision owes
-is a tier and a renewal owner, not a relocation.
+The licence key sits beside the `providePrimeNG` call in the shared theme library, which is where
+the PrimeNG configuration guide puts it — a PrimeUI key is client-side by design. The prototype's
+key is `dev`-tier; production needs a production tier with a named renewal owner.
 
 ## Decision
 
@@ -147,12 +137,16 @@ is a tier and a renewal owner, not a relocation.
 Bootstrap, ng-bootstrap, and the single-purpose widget libraries. Generate design tokens from
 Figma rather than hand-authoring them.**
 
-1. **Start on PrimeNG 21.1.10 (MIT).** The technical migration does not wait on procurement. Move
-   to 22 as a separate, small decision once a commercial licence is in place — or don't.
+1. **PrimeNG 22.** The version the prototype runs and the generated preset targets
+   (`@primeuix/styled` 1.x). Reopened only if Design or Product reject the component library
+   itself.
 2. **PrimeNG owns components; Tailwind owns layout, spacing and typography.** A component
    stylesheet is the exception, justified by something neither layer expresses, not the default.
-3. **Design tokens are generated, never hand-edited.** The Figma export is the source of truth.
-   Generated files under `theme/` are build output and are reviewed as such.
+3. **Design tokens are generated, never hand-edited, and published as a versioned package.** The
+   Figma export is the source of truth. A separate design-token repository generates the preset and
+   Tailwind tokens from it and publishes an npm package; applications consume a version. A token
+   change is a package release, reviewed in the token repository — not a diff of generated files
+   in the application repository.
 4. **One `@theme` entrypoint.** Tailwind tokens live in `styles/tailwind.css` and nowhere else —
    `@theme` blocks in any other file are silently discarded by Tailwind v4.
 5. **PrimeNG component overrides go through the preset**, under `colorScheme.light` /
@@ -164,6 +158,14 @@ Figma rather than hand-authoring them.**
    _containment_ starts immediately and is enforceable straight away.
 8. **Delete the two dead global stylesheets now.** `@ng-select` and `snazzy-info-window` have zero
    usage and are unrelated to the rest of this decision.
+9. **One theme library owns PrimeNG configuration.** A single `providePrimeNgPlatform()` provider,
+   consuming the token package, is the only place `providePrimeNG` is called; every application
+   composes it. In the prototype this is `libs/shared/theme` (`type:util`), renamed from
+   `libs/platform` because "platform" collided with ADR-0005's `platform:*` tag axis. It owns the
+   dark-mode class too, so the store depends on it rather than the reverse. It is distinct from `libs/data-access/theme`, which holds the visitor's theme
+   _preference_ (dark mode, palette), not the design system.
+10. **Dark mode is supported at the token level.** It costs nothing structurally. Whether and where
+    it ships is a product decision (Open questions).
 
 ### Migration shape
 
@@ -199,17 +201,21 @@ not as a substitute for this ADR.
 design-system team. This trades a licence cost for an unbounded maintenance cost, paid in
 accessibility bugs the team will find one at a time.
 
-**D. Angular Material + CDK.** A genuine alternative and the honest counterweight to the
-licensing problem: MIT, maintained by the Angular team, and `@angular/cdk ^21.1.1` is _already
+**D. Angular Material + CDK.** A genuine alternative: MIT, maintained by the Angular team, and `@angular/cdk ^21.1.1` is _already
 installed_. Rejected on fit rather than quality. Material Design is an opinionated visual
 language, and Wingstop's brand is not it; theming Material away from Material is well-known to be
-expensive, and doing so undercuts the reason for adopting a component library. Worth revisiting if
-the PrimeNG licence is refused and option E is also refused.
+expensive, and doing so undercuts the reason for adopting a component library. The fallback if
+Design or Product reject PrimeNG.
 
-**E. PrimeNG 22 with a commercial licence, now.** **Deferred, not rejected.** Technically the
-better destination — the prototype is built on it, and the generated preset targets v22's
-`@primeuix/styled` 1.x token runtime. Deferred because it converts an engineering decision into a
-procurement cycle, and Decision 1 makes that unnecessary for the first four phases.
+**E. Start on PrimeNG 21.1.10 (MIT); move to 22 later.** Rejected. It avoids a licence, and buys
+two migrations instead of one: the generated preset targets v22's `@primeuix/styled` 1.x runtime
+and has never been run against v21's 0.7.x, so it would need its own spike, then a second upgrade
+once the team moved to 22 anyway.
+
+**F. Commit generated token files to the application repository.** What the prototype does today.
+Rejected as the destination: 86 generated files per export make application diffs unreadable, and
+design changes ride the application's release cadence rather than their own. A package moves the
+review to where the change originates.
 
 ## Consequences
 
@@ -238,14 +244,16 @@ procurement cycle, and Decision 1 makes that unnecessary for the first four phas
   visibly, and the `m-*` / `p-*` spacing scales diverge above step 2. Current usage of the
   colliding spacing utilities is close to zero (measured: 4 occurrences total), so the exposure is
   small, but layer order must be declared before the first Tailwind class ships, not after.
-- **A licence cost arrives eventually** if the team wants v22. Decision 1 defers it; it does not
-  remove it. Budget for per-seat annual renewal or plan to stay on 21 indefinitely, and be honest
-  about which.
+- **A per-developer licence with an annual renewal**, which needs a named owner.
 - **The prototype proves the destination, not the migration** — same caveat ADR-0001 records.
-  It is greenfield: it has never had Bootstrap removed from underneath it, and the generated
-  preset has never been run against PrimeNG 21's older `@primeuix/styled` 0.7.x runtime. **This ADR records a destination. It is not a migration plan.**
-- **Generated theme files are 86 files of build output in version control.** That is a deliberate
-  trade for reviewability, and it will make some diffs unreadable.
+  It is greenfield: it has never had Bootstrap removed from underneath it. **This ADR records a
+  destination. It is not a migration plan.**
+- **A second repository and a release step for design changes.** A token change is now a package
+  release plus a version bump in each consuming application. Two applications (ADR-0005) can pin
+  different versions — which is a feature during a rollout and a source of drift if nobody watches
+  it. This is the same publish overhead ADR-0001 Alternative C rejects for product code; it is
+  accepted here because tokens change on Design's cadence, not the product's, and have a different
+  owner.
 
 ## Enforcement
 
@@ -255,34 +263,36 @@ A decision with no failing build behind it is a preference. This ADR is implemen
 | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | A lint rule rejecting Bootstrap class names in new or modified templates              | This is Decision 7. Without it the ratchet is a hope                                 |
 | A lint rule rejecting `@import 'bootstrap/...'` in new SCSS                           | Blocks the mixin dependency from regrowing                                           |
-| `theme/` marked generated; a CI check that it matches a fresh Figma export            | Otherwise "generated" degrades to "generated once"                                   |
+| The token repository's CI regenerating from the Figma export and failing on drift     | Otherwise "generated" degrades to "generated once"                                   |
+| `providePrimeNG` called only inside the theme library                                 | Decision 9. A second call site is a second, silently diverging design system         |
 | `@theme` permitted only in `styles/tailwind.css`, enforced by lint                    | Tailwind v4 silently discards `@theme` elsewhere — a failure with no error message   |
 | Declared CSS layer order, asserted by a test                                          | Layer order is load-bearing and invisible                                            |
 | A rule rejecting `::ng-deep` into PrimeNG internals                                   | Preset overrides are the supported seam; `::ng-deep` breaks on every PrimeNG upgrade |
-| A non-`dev` PrimeNG licence tier, with its expiry tracked                             | Placement in `providePrimeNG` is vendor-prescribed; the tier and clock are the risk  |
+| A production PrimeNG licence tier, with its expiry tracked                            | Placement in `providePrimeNG` is vendor-prescribed; an expired key is the risk       |
 | A dependency check failing the build if `bootstrap` reappears, once Phase 3 completes | Makes removal permanent rather than temporary                                        |
 
 ## Acceptance criteria
 
 This ADR stays at **Proposed** until all of the following exist:
 
-1. A licensing decision: PrimeNG 21 (MIT) indefinitely, or 21 now with a funded path to 22, or
-   neither — in which case reopen alternative D.
-2. A spike proving the generated Figma preset works against PrimeNG 21's token runtime. If it
-   does not, Decision 1 collapses and the licence becomes a blocker rather than a deferral.
-3. A spike introducing Tailwind alongside globally-loaded Bootstrap 4 in `ngfe-web` itself,
+1. A spike introducing Tailwind alongside globally-loaded Bootstrap 4 in `ngfe-web` itself,
    including layer order and the `container` collision. This is the spike ADR-0001 flagged.
-4. A migration plan covering Phase 2's 360 call sites, a first target area, and **a defined
+2. A migration plan covering Phase 2's 360 call sites, a first target area, and **a defined
    stopping point** if the three-systems period proves unmanageable.
-5. Design sign-off that the Figma variables export is a maintained artefact, not a one-off.
+3. The design-token repository exists and publishes a package the prototype consumes in place of
+   its committed `theme/` files.
+4. Design sign-off that the Figma variables export is a maintained artefact, not a one-off.
+5. Design and Product confirmation of PrimeNG as the component library, and a production licence
+   with a renewal owner.
 6. Sign-off from Wingstop internal development leadership.
 
 ## Open questions
 
 Deliberately unresolved; each is a follow-on decision:
 
-- **Where does the component library live under ADR-0001's structure?** A `libs/ui/` library, or
-  consumed directly by apps? This ADR assumes the former and does not decide it.
+- ~~**Where does the component library configuration live?**~~ **Resolved** — one theme library
+  (Decision 9). Presentational wrappers around PrimeNG components, where needed, are `ui`
+  libraries under ADR-0001.
 - **What happens to the custom icon font?** `fantasticon` generates an icon font from SVGs, and
   four FontAwesome packages sit alongside it. `primeicons` replaces some of this and none of the
   brand marks. Unresolved.
@@ -292,8 +302,14 @@ Deliberately unresolved; each is a follow-on decision:
 - **Does Tailwind's utility-first model survive contact with this team's review culture?** It
   moves styling into templates. That is a working-agreement change, not a tooling change, and
   this ADR does not address it.
-- **Dark mode: is it wanted?** The prototype supports it. No one has asked for it. It is listed
-  above as a benefit; it may be a benefit nobody will spend a design cycle on.
+- **Dark mode: where does it ship?** Kept (Decision 10). The use case — whole site, ordering
+  only, user preference or system preference — is a conversation with Product that has not
+  happened.
+- **Scheduled theme changes.** A seasonal or campaign theme switching on a date. Not needed now.
+  The constraint to remember: a theme shipped as a package cannot change without a release, so
+  scheduling means several themes ship in one build and something at runtime selects one — the
+  CMS (if it is Strapi) or runtime configuration (ADR-0003). How many themes ship per build is the
+  real question.
 
 ## Evidence
 

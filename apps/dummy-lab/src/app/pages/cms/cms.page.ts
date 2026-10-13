@@ -10,7 +10,8 @@ import {
 } from '@dummy-lab/data-access-pages';
 import { injectDispatch } from '@ngrx/signals/events';
 import { toBlockInputs } from '@dummy-lab/shared-models';
-import { CmsMediaUrl, getContentBlockEntry } from '@dummy-lab/ui-content-blocks';
+import { getContentBlockEntry } from '@dummy-lab/feature-content-blocks';
+import { CmsMediaUrl } from '@dummy-lab/ui-content-blocks';
 
 import { NavbarComponent } from '../../components/layout/navbar/navbar.component';
 

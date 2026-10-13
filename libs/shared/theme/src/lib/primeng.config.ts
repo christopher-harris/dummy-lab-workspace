@@ -1,10 +1,10 @@
 import type { Theme } from '@primeuix/themes/types';
-import { DARK_MODE_SELECTOR } from '@dummy-lab/data-access-theme';
+import { DARK_MODE_SELECTOR } from './dark-mode';
 
 /**
  * Runtime options shared by every PrimeNG setup in the workspace.
  *
- * `darkModeSelector` is taken from `@dummy-lab/data-access-theme` rather than
+ * `darkModeSelector` comes from {@link DARK_MODE_SELECTOR} rather than being
  * spelled out here - the theme store toggles that same class on `<html>`, and
  * the two drifting apart silently breaks dark mode.
  *

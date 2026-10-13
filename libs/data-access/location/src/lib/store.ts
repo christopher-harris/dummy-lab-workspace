@@ -15,7 +15,7 @@ import {
 } from '@ngrx/signals/events';
 import { tap } from 'rxjs';
 
-import { locationEvents } from './actions';
+import { locationEvents } from './events';
 import { DEFAULT_POSITION_OPTIONS, POSITION_ERROR } from './config';
 import type {
   LocationFailure,

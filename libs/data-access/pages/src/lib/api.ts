@@ -2,7 +2,7 @@
  * Request construction for `GET /api/pages`. No response handling — the store
  * exposes what Strapi returns.
  */
-import type { CmsStatus } from '@dummy-lab/data-access-content';
+import type { CmsStatus } from '@dummy-lab/shared-cms';
 import { strapiQuery } from '@dummy-lab/shared-utils';
 
 /**

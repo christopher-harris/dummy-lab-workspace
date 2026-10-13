@@ -3,7 +3,7 @@ import { Events, injectDispatch } from '@ngrx/signals/events';
 import type { Observable } from 'rxjs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { locationEvents } from './actions';
+import { locationEvents } from './events';
 import { DEFAULT_POSITION_OPTIONS, POSITION_ERROR } from './config';
 import { GEOLOCATION, PERMISSIONS } from './platform';
 import { LocationStore } from './store';

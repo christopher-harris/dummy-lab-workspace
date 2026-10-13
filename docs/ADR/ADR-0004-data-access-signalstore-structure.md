@@ -1,19 +1,20 @@
 # 🤖 ADR-0004 — Structure `data-access` libraries around a SignalStore with an event-driven public API
 
-|                |                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | **Draft** — rough cut for refinement, not yet ready for discussion                                                                               |
-| **Date**       | 2026-10-05                                                                                                                                       |
-| **Deciders**   | Wingstop internal development leadership                                                                                                         |
-| **Applies to** | `ngfe-web`                                                                                                                                       |
-| **Prototype**  | A prototype workspace — 12 `data-access` libraries on SignalStore — _link TBD_                                                                   |
-| **Blocked on** | A generator, an event-granularity convention, and bringing the prototype in line. See [Acceptance criteria](#acceptance-criteria).               |
-| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which decided that one `data-access` library per domain exists, but not what is inside it |
+|                |                                                                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | **Draft** — rough cut for refinement, not yet ready for discussion                                                                                  |
+| **Date**       | 2026-10-05                                                                                                                                          |
+| **Revised**    | 2026-10-13 — facades replace the "ambient" carve-out; server-state-only scope; `httpResource` first; working note folded in                         |
+| **Deciders**   | Wingstop internal development leadership                                                                                                            |
+| **Applies to** | `ngfe-web`                                                                                                                                          |
+| **Prototype**  | A prototype workspace — 15 `data-access` libraries on SignalStore — _link TBD_                                                                      |
+| **Blocked on** | An Nx generator, an event-granularity convention, and bringing the prototype in line. See [Acceptance criteria](#acceptance-criteria).              |
+| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — which owns the dependency rules and decided that one `data-access` library per domain exists |
 
 > **Purpose.** ADR-0001 decided that domain data and state live in one `data-access` library per
-> domain, and deliberately deferred everything about that library's internals. This document is
-> the answer to the deferred part: what a `data-access` library contains, what it exposes, what it
-> may depend on, and how the rest of the application talks to it.
+> domain, that peer domains do not depend on each other, and that cross-domain composition happens
+> in a facade. This document is the inside of that box: what a `data-access` library contains,
+> what it exposes, and how the rest of the application talks to it.
 >
 > It is written as a target, not as a critique. **This is a draft** — several decisions are
 > coin-flips whose only real value is being made once. Argue with them.
@@ -22,13 +23,13 @@
 
 ## Context
 
-ADR-0001 established the container: one `data-access` library per domain, owning that domain's API
-surface, models and state, behind a controlled public API. It left five questions open, and they
-are the ones that decide whether a per-domain library is an improvement or just a nicer folder:
+ADR-0001 established the container and its edges. It left five questions about the inside open,
+and they are the ones that decide whether a per-domain library is an improvement or just a nicer
+folder:
 
 1. **What lives inside the library?**
 2. **What does it expose, and what stays private?**
-3. **What may it depend on?**
+3. **How does a consumer that needs two domains get them?**
 4. **How does a component cause a state change?**
 5. **Where does server state live, and who owns its shape?**
 
@@ -42,9 +43,10 @@ prototype can de-risk it. Do not cite this ADR as having proven a migration path
 
 ## Decision
 
-**A `data-access` library owns one domain's models, server access and state. It exposes a
-SignalStore and an event group. It does not depend on another domain's store. Consumers read by
-injecting the store and write by dispatching events. The repository is private.**
+**A `data-access` library is a reflection of one domain's server state and API-call state. It
+exposes a SignalStore, an event group and its models. It never injects a peer domain's store.
+Consumers read by injecting the store — or a facade, when they need more than one domain — and
+write by dispatching events. Server access is private.**
 
 ### The shape
 
@@ -56,9 +58,9 @@ libs/data-access/<domain>/
       models.ts         # domain types
       events.ts         # the event group — the domain's verb surface
       store.ts          # the SignalStore
-      api.ts            # repository / server access — PRIVATE
-      config.ts         # constants, storage keys          (optional)
-      route-params.ts   # route parameter names it owns    (optional)
+      api.ts            # request builders, DTO mappers — PRIVATE   (optional)
+      config.ts         # constants, storage keys                    (optional)
+      route-params.ts   # route parameter names it owns              (optional)
 ```
 
 ```
@@ -66,15 +68,15 @@ libs/data-access/<domain>/
    component  ───────────────────────────►  ┌──────────────────┐
        │                                     │   SignalStore    │
        └──────────◄──────────────────────────┤                  │
-                    read signals             │  state           │
-                                             │  resources       │
+                    read signals             │  resources       │
+                                             │  request state   │
                                              │  reducers        │  ──►  api.ts
                                              │  handlers        │       (private)
                                              │  mutations       │
                                              └──────────────────┘
 ```
 
-### 1. The public API exports the store, the events and the models — never the repository
+### 1. The public API exports the store, the events and the models — never the server access
 
 ```ts
 // index.ts
@@ -84,43 +86,67 @@ export * from './lib/store';
 // api.ts is deliberately absent.
 ```
 
-A repository reachable from the barrel is an invitation to bypass the store, and the second call
-site that accepts it ends the store's claim to be the source of truth for that domain. The library
-exports the store and its events; never the thing the store is built on.
+A request function reachable from the barrel is an invitation to bypass the store, and the second
+call site that accepts it ends the store's claim to be the source of truth for that domain. The
+library exports the store and its events; never the thing the store is built on.
 
-### 2. A domain library does not depend on another domain's store
+### 2. A domain library never injects a peer domain's store; cross-domain reads go through a facade
 
-Peer domains do not inject each other. `carts` does not inject `ProductsStore`. That edge is what
-turns a dependency graph into a mesh, and it is the one ADR-0001 named as the most consequential
-open question.
+`carts` does not inject `ProductsStore`. Two domains that each need the other — a products list
+showing "in cart" badges, and a cart drawer showing product names and prices — would otherwise
+inject each other, which fails at runtime (`NG0200`) and in lint. The rule is not stylistic: the
+cyclic version does not run. It is stated canonically in ADR-0001's dependency table.
 
-Three carve-outs make the rule workable rather than merely strict:
+Three provisions make the rule workable rather than merely strict:
 
-**(a) Composition happens in a `feature` library.** When a surface genuinely needs two domains, the
-facade that combines them is a `feature` library — which ADR-0001 already defines as domain-bound
-UI that may depend on multiple `data-access` libraries.
+**(a) Composition happens in a facade.** When a page, component or feature needs two or more
+domains, a facade injects them and derives what the consumer needs:
 
-> Put the facade in a page component instead and you have started the walk back toward a
-> multi-thousand-line component with twenty-plus injected dependencies. A `feature` library is
-> independently testable and has a declared, enforceable dependency list; a page component has
+```ts
+// Beside the page in the app, or in a feature library if a second surface needs it.
+// Provided at the route, not root.
+export const ProductCatalogFacade = signalStore(
+  withProps(() => ({
+    products: inject(ProductsStore),
+    cart: inject(SessionCartStore),
+  })),
+  withComputed(({ products, cart }) => ({
+    rows: computed(() => {
+      const lines = new Map(
+        (cart.cart()?.products ?? []).map((p) => [p.id, p.quantity]),
+      );
+      return (
+        products.allProducts.value()?.products.map((product) => ({
+          ...product,
+          inCart: lines.has(product.id),
+          quantity: lines.get(product.id) ?? 0,
+        })) ?? []
+      );
+    }),
+  })),
+);
+```
+
+A facade is a `signalStore`, or a plain injectable wrapping `signalState` when it needs no store
+features. **Facades compose reads; writes still dispatch the owning domain's events.** A facade
+that grows mutation methods has become a domain store with a different label.
+
+Where it lives follows its consumer count: one page → beside that page in the app; a second
+surface → a `feature` library. **Never in `data-access`.**
+
+> Put cross-domain logic in the page component itself, rather than a facade, and you have started
+> the walk back toward a multi-thousand-line component with twenty-plus injected dependencies. A
+> facade is independently testable and has a declared dependency list; a page component has
 > neither.
 
-**(b) Ambient state is not a peer domain.** Session, locale, feature flags and device location are
-cross-cutting facts, not domains. A domain store may read them.
+**(b) `scope:shared` libraries are not peer domains.** Session identity is something a domain needs
+to _build its own requests_, not something it composes. If a cart store cannot read the session,
+the user id has to travel in every event payload — `itemAdded: { product, userId }` — and the
+failure mode is silent: one page omits it and you get a guest cart with no error anywhere. A facade
+cannot fix that, because the facade is not the thing making the request.
 
-The practical consequence of getting this wrong: if a cart store cannot read the session, the user
-id has to travel in the event payload — `itemAdded: { product, userId }` — so every call site must
-now know to supply identity, and the failure mode is silent. One page omits it and you get a guest
-cart with no error anywhere.
-
-Ambient libraries are marked by tag, not by convention, so the allowance is enforceable:
-
-```
-type:data-access  →  type:util, scope:ambient
-```
-
-Note that this is a **tightening**, not a new restriction. The rule as written today permits
-`type:data-access → type:data-access`, which allows every domain to import every other.
+So a domain store may inject a `scope:shared` `data-access` library such as auth. The allowance is
+granted by tag, which is why ADR-0001 requires an owner for `scope:shared`.
 
 **(c) Importing another library's _events_ is not the same as injecting its _store_.** An event
 group is a set of types and a dispatch token. A store is state and behaviour. A domain may listen
@@ -144,7 +170,7 @@ longer owning their own vocabulary. Try (c) first; keep the catalogue in reserve
 
 ```ts
 export class ProductsListPage {
-  // Read: inject and read signals.
+  // Read: inject and read signals — the domain store, or a facade over several.
   readonly store = inject(ProductsStore);
   // Write: dispatch. Never a method call that mutates.
   readonly actions = injectDispatch(productsEvents);
@@ -152,11 +178,13 @@ export class ProductsListPage {
 ```
 
 The asymmetry is deliberate. Reads are a direct dependency because they are cheap, typed and
-synchronous — indirection there buys nothing. Writes go through one dispatch surface so that a
-state change has exactly one vocabulary, appears in devtools under a name, and can be observed by
-more than one listener without the dispatcher knowing any of them exist.
+synchronous — indirection there buys nothing, and signals are pull-based, so there is nothing to
+dispatch. Writes go through one dispatch surface so that a state change has exactly one
+vocabulary, appears in devtools under a name, and can be observed by more than one listener
+without the dispatcher knowing any of them exist.
 
-That last property is the whole point, and it is the one a method call cannot provide.
+That last property is the whole point, and it is the one a method call cannot provide. A component
+also does not take a dependency on an entire store just to invoke one behaviour.
 
 ### 4. Events name domain facts and user intent
 
@@ -196,8 +224,8 @@ it would change _what else happens_, it belongs in a handler.
 
 ```ts
 withReducer(
-  on(sessionCartEvents.cartDrawerVisibilityChanged, (event) => ({
-    cartDrawerVisible: event.payload,
+  on(productsEvents.categorySelected, (event) => ({
+    selectedCategory: event.payload,
   })),
 ),
 withMutations(({ apiBaseUrl, cartActions, ...store }) => ({
@@ -219,16 +247,18 @@ withEventHandlers(({ events, ...store }) => ({
 })),
 ```
 
-### 6. Server state is a resource; `withState` is for what the client owns
+### 6. Server state is a resource; `withState` holds only what parameterises the server
 
 `httpResource`, `withResource` and `withEntityResources` own the loading, error and value of
 server-owned data. Never mirror a resource into `withState` — two copies means one is stale, and
 nothing tells you which.
 
-`withState` holds client-owned facts: the current selection, drawer visibility, a preview id.
+`withState` in a `data-access` store holds **API-call state**: the values a request depends on —
+the selected category, the current page, the id being previewed — plus request outcomes a resource
+does not already carry.
 
 ```ts
-withState({ previewProductId: undefined, selectedCategory: undefined }),
+withState({ selectedCategory: undefined }),
 withResource(({ apiBaseUrl, selectedCategory }) => ({
   products: httpResource<ProductsResponse>(() => {
     const category = selectedCategory();
@@ -239,21 +269,39 @@ withResource(({ apiBaseUrl, selectedCategory }) => ({
 })),
 ```
 
-The selection is state. The products are a resource derived from it.
+The selection is state because the request reads it. The products are a resource derived from it.
 
-### 7. One HTTP stack
+**UI state does not belong here.** Drawer visibility, a form draft, an expanded panel — none of
+these parameterise a request, and they live in the facade, the `feature` library, or the component
+that owns the surface. The test is the same as for the facade: _does the server care?_ If not, it
+is not `data-access` state.
 
-Server access goes through `HttpClient`, or the `httpResource` / `httpMutation` primitives built
-on it. Never raw `fetch()`.
+A `feature` library may hold its own state in a `+state` folder when that state has **exactly one
+consuming surface** — a wizard's step state, a filter panel's draft selection. Use the consumer
+count as the test. Cart state fails it twice: it has four consumers across three surfaces, and it
+carries server mutations, persistence and a guest-id fallback. That is a domain.
+
+### 7. `httpResource` first; `HttpClient` when a resource cannot express it; never raw `fetch()`
+
+Reads are `httpResource` (through `withResource` / `withEntityResources`). Writes are
+`httpMutation`. Plain `HttpClient` Observables are for the cases neither primitive expresses — a
+stream, a cancellation pattern a resource cannot model. Raw `fetch()` is not used.
 
 This is not stylistic. `fetch()` bypasses the interceptor chain, which makes auth headers,
 correlation IDs, retry and timeout policy unenforceable — every one of them becomes something each
 call site must remember instead of something the application guarantees.
 
-### 8. The repository maps DTOs to domain models
+**Named exception — build-time prerender enumeration.** `getPrerenderParams()` runs at build time,
+where `inject()` is legal only before the first `await`, so a paginated walk of the CMS cannot hold
+an injected client across its loop. That code uses `fetch()` deliberately and documents why. It is
+build tooling, not runtime server access, and the interceptor chain is not wanted there. Any
+further exception is added to this paragraph by name, or it is a violation.
 
-Backend response shapes stop at the repository boundary; the store's state is domain types. The
-cost is real and recurring and is priced in Consequences rather than waved through.
+### 8. Server responses are mapped to domain models before they reach state
+
+Backend response shapes stop at the library boundary — in a resource's `parse`, or a private mapper
+in `api.ts` — and the store's state is domain types. The cost is real and recurring and is priced
+in Consequences rather than waved through.
 
 ### 9. One name: `events.ts`
 
@@ -264,19 +312,23 @@ coin-flip whose value is entirely in being settled.
 
 A store owning local user preference with no backend may expose methods — events would be pure
 ceremony. Any store that talks to a server uses events. The exception stays narrow by definition:
-_no server state at all_, not _only a little_.
+_no server state at all_, not _only a little_. A store in this position is expected to gain server
+state or move out of `data-access`; it is not a permanent category.
 
 ### Adding a new domain
 
-1. Generate the library with the layout above (see Enforcement — this should be a generator, not a
-   copy-paste).
+1. Generate the library with an Nx generator (see Enforcement — this is a local workspace
+   generator, not a copy-paste).
 2. Write `models.ts` as domain types, not response shapes.
 3. Write `events.ts` first. Naming the domain's verbs before its state tends to produce better
    state.
-4. Write `api.ts` returning domain models.
-5. Assemble `store.ts`: `withState` for client-owned facts, resources for server-owned data,
+4. Assemble `store.ts`: resources for server-owned data, `withState` only for what requests read,
    reducers for transitions, mutations for writes, handlers for orchestration.
+5. Put request builders and DTO mappers in `api.ts`, unexported.
 6. Export store, events, models. Stop.
+
+If a consumer needs this domain _and_ another, that is a facade beside the consumer — not a new
+dependency in either domain.
 
 ## Alternatives considered
 
@@ -288,9 +340,10 @@ cross-domain reaction has nowhere to live. Decision 10 keeps it for exactly the 
 those matter.
 
 **B. Allow domains to inject each other freely, relying on tags only to prevent cycles.** Rejected.
-An acyclic mesh is still a mesh — it preserves the property that changing one domain can break
-another at a distance, which is the thing the per-domain library was meant to end. Decision 2's
-carve-outs cover the cases that actually motivated this.
+Tags do not prevent the cycle until it has been written, and an acyclic mesh is still a mesh — it
+preserves the property that changing one domain can break another at a distance, and a store that
+injects three others constructs all three and fires their requests on first use. Decision 2's
+provisions cover the cases that actually motivated this.
 
 **C. Classic NgRx — actions, reducers, effects, selectors, feature state.** Rejected on fit, not
 quality. The per-domain library is the unit that makes a lighter model viable; a global feature
@@ -307,6 +360,20 @@ multi-thousand-line components with twenty-plus injected dependencies.
 store cannot be split across libraries with enforced boundaries, which is the mechanism the whole
 architecture rests on.
 
+**G. Events only between domains — each keeps a local projection of the other's data.** Rejected
+for derived read state, retained for reactions. Products publishes `productsLoaded`, cart keeps
+its own copy: fully decoupled, and the state is duplicated with nothing reconciling the copies. It
+is the right answer for "cart clears on `sessionExpired`" (Decision 2c) and the wrong one for "the
+drawer shows product names" (Decision 2a).
+
+**H. A separate `type:composition` tag and library tier for facades.** Rejected for now. More
+honest about what a facade is, but a new tag and rule set buys nothing the app and `feature` tiers
+do not already express. Revisit if facades start being shared across unrelated features.
+
+**I. `withConditional` to provision guest versus authenticated behaviour.** Rejected. It selects
+between two store features once, at construction, and never re-reads the condition. Login happens
+after the store exists, so it cannot express the case it looks designed for.
+
 ## Consequences
 
 **Gained**
@@ -314,11 +381,10 @@ architecture rests on.
 - A domain has one home, one vocabulary, one public surface.
 - Cross-domain reaction without coupling: a second store listens to an event without the
   dispatcher knowing it exists.
-- The dependency graph stays a graph. A domain's blast radius is its own library plus whatever
-  listens to its events, and both are visible.
+- The dependency graph cannot cycle through `data-access`, by rule rather than by care.
 - State changes appear in devtools as named domain events rather than anonymous patches.
-- The repository is unreachable, so "the store is the source of truth" is structural rather than
-  cultural.
+- Server access is unreachable from outside the library, so "the store is the source of truth" is
+  structural rather than cultural.
 - Server state stops being hand-mirrored, removing a class of staleness bug outright.
 - A new domain has an obvious shape, which is what makes it reviewable.
 
@@ -329,12 +395,17 @@ architecture rests on.
 - **"Where is this handled?" becomes a search.** The price of decoupling is indirection. A method
   call has one definition; an event may have zero, one, or several handlers, and nothing at the
   dispatch site says which.
-- **Decision 2 adds a library.** Any genuine two-domain surface now needs a `feature` library that
-  would not otherwise exist. That is the cost of not letting domains reach into each other, and on
-  a one-off screen it will feel like pure overhead.
-- **The ambient carve-out needs an owner.** `scope:ambient` is a judgement call, and the pressure
-  to relabel an inconvenient domain as ambient will arrive. Who approves that tag matters more than
-  the rule itself.
+- **Every cross-domain surface needs a facade.** That is the cost of not letting domains reach into
+  each other, and on a one-off screen it will feel like pure overhead.
+- **Facades cascade instantiation.** A `providedIn: 'root'` store constructs on first injection, so
+  a facade over three stores constructs all three, runs their `onInit` hooks and storage reads, and
+  starts any resource whose URL is already defined. Count the requests when the surface first
+  renders, and check the facade does not pull a domain library into an eager chunk.
+- **`scope:shared` needs an owner.** It is the only way around Decision 2, and the pressure to
+  relabel an inconvenient domain as shared will arrive. Who grants the tag matters more than the
+  rule itself.
+- **UI state moves out of stores that hold it today.** Decision 6 relocates drawer visibility and
+  similar flags from `data-access` into facades and features. That is a refactor of working code.
 - **Event catalogues grow.** One prototype store already declares fourteen events. Without a
   granularity convention — which does not yet exist — the catalogue becomes its own maintenance
   surface.
@@ -342,35 +413,34 @@ architecture rests on.
   violate under delivery pressure.
 - **DTO mapping is a permanent tax.** Every backend field change touches a mapper. The benefit is
   real but deferred; the cost is immediate and recurring.
-- **The pattern does not propagate by example.** See Evidence. This is why Enforcement leads with
-  a generator rather than a lint rule.
 
 ## Enforcement
 
 A decision with no failing build behind it is a preference. This ADR is implemented when:
 
-| Mechanism                                                                                          | Notes                                                                                                                                |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **A generator scaffolding the layout and the public API**                                          | The highest-leverage item here by a wide margin. A shape that lives only in an example does not survive contact with a second author |
-| `depConstraints` narrowed so `type:data-access` may depend only on `type:util` and `scope:ambient` | Decision 2. The current rule permits any domain to import any other                                                                  |
-| A negative test proving a peer-domain import fails the build                                       | Otherwise the tightening is unverified                                                                                               |
-| An owner for the `scope:ambient` tag, and a short list of what currently carries it                | The carve-out is only as good as the discipline around who gets it                                                                   |
-| A check rejecting any repository export from a `data-access` public API                            | Decision 1, the load-bearing one                                                                                                     |
-| `@nx/enforce-module-boundaries` forbidding `type:ui` → `type:data-access`                          | Makes "components do not talk to API services" mechanical rather than aspirational                                                   |
-| A check rejecting raw `fetch()` inside `data-access`                                               | Decision 7. Without it the interceptor chain is decorative                                                                           |
-| A check rejecting `patchState` from outside the owning library                                     | Keeps the write surface to the store's own reducers, handlers and mutations                                                          |
-| A naming check: `events.ts` exists, `actions.ts` does not                                          | A settled coin-flip is only worth settling if it is kept                                                                             |
-| Store tests that dispatch events and assert state, rather than calling internals                   | See Open questions — the shape of these tests is not yet settled                                                                     |
+| Mechanism                                                                                   | Notes                                                                                                                                |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **An Nx generator scaffolding the layout and the public API**                               | The highest-leverage item here by a wide margin. A shape that lives only in an example does not survive contact with a second author |
+| `depConstraints` restricting `type:data-access` to `type:util` and `scope:shared`           | Decision 2, as stated in ADR-0001's dependency table                                                                                 |
+| A negative test proving a peer-domain import fails the build                                | Otherwise the restriction is unverified                                                                                              |
+| An owner for the `scope:shared` tag, and a short list of what currently carries it          | The carve-out is only as good as the discipline around who gets it                                                                   |
+| A check rejecting any `api.ts` export from a `data-access` public API                       | Decision 1, the load-bearing one                                                                                                     |
+| `@nx/enforce-module-boundaries` forbidding `type:ui` → `type:data-access`                   | ADR-0001 Decision 4. Makes "presentational components do not know where data comes from" mechanical                                  |
+| A check rejecting raw `fetch()` inside `data-access`, with an allowlist matching Decision 7 | Without it the interceptor chain is decorative; without the allowlist the check gets disabled                                        |
+| A check rejecting `patchState` from outside the owning library                              | Keeps the write surface to the store's own reducers, handlers and mutations                                                          |
+| A naming check: `events.ts` exists, `actions.ts` does not                                   | A settled coin-flip is only worth settling if it is kept                                                                             |
+| Store tests that dispatch events and assert state, rather than calling internals            | See Open questions — the shape of these tests is not yet settled                                                                     |
 
 ## Acceptance criteria
 
 This ADR stays at **Draft** until:
 
 1. An event-granularity convention exists — what deserves an event and what does not.
-2. A generator exists for the layout in Decision 1.
-3. `scope:ambient` has an owner and an initial membership list.
+2. An Nx generator exists for the layout in Decision 1.
+3. `scope:shared` has an owner and an initial membership list.
 4. The prototype either follows its own decisions or records each deviation as a deliberate,
-   named exception. Shipping an ADR that most libraries violate is worse than shipping none.
+   named exception. Shipping an ADR that its own reference implementation violates is worse than
+   shipping none.
 5. The store-testing pattern is chosen (see Open questions) and one library demonstrates it.
 6. A coexistence mechanism with legacy state is proven on `ngfe-web` itself, on a spike branch —
    separately from this ADR, which must not be cited as having done it.
@@ -386,14 +456,21 @@ fact requires several domains to react**:
 - Checkout completes → offers, rewards and menu resources are now stale
 - Route change → page metadata derived from the router plus one or more domain stores
 
-Each domain listening independently works and scales poorly — the knowledge that "these five
-things happen on logout" is then spread across five libraries with nothing naming the set. The
-alternative is an application-level orchestration seam subscribed to the event bus. Neither is
-decided, and this is the one genuine gap left in the model.
+A facade cannot own these — it exists only while its surface does. Each domain listening
+independently works and scales poorly: the knowledge that "these five things happen on logout" is
+then spread across five libraries with nothing naming the set. The alternative is an
+application-level orchestration seam subscribed to the event bus. Neither is decided, and this is
+the one genuine gap left in the model.
 
 _(An earlier draft listed hydration here. It does not belong: a `providedIn: 'root'` store with a
 resource loads on first injection, and `withStorageSync` restores at construction. Hydration is
 already handled by the state model.)_
+
+### When two surfaces need the same derived shape
+
+If the products list and the cart drawer end up with near-identical facades, is that one shared
+facade in a `feature` library — and at what point is a shared facade just a domain store with a
+different label? Decide against a real second case, not in the abstract.
 
 ### What is the unit under test, and what replaces the network?
 
@@ -411,6 +488,13 @@ none settled:
 Related and uncomfortable: most prototype libraries currently carry placeholder specs, and the
 coverage thresholds pass over them. A green check that means nothing is worse than no check.
 
+### The content library waits on the CMS decision
+
+`data-access/content` exports its server access and declares no events — both violations. It is
+left as-is deliberately: the CMS platform is not chosen, and a Strapi outcome may move content
+fetching to GraphQL, which would reshape the library anyway. Bring it in line when the platform is
+settled, not before.
+
 ### Deferred to their own ADRs
 
 **Persistence.** Per-store, via `withStorageSync`, and the storage mechanism (local, session,
@@ -421,6 +505,8 @@ IndexedDB) is the easy part. The decision is policy:
 - Validation on read before the value is trusted, the same discipline ADR-0003 applies to config
 - What must never persist — session tokens in `localStorage` are XSS-reachable, and that is a
   security decision rather than a storage preference
+- Cross-tab coherence — the storage library has no `storage` listener, so a logout in one tab is
+  undone by a write from another (ADR-0005)
 - Behaviour under server-side rendering, where none of these APIs exist
 
 **Typed analytics.** Emitting from the store rather than sprinkling `trackEvent()` through
@@ -432,29 +518,43 @@ dual-emitting explicit analytics events; or direct subscription with no mapping.
 
 ## Evidence
 
-**On propagation — the finding that shaped the Enforcement section.** Twelve `data-access`
-libraries exist in the prototype. Measured October 2026:
+Measured in the prototype, 2026-10-13. Fifteen `data-access` libraries exist, in two groups that
+must be read separately.
 
-| Property                                               | Count |
-| ------------------------------------------------------ | ----- |
-| `data-access` libraries                                | 12    |
-| Public APIs exporting the repository                   | 8     |
-| Libraries declaring an event group                     | 4     |
-| `events.ts` / `actions.ts` split                       | 2 / 2 |
-| Libraries still using raw `fetch()`                    | 8     |
-| Libraries with events + reducer + handlers + mutations | 1     |
+**Eight are example libraries** — `carts`, `comments`, `posts`, `products`, `quotes`, `recipes`,
+`todos`, `users` — wrapping DummyJSON to give the workspace realistic data. They were scaffolded
+before this pattern existed, and their exported `api.ts` files and raw `fetch()` calls are
+scaffolding, not design. They demonstrate nothing about whether the pattern holds and are expected
+to be regenerated or retired, not cited.
 
-One library in twelve demonstrates the full shape — the most recently written one. The pattern
-improved as it was discovered and did not travel backwards to the libraries written before it.
-That happened in a greenfield workspace, with one author, under no delivery pressure. It is the
-clearest available evidence that this shape needs a generator and a set of checks rather than a
-document, and it is why Acceptance criterion 4 exists.
+**Seven were written against the pattern** — `auth`, `content`, `location`, `nutrition`, `pages`,
+`session-cart`, `theme`:
 
-Two of those deviations are deliberate and should survive as named exceptions: a theme store with
-no server state using `withMethods` (Decision 10), and one library re-exporting domain types from
-a shared models library because two domains genuinely share them.
+| Library        | Server access private | `events.ts`          | Peer store injected | Notes                                                      |
+| -------------- | --------------------- | -------------------- | ------------------- | ---------------------------------------------------------- |
+| `nutrition`    | yes                   | yes                  | —                   | Full shape                                                 |
+| `pages`        | yes                   | yes                  | —                   | Prerender `fetch()` is Decision 7's named exception        |
+| `session-cart` | yes                   | yes                  | `AuthStore`         | Legal under 2(b) — auth is `scope:shared`                  |
+| `auth`         | yes                   | yes                  | —                   | Renamed from `actions.ts` 2026-10-13                       |
+| `location`     | yes                   | yes                  | —                   | Renamed from `actions.ts` 2026-10-13                       |
+| `theme`        | n/a                   | none — `withMethods` | —                   | Decision 10 exception; HTTP-backed settings planned        |
+| `content`      | **exported**          | none                 | —                   | Deliberately deferred to the CMS decision (Open questions) |
 
-One current violation of Decision 2 is known: a cart store injects the auth store to read session
-identity. Under Decision 2(b) this becomes legal by tagging the session library `scope:ambient` —
-but that tag does not exist yet, so today it is permitted only because the dependency rule is too
-loose.
+Among libraries written against it, the pattern mostly held. Before 2026-10-13 two of them used
+`actions.ts` — a naming split with one author in a greenfield workspace, which is still the
+clearest argument that this shape needs a generator and checks rather than a document.
+
+Further findings, outside the table:
+
+- **`users`** (an example library) also injects `AuthStore` — legal under 2(b), recorded so the
+  count is honest.
+- **Peer edges hid in a shared token.** `nutrition` and `pages` imported `CMS_PREVIEW` and
+  `CmsStatus` from `content`: not a store, but still a `data-access` → `data-access` edge in the
+  graph. The preview contract is request context, like auth, so it moved to a `util` library
+  (`libs/shared/cms`). Worth expecting more of: the rule is per project, not per symbol, so a
+  constant in the wrong library creates an edge just as a store does.
+- **`libs/ui/content-blocks` injected `NutritionStore` and `ThemeStore`**, violating ADR-0001
+  Decision 4, and passed lint only because `type:ui` could depend on anything. Resolved
+  2026-10-13: the presentational blocks take data as inputs, and thin wrappers in
+  `libs/feature/content-blocks` read the stores. The registry moved with them, since it maps keys
+  to both kinds of block.

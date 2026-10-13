@@ -21,7 +21,7 @@ import {
 import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 
-import { authEvents } from './actions';
+import { authEvents } from './events';
 import type { AuthLoginCredentials, AuthSession } from './models';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 

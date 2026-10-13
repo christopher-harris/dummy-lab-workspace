@@ -4,7 +4,7 @@
  */
 import { strapiQuery } from '@dummy-lab/shared-utils';
 
-import type { CmsStatus } from './preview';
+import type { CmsStatus } from '@dummy-lab/shared-cms';
 
 /**
  * The landing page and its hero carousel.

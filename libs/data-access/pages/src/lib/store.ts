@@ -4,7 +4,7 @@ import { withDevtools, withResource } from '@ngrx-toolkit/core';
 import { signalStore, withComputed, withProps, withState } from '@ngrx/signals';
 import { on, withReducer } from '@ngrx/signals/events';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
-import { CMS_PREVIEW } from '@dummy-lab/data-access-content';
+import { CMS_PREVIEW } from '@dummy-lab/shared-cms';
 
 import { pageByPathUrl } from './api';
 import { pagesEvents } from './events';

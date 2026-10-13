@@ -1,18 +1,11 @@
 import type { PrimaryColor, ThemeMode, ThemePreset } from './models';
 
 /**
- * Class toggled on `<html>` to put PrimeNG's design tokens into dark mode.
- *
- * Must stay in sync with the `darkModeSelector` passed to `providePrimeNG()`
- * in the application config.
+ * The dark-mode class and selector are owned by `@dummy-lab/shared-theme`, next
+ * to the PrimeNG configuration that reads them, and re-exported here so the
+ * store and its consumers keep one import.
  */
-export const DARK_MODE_CLASS = 'my-app-dark';
-
-/**
- * The CSS selector form of {@link DARK_MODE_CLASS}, ready to hand to
- * `providePrimeNG({ theme: { options: { darkModeSelector } } })`.
- */
-export const DARK_MODE_SELECTOR = `.${DARK_MODE_CLASS}`;
+export { DARK_MODE_CLASS, DARK_MODE_SELECTOR } from '@dummy-lab/shared-theme';
 
 /** `localStorage` key the theme store persists its selections under. */
 export const THEME_STORAGE_KEY = 'dummy-lab-theme';

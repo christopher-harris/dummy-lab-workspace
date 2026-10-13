@@ -1,7 +1,7 @@
 import type { EnvironmentProviders } from '@angular/core';
 import { providePrimeNG } from 'primeng/config';
 import type { PrimeNGConfigType } from 'primeng/config';
-import figmaPreset from '../../../../theme/ts';
+import figmaPreset from '../../../../../theme/ts';
 
 import { PRIMENG_THEME_OPTIONS } from './primeng.config';
 

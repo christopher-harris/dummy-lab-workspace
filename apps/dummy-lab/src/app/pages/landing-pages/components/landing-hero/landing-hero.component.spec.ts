@@ -8,8 +8,8 @@ import {
   type HeroSlideBlock,
   type StrapiMedia,
 } from '@dummy-lab/shared-models';
+import { CenteredProductImageBlockComponent } from '@dummy-lab/feature-content-blocks';
 import {
-  CenteredProductImageComponent,
   DarkImageBackgroundComponent,
   LightImageBackgroundComponent,
   RightAlignedImageComponent,
@@ -146,7 +146,7 @@ describe('LandingHeroComponent', () => {
     ]);
 
     expect(component.slides().map((slide) => slide.component)).toEqual([
-      CenteredProductImageComponent,
+      CenteredProductImageBlockComponent,
       RightAlignedImageComponent,
       LightImageBackgroundComponent,
       DarkImageBackgroundComponent,
@@ -161,7 +161,7 @@ describe('LandingHeroComponent', () => {
     ]);
 
     expect(component.slides().map((slide) => slide.component)).toEqual([
-      CenteredProductImageComponent,
+      CenteredProductImageBlockComponent,
     ]);
   });
 

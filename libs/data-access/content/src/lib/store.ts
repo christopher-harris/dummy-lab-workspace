@@ -5,7 +5,7 @@ import { signalStore, withProps } from '@ngrx/signals';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
 
 import { landingPageUrl } from './api';
-import { CMS_PREVIEW } from './preview';
+import { CMS_PREVIEW } from '@dummy-lab/shared-cms';
 import type { LandingPageResponse } from './models';
 
 /**

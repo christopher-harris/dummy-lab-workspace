@@ -3,7 +3,7 @@
  * the store exposes what Strapi returns.
  */
 import type { NutritionCategory } from '@dummy-lab/shared-models';
-import type { CmsStatus } from '@dummy-lab/data-access-content';
+import type { CmsStatus } from '@dummy-lab/shared-cms';
 import { strapiQuery } from '@dummy-lab/shared-utils';
 
 /**

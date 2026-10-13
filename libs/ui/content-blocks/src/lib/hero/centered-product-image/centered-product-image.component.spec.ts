@@ -1,7 +1,5 @@
-import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RUNTIME_CONFIG } from '@dummy-lab/shared-runtime-config';
-import { ThemeStore } from '@dummy-lab/data-access-theme';
 import {
   DEFAULT_BLOCK_SETTINGS,
   type HeroCenteredProductImageContent,
@@ -23,21 +21,15 @@ const content: HeroCenteredProductImageContent = {
 describe('CenteredProductImageComponent', () => {
   let fixture: ComponentFixture<CenteredProductImageComponent>;
   let component: CenteredProductImageComponent;
-  const isDark = signal(false);
 
   const root = (): HTMLElement =>
     fixture.nativeElement.querySelector(':scope > div');
   const copyColumn = (): HTMLElement => root().firstElementChild as HTMLElement;
 
   beforeEach(async () => {
-    isDark.set(false);
-
     await TestBed.configureTestingModule({
       imports: [CenteredProductImageComponent],
-      providers: [
-        { provide: RUNTIME_CONFIG, useValue: TEST_RUNTIME_CONFIG },
-        { provide: ThemeStore, useValue: { isDark } },
-      ],
+      providers: [{ provide: RUNTIME_CONFIG, useValue: TEST_RUNTIME_CONFIG }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CenteredProductImageComponent);
@@ -48,6 +40,7 @@ describe('CenteredProductImageComponent', () => {
 
   it('renders without settings being passed at all', () => {
     expect(component.settings()).toBe(DEFAULT_BLOCK_SETTINGS);
+    expect(component.dark()).toBe(false);
     expect(fixture.nativeElement.textContent).toContain('Where Flavor');
   });
 
@@ -83,13 +76,13 @@ describe('CenteredProductImageComponent', () => {
     expect(frame.className).toContain('max-w-[720px]');
   });
 
-  it('ships one image rather than a light/dark pair, picked off the theme store', async () => {
+  it('ships one image rather than a light/dark pair, picked by the dark input', async () => {
     // A `display: none` image is still fetched, so the pair cost ~162 KiB to
     // show ~81 KiB of it. This is the page's LCP element.
     expect(fixture.nativeElement.querySelectorAll('img').length).toBe(1);
     expect(component.heroImage().src).toContain('/uploads/light.jpg');
 
-    isDark.set(true);
+    fixture.componentRef.setInput('dark', true);
     await fixture.whenStable();
 
     expect(component.heroImage().src).toContain('/uploads/dark.jpg');

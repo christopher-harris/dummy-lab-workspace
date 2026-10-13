@@ -3,7 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { CarouselModule, CarouselPassThroughOptions } from 'primeng/carousel';
 import { ContentStore } from '@dummy-lab/data-access-content';
 import { toBlockInputs } from '@dummy-lab/shared-models';
-import { getContentBlockEntry } from '@dummy-lab/ui-content-blocks';
+import { getContentBlockEntry } from '@dummy-lab/feature-content-blocks';
 
 @Component({
   selector: 'dl-landing-hero',

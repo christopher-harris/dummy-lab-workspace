@@ -1,14 +1,21 @@
 # 🤖 ADR-0003 — Load environment configuration at runtime; promote one build artifact
 
-|                |                                                                                                                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Status**     | Proposed — **for discussion, not for approval**                                                                          |
-| **Date**       | 2026-10-05                                                                                                               |
-| **Deciders**   | Wingstop internal development leadership; Release engineering                                                            |
-| **Applies to** | `ngfe-web`                                                                                                               |
-| **Prototype**  | A prototype workspace — runtime config + promoted artifact, measured — _link TBD_                                        |
-| **Blocked on** | A hosting decision for the configuration document. See [Acceptance criteria](#acceptance-criteria).                      |
-| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — the build-configuration count is a stated input to that migration |
+|                |                                                                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | Proposed — **for discussion, not for approval**                                                                                              |
+| **Date**       | 2026-10-05                                                                                                                                   |
+| **Deciders**   | Wingstop internal development leadership; Release engineering                                                                                |
+| **Applies to** | `ngfe-web`                                                                                                                                   |
+| **Prototype**  | A prototype workspace — runtime config + promoted artifact, measured — _link TBD_                                                            |
+| **Blocked on** | A hosting decision for the configuration document. See [Acceptance criteria](#acceptance-criteria).                                          |
+| **Revised**    | 2026-10-13 — amendment by ADR-0005 recorded; server-side configuration path documented                                                       |
+| **Amended by** | [ADR-0005](./ADR-0005-application-topology-and-render-modes.md) — "promote one artifact" **does not hold for the prerendered marketing app** |
+| **Relates to** | [ADR-0001](./ADR-0001-nx-multi-project-workspace.md) — the build-configuration count is a stated input to that migration                     |
+
+> **Amendment, 2026-10-13.** ADR-0005 proposes a prerendered `marketing` application. Prerendered
+> HTML contains content and configuration resolved at build time, so that artifact is
+> environment-specific and is **built per environment, not promoted**. Everything below continues
+> to hold for `ordering` and for every non-prerendered asset. Read Decisions 7–8 with that scope.
 
 > **Purpose.** This document exists to put a mechanism on the record, and to price it honestly.
 > The benefit is large and structural. The cost is small, real, measured, and paid on every cold
@@ -24,10 +31,11 @@ environment**. Angular's `fileReplacements` swaps an `environment.ts` module for
 environment-specific sibling at compile time, so the API base URL, feature toggles and related
 values are baked into the JavaScript bundle.
 
-The consequence is arithmetic. There are **27 build configurations and 25 serve configurations**,
-each carrying its own `fileReplacements` block. Reducing that count is named as the single
-largest lever on the cost of the workspace migration, and it is a hard prerequisite on the
-restructuring phase that follows.
+The consequence is arithmetic. There are **more than twenty build configurations and nearly as
+many serve configurations**, each carrying its own `fileReplacements` block. The exact count is
+beside the point; what matters is that it is far beyond what anyone can keep in their head, and it
+only grows. Reducing it is named as the single largest lever on the cost of the workspace
+migration, and it is a hard prerequisite on the restructuring phase that follows.
 
 ### What the mechanism actually costs
 
@@ -39,7 +47,7 @@ build**, which produces four structural effects:
 | The artifact tested is never the artifact shipped    | Stage and prod run different bytes. Every promotion is an untested build, however small the delta |
 | Configuration changes require a rebuild and redeploy | Changing one URL means a full CI cycle, not a configuration change                                |
 | Build configurations multiply combinatorially        | Every new environment, region or toggle multiplies against every existing one                     |
-| The count itself becomes migration scope             | 27 configurations must be understood and mapped before the workspace can be restructured          |
+| The count itself becomes migration scope             | 20+ configurations must be understood and mapped before the workspace can be restructured         |
 
 The fourth is why this ADR exists now rather than later. The build-configuration count is an
 input to ADR-0001's migration plan, and the cheapest way to shrink it is to stop encoding the
@@ -136,8 +144,9 @@ taking if the measured cost proves unacceptable; not worth taking pre-emptively.
 
 **D. Inject configuration at the edge** (a Worker rewriting the HTML response). Deferred. Same
 benefit as C without the deploy-time step, at the cost of binding configuration delivery to a
-specific CDN's programmable layer. Revisit alongside the rendering decision, which will have its
-own reasons to want or avoid an edge runtime.
+specific CDN's programmable layer. ADR-0005's segment personalization likely puts an edge layer in
+front of `marketing` regardless; if it does, this becomes much cheaper to adopt there and should be
+reconsidered at that point.
 
 **E. Ship every environment's configuration in the bundle; select by hostname.** Rejected. It
 publishes non-production URLs to every visitor and couples the application to its own DNS. One
@@ -172,10 +181,14 @@ artifact, but for the wrong reason.
 - **The configuration document is a public, unauthenticated endpoint.** Decision 4 is a standing
   discipline, not a one-time check — the pressure to add "just one" secret to a convenient
   document that already reaches every client will recur.
-- **The loader reads a browser global to resolve its URL**, which makes it browser-only as
-  written. If server-side rendering is adopted, this loader needs a server path, and that work
-  belongs to the rendering decision rather than to this one. Flagged here because the dependency
-  is not obvious until it breaks.
+- **Prerendering needs its configuration at build time, and that bakes it in.** The browser
+  loader resolves `/runtime-config.json` against the page URL, which does not exist during a
+  static build. The prototype's server configuration therefore reads the **same document, in the
+  same shape**, from the `RUNTIME_CONFIG_JSON` environment variable that the host's function
+  serves to browsers — one contract, two transports. It throws when the variable is unset rather
+  than defaulting, because a default would prerender against the wrong CMS and deploy looking
+  healthy. The consequence is the amendment above: configuration resolved at build time is part
+  of the artifact, which is exactly why a prerendered app cannot be promoted.
 - **One more moving part at start-up.** A request that must succeed before anything renders is a
   new failure mode that did not exist when the values were compiled in.
 
@@ -205,9 +218,7 @@ This ADR stays at **Proposed** until all of the following exist:
    is adopted at the same time.
 3. An owner for the configuration schema and a process for changing it — adding a field touches
    the host, the type, and every environment's document simultaneously.
-4. Verification of the current build- and serve-configuration counts against the repository
-   (see Evidence).
-5. Sign-off from Wingstop internal development leadership.
+4. Sign-off from Wingstop internal development leadership.
 
 ## Open questions
 
@@ -245,11 +256,8 @@ The prototype's configuration library carries unit tests covering parsing and no
 URL resolution and cache behaviour, and failure on a non-success response — the last of which is
 the test that holds Decision 5 in place.
 
-> **Two numbers to reconcile before this is published.** ADR-0001 records **28 build
-> configurations** for `ngfe-web`; the backlog this ADR draws on records **27 build configurations
-> and 25 serve configurations**. One of them is stale. Re-measure against the repository and
-> correct both documents — this ADR's central claim is a count, and it should not ship with two
-> values in circulation.
+Current counts can be taken against `ngfe-web` at any time; both ADR-0001 and this ADR state
+"more than twenty" deliberately, because the argument does not depend on the exact number.
 
 ```
 # Build and serve configuration counts, against ngfe-web:

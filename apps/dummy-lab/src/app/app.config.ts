@@ -16,13 +16,10 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { appRoutes } from './app.routes';
-import { providePrimeNgPlatform } from '@dummy-lab/platform';
+import { providePrimeNgPlatform } from '@dummy-lab/shared-theme';
 import { authInterceptor } from '@dummy-lab/data-access-auth';
-import {
-  CMS_API_TOKEN,
-  CMS_PREVIEW,
-  cmsInterceptor,
-} from '@dummy-lab/data-access-content';
+import { CMS_API_TOKEN, cmsInterceptor } from '@dummy-lab/data-access-content';
+import { CMS_PREVIEW } from '@dummy-lab/shared-cms';
 import { provideRuntimeConfig } from '@dummy-lab/shared-runtime-config';
 
 export const appConfig: ApplicationConfig = {

@@ -1,10 +1,13 @@
 import type { HeroSlideBlock } from '@dummy-lab/shared-models';
 
-import type { ContentBlockRegistry } from '../content-block.types';
-import { CenteredProductImageComponent } from './centered-product-image/centered-product-image.component';
-import { DarkImageBackgroundComponent } from './dark-image-background/dark-image-background.component';
-import { LightImageBackgroundComponent } from './light-image-background/light-image-background.component';
-import { RightAlignedImageComponent } from './right-aligned-image/right-aligned-image.component';
+import {
+  DarkImageBackgroundComponent,
+  LightImageBackgroundComponent,
+  RightAlignedImageComponent,
+  type ContentBlockRegistry,
+} from '@dummy-lab/ui-content-blocks';
+
+import { CenteredProductImageBlockComponent } from './centered-product-image-block.component';
 
 export type HeroBlockKey = HeroSlideBlock['__component'];
 
@@ -19,7 +22,9 @@ export const HERO_BLOCK_REGISTRY: Pick<ContentBlockRegistry, HeroBlockKey> = {
     key: 'hero.centered-product-image',
     family: 'hero',
     label: 'Centered Product Image',
-    component: CenteredProductImageComponent,
+    // The one hero that reads the theme store, so it registers its
+    // data-bound wrapper rather than the presentational component.
+    component: CenteredProductImageBlockComponent,
   },
   'hero.right-aligned-image': {
     key: 'hero.right-aligned-image',

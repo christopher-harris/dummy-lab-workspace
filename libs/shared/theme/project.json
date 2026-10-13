@@ -1,19 +1,18 @@
 {
-  "name": "platform",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/platform/src",
+  "name": "shared-theme",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/shared/theme/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:ui", "scope:shared"],
+  "tags": ["type:util", "scope:shared"],
   "targets": {
     "test": {
       "outputs": [
         "{projectRoot}/{options.coverage.reportsDirectory}",
-        "{workspaceRoot}/coverage/libs/platform"
+        "{workspaceRoot}/coverage/libs/shared/theme"
       ],
       "options": {
-        "coverage.reportsDirectory": "../../coverage/libs/platform",
-        "passWithNoTests": true
+        "coverage.reportsDirectory": "../../../coverage/libs/shared/theme"
       }
     },
     "lint": {
