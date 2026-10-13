@@ -7914,17 +7914,17 @@
     "text": {
       "color": {
         "$type": "color",
-        "$value": "{surface.700}"
+        "$value": "{primary.color}"
       },
       "hover": {
         "color": {
           "$type": "color",
-          "$value": "{surface.800}"
+          "$value": "{primary.700}"
         },
         "muted": {
           "color": {
             "$type": "color",
-            "$value": "{surface.600}"
+            "$value": "{primary.400}"
           }
         }
       },
@@ -13906,11 +13906,11 @@
     "menubar": {
       "background": {
         "$type": "color",
-        "$value": "{content.background}"
+        "$value": "{surface.0}"
       },
       "color": {
         "$type": "color",
-        "$value": "{content.color}"
+        "$value": "{primary.color}"
       },
       "gap": {
         "$type": "number",
@@ -17570,7 +17570,7 @@
     "toolbar": {
       "background": {
         "$type": "color",
-        "$value": "{surface.400}"
+        "$value": "{surface.0}"
       },
       "color": {
         "$type": "color",
