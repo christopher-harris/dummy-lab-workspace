@@ -17570,11 +17570,11 @@
     "toolbar": {
       "background": {
         "$type": "color",
-        "$value": "{surface.0}"
+        "$value": "{surface.400}"
       },
       "color": {
         "$type": "color",
-        "$value": "{surface.950}"
+        "$value": "{primary.color}"
       },
       "gap": {
         "$type": "number",
