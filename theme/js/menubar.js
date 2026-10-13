@@ -1,9 +1,9 @@
 export default {
     root: {
-        background: "{content.background}",
+        background: "{surface.0}",
         borderColor: "{content.border.color}",
         borderRadius: "{content.border.radius}",
-        color: "{content.color}",
+        color: "{primary.color}",
         gap: "0.5rem",
         padding: "0.5rem 0.75rem",
         transitionDuration: "{transition.duration}"

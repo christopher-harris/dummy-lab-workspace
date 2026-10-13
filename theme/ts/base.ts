@@ -385,10 +385,10 @@ export default {
         shadow: "0 1px 2px 0 #1212170d"
     },
     text: {
-        color: "light-dark({surface.700}, {surface.0})",
-        hoverColor: "light-dark({surface.800}, {surface.0})",
+        color: "light-dark({primary.color}, {surface.0})",
+        hoverColor: "light-dark({primary.700}, {surface.0})",
         mutedColor: "light-dark({surface.500}, {surface.400})",
-        hoverMutedColor: "light-dark({surface.600}, {surface.300})"
+        hoverMutedColor: "light-dark({primary.400}, {surface.300})"
     },
     list: {
         padding: "0.25rem",
