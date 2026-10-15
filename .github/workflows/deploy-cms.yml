@@ -1,0 +1,163 @@
+name: Deploy CMS
+
+# Builds the Strapi image, pushes it to ECR, and has the EC2 host pull and
+# restart it. The host never builds: the admin panel needs more memory than
+# its 2 GB, and a build there takes minutes of swapping.
+#
+# AWS access is OIDC, not stored keys: GitHub mints a short-lived token per
+# run, and the IAM role in CMS_DEPLOY_ROLE_ARN trusts it only for this repo
+# on `main`. That role can push to one ECR repository, write release files
+# under one S3 prefix, and send commands to the instance tagged
+# Name=dummy-lab-cms — nothing else.
+#
+# Rollback: re-run an earlier successful run of this workflow. It reuses that
+# commit's image from ECR (or rebuilds it if expired) and ships it the same
+# way.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/cms/**'
+      - '.github/workflows/deploy-cms.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # lets the job request the OIDC token AWS trusts
+
+# One deploy at a time, and never cancel one halfway through a restart.
+concurrency:
+  group: cms-deploy
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: dummy-lab-cms
+  INSTANCE_NAME: dummy-lab-cms
+
+jobs:
+  deploy:
+    name: Build image and deploy to the CMS host
+    # Arm, matching the t4g host, so the image runs there without emulation.
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.CMS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Tags are immutable in ECR, so a second push of the same SHA is
+      # rejected. Re-running an old run (the rollback path) therefore reuses
+      # its image instead of rebuilding — unless the lifecycle rule has
+      # already expired it, in which case it is rebuilt from that commit.
+      - name: Check for an existing image
+        id: existing
+        shell: bash
+        run: |
+          if aws ecr describe-images --repository-name "$ECR_REPOSITORY" \
+            --image-ids "imageTag=$GITHUB_SHA" >/dev/null 2>&1; then
+            echo "Image for $GITHUB_SHA already in ECR; skipping build."
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: docker/setup-buildx-action@v3
+        if: steps.existing.outputs.found != 'true'
+
+      - name: Build and push image
+        if: steps.existing.outputs.found != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: apps/cms
+          platforms: linux/arm64
+          push: true
+          tags: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          # One image per tag. Provenance attestations would add a second
+          # manifest to every push, which ECR lists as an untagged image.
+          provenance: false
+          cache-from: type=gha,scope=cms
+          cache-to: type=gha,scope=cms,mode=max
+
+      # The host copies these in on every deploy, so its compose file and
+      # Caddyfile always match the commit being shipped.
+      - name: Upload release files
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          account=$(aws sts get-caller-identity --query Account --output text)
+          bucket="dummy-lab-cms-deploy-$account"
+          prefix="releases/$GITHUB_SHA"
+          for file in compose.prod.yaml Caddyfile deploy/remote-deploy.sh; do
+            aws s3 cp "apps/cms/$file" "s3://$bucket/$prefix/$(basename "$file")" --only-show-errors
+          done
+          echo "bucket=$bucket" >> "$GITHUB_OUTPUT"
+          echo "prefix=$prefix" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy on the host
+        shell: bash
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          BUCKET: ${{ steps.release.outputs.bucket }}
+          PREFIX: ${{ steps.release.outputs.prefix }}
+        run: |
+          set -euo pipefail
+
+          # Found by tag rather than pinned by ID, so replacing the instance
+          # doesn't mean editing this workflow.
+          instance=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=$INSTANCE_NAME" "Name=instance-state-name,Values=running" \
+            --query 'Reservations[].Instances[].InstanceId' --output text)
+          if [ "$(wc -w <<<"$instance")" -ne 1 ]; then
+            echo "::error::Expected exactly one running instance named $INSTANCE_NAME, found: '${instance}'"
+            exit 1
+          fi
+
+          # Run Command executes these as root under /bin/sh on the host.
+          script=$(cat <<EOF
+          set -eu
+          dir=\$(mktemp -d)
+          for f in compose.prod.yaml Caddyfile remote-deploy.sh; do
+            /snap/bin/aws s3 cp "s3://$BUCKET/$PREFIX/\$f" "\$dir/\$f" --region $AWS_REGION --only-show-errors
+          done
+          bash "\$dir/remote-deploy.sh" "$IMAGE" "\$dir"
+          EOF
+          )
+          params=$(jq -n --arg script "$script" '{commands: [$script], executionTimeout: ["900"]}')
+
+          command_id=$(aws ssm send-command \
+            --instance-ids "$instance" \
+            --document-name AWS-RunShellScript \
+            --comment "deploy-cms ${GITHUB_SHA::7}" \
+            --parameters "$params" \
+            --query Command.CommandId --output text)
+          echo "Run Command $command_id on $instance"
+
+          # Poll rather than `aws ssm wait`, whose waiter gives up after
+          # 100 seconds. A pull plus health-checked restart can take longer.
+          for _ in $(seq 1 90); do
+            sleep 10
+            status=$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+              --query Status --output text 2>/dev/null || echo Pending)
+            case "$status" in
+              Pending | InProgress | Delayed) continue ;;
+              *) break ;;
+            esac
+          done
+
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+            --query StandardOutputContent --output text
+          if [ "$status" != Success ]; then
+            echo "::group::stderr"
+            aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+              --query StandardErrorContent --output text
+            echo "::endgroup::"
+            echo "::error::Deploy command finished with status $status"
+            exit 1
+          fi
