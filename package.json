@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "config": {
-    "perfUrl": "https://dummy-lab-prod.pages.dev/"
+    "perfUrl": "https://dummy-lab-stage.pages.dev/"
   },
   "scripts": {
     "nx": "nx",

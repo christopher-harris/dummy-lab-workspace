@@ -35,6 +35,15 @@ export class LandingHeroComponent {
    * active item for screen readers. It also defuses `transitionend` bubbling out
    * of a slide (a hovered CTA) and tripping the same handler.
    *
+   * `basis-full shrink-0 grow` — the `flex: 1 0 100%` PrimeNG gives each item
+   * for `numVisible` 1, but in the prerendered HTML. PrimeNG writes that rule
+   * into a `<style>` from `createStyle()`, which only runs in the browser, so
+   * the static page painted every slide squeezed into one row and then
+   * reflowed them all to full width once scripts ran — 0.42 of desktop CLS
+   * on stage (Lighthouse, 15 Oct 2026). Squeezed, every slide also sat inside
+   * the viewport, so the lazy hero images loaded at once and competed with
+   * the LCP image. PrimeNG's rule still lands later; it's the same value.
+   *
    * `item` and `itemClone` both need these because `[circular]="true"` renders
    * clones at either end. Utility classes win over PrimeNG's own rules here: the
    * workspace sets the cssLayer order to `theme, base, primeng, utilities` in
@@ -43,8 +52,8 @@ export class LandingHeroComponent {
   readonly carouselPt: CarouselPassThroughOptions = {
     content: 'items-stretch',
     itemList: 'items-stretch',
-    item: 'flex flex-col visible',
-    itemClone: 'flex flex-col visible',
+    item: 'flex flex-col visible basis-full shrink-0 grow',
+    itemClone: 'flex flex-col visible basis-full shrink-0 grow',
   };
 
   /**

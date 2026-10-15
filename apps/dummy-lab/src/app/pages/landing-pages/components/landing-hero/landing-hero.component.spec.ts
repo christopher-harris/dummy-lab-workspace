@@ -233,5 +233,16 @@ describe('LandingHeroComponent', () => {
       expect(component.carouselPt.item).toContain('visible');
       expect(component.carouselPt.itemClone).toContain('visible');
     });
+
+    it('sizes items full width in the prerendered HTML, before PrimeNG does it in the browser', () => {
+      for (const pt of [
+        component.carouselPt.item,
+        component.carouselPt.itemClone,
+      ]) {
+        expect(pt).toContain('basis-full');
+        expect(pt).toContain('shrink-0');
+        expect(pt).toContain('grow');
+      }
+    });
   });
 });
