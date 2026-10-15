@@ -78,7 +78,7 @@ describe('RightAlignedImageComponent', () => {
   });
 
   it('resolves the artwork against the CMS origin and takes alt text off the asset', () => {
-    expect(component.image()).toEqual({
+    expect(component.image()).toMatchObject({
       src: 'http://localhost:1337/uploads/hero-1.jpg',
       alt: 'hero-1 alt',
     });

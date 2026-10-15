@@ -42,12 +42,22 @@ export class DarkImageBackgroundComponent {
    */
   email = '';
 
+  /**
+   * The widest stored rendition, not the original upload — see
+   * `CmsMediaUrl.image()`. A CSS background rather than `<img ngSrc>`: the
+   * photo is one of four layers blended with `background-blend-mode`, which
+   * only composites layers of the same element.
+   */
+  private readonly backgroundUrl = computed(
+    () => this.cmsMediaUrl.image(this.content().backgroundImage)?.src ?? '',
+  );
+
   /** Four stacked layers; `backgroundBlendMode` below pairs with them in order. */
   readonly backgroundStyle = computed(() => ({
     background: `linear-gradient(0deg, color-mix(in srgb, var(--p-surface-950) 50%, transparent) 0%, transparent 100%),
                     linear-gradient(0deg, var(--p-primary-500) 0%, var(--p-primary-500) 100%),
                     linear-gradient(0deg, color-mix(in srgb, var(--p-primary-800) 60%, transparent) 0%, color-mix(in srgb, var(--p-primary-800) 60%, transparent) 100%),
-                    url('${this.cmsMediaUrl.resolve(this.content().backgroundImage)}') center/cover no-repeat`,
+                    url('${this.backgroundUrl()}') center/cover no-repeat`,
     backgroundBlendMode: 'normal, multiply, lighten, normal',
   }));
 }

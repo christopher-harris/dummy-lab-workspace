@@ -1,5 +1,5 @@
 <div class="relative p-8 md:p-12 lg:p-20 overflow-hidden">
-  <!-- 207 KiB of background art for a slide that is off-screen at first paint.
+  <!-- Background art for a slide that is off-screen at first paint.
        Every slide lives in the same flex row at the top of the document, so
        Chrome treats it as in-viewport and fetches it at High priority, against
        the real LCP image.
@@ -7,9 +7,10 @@
        NOTE: this `@defer` does NOT currently fix that. Measured on dev
        (lighthouse 2026-10-01): the request still starts at ~333ms at High
        priority, because the default `on idle` trigger fires almost immediately
-       after first render. Real options are an `on viewport` / `on timer`
-       trigger, or — better — shrinking the asset via the Supabase
-       `/render/image/` endpoint's `width`/`quality` params.
+       after first render. The asset is now Strapi's widest stored rendition
+       rather than the original upload (`CmsMediaUrl.image()`), which caps
+       the cost; an `on viewport` / `on timer` trigger is still the way to
+       take it off the critical path entirely.
 
        The block is kept because moving the stack onto its own layer is correct
        either way: all four gradient layers stay on one element, so

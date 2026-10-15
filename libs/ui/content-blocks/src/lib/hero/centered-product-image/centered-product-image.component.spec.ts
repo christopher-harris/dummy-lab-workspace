@@ -80,11 +80,14 @@ describe('CenteredProductImageComponent', () => {
     // A `display: none` image is still fetched, so the pair cost ~162 KiB to
     // show ~81 KiB of it. This is the page's LCP element.
     expect(fixture.nativeElement.querySelectorAll('img').length).toBe(1);
-    expect(component.heroImage().src).toContain('/uploads/light.jpg');
+    expect(component.heroImage()?.src).toContain('/uploads/light.jpg');
 
     fixture.componentRef.setInput('dark', true);
     await fixture.whenStable();
 
-    expect(component.heroImage().src).toContain('/uploads/dark.jpg');
+    // A fresh <img>, not a rebound one — NgOptimizedImage throws on a new
+    // `ngSrcset` or `loaderParams` after init.
+    expect(component.heroImage()?.src).toContain('/uploads/dark.jpg');
+    expect(fixture.nativeElement.querySelectorAll('img').length).toBe(1);
   });
 });

@@ -56,9 +56,14 @@ export class LightImageBackgroundComponent {
     })),
   );
 
+  /** The widest stored rendition, not the original upload — see `CmsMediaUrl.image()`. */
+  private readonly backgroundUrl = computed(
+    () => this.cmsMediaUrl.image(this.content().backgroundImage)?.src ?? '',
+  );
+
   /** Radial scrim over the photo, so the white headline stays readable. */
   readonly backgroundStyle = computed(() => ({
     background: `radial-gradient(67.46% 67.46% at 50% 50%, color-mix(in srgb, var(--p-surface-950) 60%, transparent) 0%, rgba(0, 0, 0, 0) 100%),
-                    url('${this.cmsMediaUrl.resolve(this.content().backgroundImage)}') lightgray 50% / cover no-repeat`,
+                    url('${this.backgroundUrl()}') lightgray 50% / cover no-repeat`,
   }));
 }

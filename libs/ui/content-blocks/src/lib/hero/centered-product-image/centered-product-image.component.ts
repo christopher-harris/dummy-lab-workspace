@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import {
@@ -7,6 +8,7 @@ import {
 } from '@dummy-lab/shared-models';
 
 import { blockContainerClass } from '../../block-container';
+import { provideCmsImageLoader } from '../../cms-image';
 import { CmsMediaUrl } from '../../cms-media-url';
 
 /**
@@ -16,7 +18,8 @@ import { CmsMediaUrl } from '../../cms-media-url';
  */
 @Component({
   selector: 'dl-hero-centered-product-image',
-  imports: [ButtonModule],
+  imports: [ButtonModule, NgOptimizedImage],
+  providers: [provideCmsImageLoader()],
   templateUrl: './centered-product-image.component.html',
   styleUrl: './centered-product-image.component.css',
 })
@@ -53,11 +56,9 @@ export class CenteredProductImageComponent {
    */
   readonly heroImage = computed(() => {
     const content = this.content();
-    const media = this.dark() ? content.imageDark : content.imageLight;
 
-    return {
-      src: this.cmsMediaUrl.resolve(media),
-      alt: media?.alternativeText ?? '',
-    };
+    return this.cmsMediaUrl.image(
+      this.dark() ? content.imageDark : content.imageLight,
+    );
   });
 }

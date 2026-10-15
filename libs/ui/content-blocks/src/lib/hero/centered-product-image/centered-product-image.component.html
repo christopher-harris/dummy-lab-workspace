@@ -26,14 +26,30 @@
       <!-- `max-w-[720px]` is art direction on this one image, not a page
            container — it stays put regardless of the container setting. -->
       <div
-        class="overflow-hidden w-full aspect-720/295 max-w-[720px] rounded-t-3xl shadow-2xl border border-b-0 border-primary-100 dark:border-primary-400/30"
+        class="relative overflow-hidden w-full aspect-720/295 max-w-[720px] rounded-t-3xl shadow-2xl border border-b-0 border-primary-100 dark:border-primary-400/30"
       >
-        <img
-          [src]="heroImage().src"
-          [alt]="heroImage().alt"
-          fetchpriority="high"
-          class="block w-full h-full object-cover object-top rounded-t-3xl"
-        />
+        <!-- `priority` is NgOptimizedImage's eager load + high fetch
+             priority, and in the prerendered HTML it adds a <link
+             rel="preload"> so the browser starts on this image before any
+             script runs.
+
+             Keyed on `src` because NgOptimizedImage rejects a new `ngSrcset`
+             or `loaderParams` after init, and the theme toggle swaps the
+             image; each swap gets a fresh <img>. -->
+        @for (img of [heroImage()]; track img?.src) {
+          @if (img) {
+            <img
+              [ngSrc]="img.src"
+              [ngSrcset]="img.srcset"
+              [loaderParams]="img.loaderParams"
+              [alt]="img.alt"
+              fill
+              priority
+              sizes="(min-width: 816px) 720px, 100vw"
+              class="object-cover object-top rounded-t-3xl"
+            />
+          }
+        }
       </div>
     </div>
   </div>
