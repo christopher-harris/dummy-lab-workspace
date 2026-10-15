@@ -1,4 +1,5 @@
 export * from './lib/block-container';
+export * from './lib/cms-image';
 export * from './lib/cms-media-url';
 export * from './lib/content-block.types';
 export * from './lib/nutrition/nutrition-table/nutrition-table.component';

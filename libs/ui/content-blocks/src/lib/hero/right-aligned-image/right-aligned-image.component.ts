@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import {
@@ -7,11 +8,13 @@ import {
 } from '@dummy-lab/shared-models';
 
 import { blockContainerClass } from '../../block-container';
+import { provideCmsImageLoader } from '../../cms-image';
 import { CmsMediaUrl } from '../../cms-media-url';
 
 @Component({
   selector: 'dl-hero-right-aligned-image',
-  imports: [ButtonModule],
+  imports: [ButtonModule, NgOptimizedImage],
+  providers: [provideCmsImageLoader()],
   templateUrl: './right-aligned-image.component.html',
   styleUrl: './right-aligned-image.component.css',
 })
@@ -39,12 +42,5 @@ export class RightAlignedImageComponent {
     blockContainerClass(this.settings()),
   );
 
-  readonly image = computed(() => {
-    const media = this.content().image;
-
-    return {
-      src: this.cmsMediaUrl.resolve(media),
-      alt: media?.alternativeText ?? '',
-    };
-  });
+  readonly image = computed(() => this.cmsMediaUrl.image(this.content().image));
 }
