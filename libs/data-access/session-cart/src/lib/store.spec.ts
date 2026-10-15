@@ -47,6 +47,7 @@ const setup = () => {
         useValue: {
           environment: 'local',
           apiBaseUrl: 'https://dummyjson.com',
+          cmsBaseUrl: 'http://localhost:1337',
           features: { experimentalCatalog: false },
         },
       },
@@ -80,8 +81,9 @@ describe('SessionCartStore', () => {
 
     patchState(store, { cart });
 
-    expect(JSON.parse(localStorage.getItem(SESSION_CART_STORAGE_KEY) ?? '{}'))
-      .toEqual({ cart, cartDrawerVisible: false });
+    expect(
+      JSON.parse(localStorage.getItem(SESSION_CART_STORAGE_KEY) ?? '{}'),
+    ).toEqual({ cart, cartDrawerVisible: false });
   });
 
   it('rehydrates a saved cart on initialization', () => {

@@ -7,6 +7,7 @@ type EnvironmentName = 'local' | 'dev' | 'stage' | 'prod';
 interface RuntimeConfig {
   environment: EnvironmentName;
   apiBaseUrl: string;
+  cmsBaseUrl: string;
   features: {
     experimentalCatalog: boolean;
   };
@@ -29,16 +30,33 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function isRuntimeConfig(value: unknown): value is RuntimeConfig {
-  if (!isRecord(value) || Object.keys(value).length !== 3) {
+/**
+ * Deployed configuration is served over the public internet, so both origins
+ * must be HTTPS here. The in-browser parser accepts HTTP as well, which is what
+ * lets `public/runtime-config.json` point at a local Strapi on port 1337; this
+ * adapter never serves that file.
+ */
+function isHttpsUrl(value: unknown): boolean {
+  if (typeof value !== 'string') {
     return false;
   }
 
-  const { apiBaseUrl, environment, features } = value;
+  try {
+    return new URL(value).protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function isRuntimeConfig(value: unknown): value is RuntimeConfig {
+  if (!isRecord(value) || Object.keys(value).length !== 4) {
+    return false;
+  }
+
+  const { apiBaseUrl, cmsBaseUrl, environment, features } = value;
   if (
     typeof environment !== 'string' ||
     !environmentNames.has(environment as EnvironmentName) ||
-    typeof apiBaseUrl !== 'string' ||
     !isRecord(features) ||
     Object.keys(features).length !== 1 ||
     typeof features['experimentalCatalog'] !== 'boolean'
@@ -46,11 +64,7 @@ function isRuntimeConfig(value: unknown): value is RuntimeConfig {
     return false;
   }
 
-  try {
-    return new URL(apiBaseUrl).protocol === 'https:';
-  } catch {
-    return false;
-  }
+  return isHttpsUrl(apiBaseUrl) && isHttpsUrl(cmsBaseUrl);
 }
 
 function parseRuntimeConfig(value: string | undefined): RuntimeConfig | null {

@@ -1,0 +1,6 @@
+# CMS_DOMAIN comes from compose.prod.yaml. A bare hostname makes Caddy obtain
+# and renew a Let's Encrypt certificate and redirect :80 to :443 on its own.
+{$CMS_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy strapi:1337
+}

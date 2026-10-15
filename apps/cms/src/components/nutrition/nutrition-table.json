@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_nutrition_nutrition_tables",
+  "info": {
+    "displayName": "Nutrition Table",
+    "icon": "chartBubble",
+    "description": "The nutritional guide as a real HTML table. Split into content and settings like every other block. The first data-bound block in this workspace: its `content` names what to show, and the rows themselves are resolved separately from `nutrition-item` — which is why it renders through a `feature` component rather than a bare `ui` one (PROVE-OUT P22)."
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "component",
+      "repeatable": false,
+      "component": "nutrition-content.nutrition-table",
+      "required": true
+    },
+    "settings": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block-settings",
+      "required": false
+    }
+  }
+}

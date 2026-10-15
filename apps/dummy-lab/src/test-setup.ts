@@ -13,6 +13,7 @@ import { beforeEach } from 'vitest';
 const testRuntimeConfig = {
   environment: 'local' as const,
   apiBaseUrl: 'https://dummyjson.com',
+  cmsBaseUrl: 'http://localhost:1337',
   features: { experimentalCatalog: true },
 };
 

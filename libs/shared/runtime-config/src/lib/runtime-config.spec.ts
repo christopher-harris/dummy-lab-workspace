@@ -1,20 +1,30 @@
+import { TestBed } from '@angular/core/testing';
+
 import {
   RuntimeConfigLoadError,
   RuntimeConfigLoader,
   parseRuntimeConfig,
 } from './runtime-config';
 
+// The loader reads RUNTIME_CONFIG_SEED with inject(), so it has to be
+// constructed inside an injection context. The default seed is null, which
+// leaves these tests on the browser fetch path.
+const createLoader = () =>
+  TestBed.runInInjectionContext(() => new RuntimeConfigLoader());
+
 describe('parseRuntimeConfig', () => {
   it('accepts and normalizes a public runtime configuration', () => {
     const config = parseRuntimeConfig({
       environment: 'stage',
       apiBaseUrl: 'https://dummyjson.com/',
+      cmsBaseUrl: 'https://cms.example.com/',
       features: { experimentalCatalog: true },
     });
 
     expect(config).toEqual({
       environment: 'stage',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     });
     expect(Object.isFrozen(config)).toBe(true);
@@ -26,17 +36,33 @@ describe('parseRuntimeConfig', () => {
     {
       environment: 'preview',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     },
     {
       environment: 'dev',
       apiBaseUrl: 'not-a-url',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: true },
     },
     {
       environment: 'prod',
       apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'https://cms.example.com',
       features: { experimentalCatalog: 'true' },
+    },
+    // A config that predates `cmsBaseUrl` must fail rather than silently
+    // yielding a store that requests `undefined/api/...`.
+    {
+      environment: 'prod',
+      apiBaseUrl: 'https://dummyjson.com',
+      features: { experimentalCatalog: true },
+    },
+    {
+      environment: 'prod',
+      apiBaseUrl: 'https://dummyjson.com',
+      cmsBaseUrl: 'ftp://cms.example.com',
+      features: { experimentalCatalog: true },
     },
   ])('rejects an invalid configuration', (config) => {
     expect(() => parseRuntimeConfig(config)).toThrow(RuntimeConfigLoadError);
@@ -61,12 +87,13 @@ describe('RuntimeConfigLoader', () => {
         JSON.stringify({
           environment: 'local',
           apiBaseUrl: 'https://dummyjson.com',
+          cmsBaseUrl: 'http://localhost:1337',
           features: { experimentalCatalog: true },
         }),
       ),
     );
 
-    const loader = new RuntimeConfigLoader();
+    const loader = createLoader();
     await expect(loader.load()).resolves.toMatchObject({
       environment: 'local',
     });
@@ -81,8 +108,6 @@ describe('RuntimeConfigLoader', () => {
   it('rejects a non-success response without providing a fallback', async () => {
     fetchSpy.mockResolvedValue(new Response(null, { status: 500 }));
 
-    await expect(new RuntimeConfigLoader().load()).rejects.toThrow(
-      RuntimeConfigLoadError,
-    );
+    await expect(createLoader().load()).rejects.toThrow(RuntimeConfigLoadError);
   });
 });

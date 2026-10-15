@@ -1,0 +1,25 @@
+{
+  "name": "feature-content-blocks",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/feature/content-blocks/src",
+  "prefix": "dl",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:content"],
+  "targets": {
+    "test": {
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/libs/feature/content-blocks"
+      ],
+      "options": {
+        "coverage.reportsDirectory": "../../../coverage/libs/feature/content-blocks"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "maxWarnings": 0
+      }
+    }
+  }
+}

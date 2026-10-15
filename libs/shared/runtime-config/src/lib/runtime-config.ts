@@ -20,6 +20,8 @@ export type RuntimeEnvironment = (typeof environments)[number];
 export interface RuntimeConfig {
   readonly environment: RuntimeEnvironment;
   readonly apiBaseUrl: string;
+  /** Origin of the headless CMS. Content only; never the same host as `apiBaseUrl`. */
+  readonly cmsBaseUrl: string;
   readonly features: Readonly<{
     experimentalCatalog: boolean;
   }>;
@@ -33,6 +35,36 @@ export class RuntimeConfigLoadError extends Error {
     super(message);
     this.name = 'RuntimeConfigLoadError';
   }
+}
+
+/**
+ * Validates one absolute base URL and strips a trailing slash, so every caller
+ * can build paths as `${base}/thing` without guessing whether to add one.
+ */
+function parseBaseUrl(value: unknown, label: string): string {
+  if (typeof value !== 'string') {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration has an invalid ${label} base URL.`,
+    );
+  }
+
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch (cause) {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration has an invalid ${label} base URL.`,
+      cause,
+    );
+  }
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    throw new RuntimeConfigLoadError(
+      `Runtime configuration ${label} base URL must use HTTP or HTTPS.`,
+    );
+  }
+
+  return url.toString().replace(/\/$/, '');
 }
 
 /** Validates and freezes the public configuration returned by the host. */
@@ -67,31 +99,10 @@ export function parseRuntimeConfig(value: unknown): RuntimeConfig {
     );
   }
 
-  if (typeof candidate['apiBaseUrl'] !== 'string') {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration has an invalid API base URL.',
-    );
-  }
-
-  let apiBaseUrl: URL;
-  try {
-    apiBaseUrl = new URL(candidate['apiBaseUrl']);
-  } catch (cause) {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration has an invalid API base URL.',
-      cause,
-    );
-  }
-
-  if (!['http:', 'https:'].includes(apiBaseUrl.protocol)) {
-    throw new RuntimeConfigLoadError(
-      'Runtime configuration API base URL must use HTTP or HTTPS.',
-    );
-  }
-
   return Object.freeze({
     environment: candidate['environment'] as RuntimeEnvironment,
-    apiBaseUrl: apiBaseUrl.toString().replace(/\/$/, ''),
+    apiBaseUrl: parseBaseUrl(candidate['apiBaseUrl'], 'API'),
+    cmsBaseUrl: parseBaseUrl(candidate['cmsBaseUrl'], 'CMS'),
     features: Object.freeze({
       experimentalCatalog: (features as Record<string, boolean>)[
         'experimentalCatalog'
@@ -100,8 +111,33 @@ export function parseRuntimeConfig(value: unknown): RuntimeConfig {
   });
 }
 
+/**
+ * A pre-resolved configuration, supplied by a host that has one already.
+ *
+ * Exists for the server: `fetchConfig` reaches for `document.baseURI`, and
+ * there is no document during prerendering or SSR, so the browser path is not
+ * merely slow there — it throws before bootstrap and takes every route with
+ * it. A build cannot fetch its own static asset either; nothing is serving it
+ * yet.
+ *
+ * Deliberately a seed for the *existing* loader rather than a second
+ * `RUNTIME_CONFIG` provider. `provideRuntimeConfig()` registers an app
+ * initializer, and initializers are multi-providers: a server config that
+ * merely re-provided `RUNTIME_CONFIG` would still run the browser initializer
+ * underneath it and still throw. Short-circuiting the loader is what actually
+ * removes the browser dependency.
+ *
+ * `null` by default, so the browser is unaffected and no caller has to know
+ * this token exists.
+ */
+export const RUNTIME_CONFIG_SEED = new InjectionToken<RuntimeConfig | null>(
+  'RUNTIME_CONFIG_SEED',
+  { providedIn: 'root', factory: () => null },
+);
+
 @Injectable()
 export class RuntimeConfigLoader {
+  private readonly seed = inject(RUNTIME_CONFIG_SEED);
   private configValue: RuntimeConfig | undefined;
   private loadPromise: Promise<RuntimeConfig> | undefined;
 
@@ -121,6 +157,13 @@ export class RuntimeConfigLoader {
   }
 
   private async fetchConfig(): Promise<RuntimeConfig> {
+    // Checked before anything touches `document`, which is the entire point:
+    // on the server this returns before the browser path is reachable.
+    if (this.seed) {
+      this.configValue = this.seed;
+      return this.seed;
+    }
+
     const configUrl = new URL('runtime-config.json', document.baseURI);
     let response: Response;
 
@@ -171,5 +214,26 @@ export function provideRuntimeConfig(): EnvironmentProviders {
       deps: [RuntimeConfigLoader],
     },
     provideAppInitializer(() => inject(RuntimeConfigLoader).load()),
+  ]);
+}
+
+/**
+ * Supplies configuration the host already holds, instead of fetching it.
+ *
+ * Merged over `provideRuntimeConfig()` by a server config — it seeds the same
+ * loader rather than replacing it, so `RUNTIME_CONFIG` resolves through one
+ * code path on both platforms and consumers stay unaware of which they are
+ * running on.
+ *
+ * Validates rather than trusting: a server reading this out of an environment
+ * variable has exactly the same reason to parse it as the browser does
+ * reading it off the network, and a malformed value should fail the build
+ * loudly rather than prerender a site pointed at `undefined`.
+ */
+export function provideServerRuntimeConfig(
+  config: unknown,
+): EnvironmentProviders {
+  return makeEnvironmentProviders([
+    { provide: RUNTIME_CONFIG_SEED, useValue: parseRuntimeConfig(config) },
   ]);
 }

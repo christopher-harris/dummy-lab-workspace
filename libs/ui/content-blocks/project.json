@@ -1,0 +1,25 @@
+{
+  "name": "content-blocks",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui/content-blocks/src",
+  "prefix": "dl",
+  "projectType": "library",
+  "tags": ["type:ui", "scope:content"],
+  "targets": {
+    "test": {
+      "outputs": [
+        "{projectRoot}/{options.coverage.reportsDirectory}",
+        "{workspaceRoot}/coverage/libs/ui/content-blocks"
+      ],
+      "options": {
+        "coverage.reportsDirectory": "../../../coverage/libs/ui/content-blocks"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "maxWarnings": 0
+      }
+    }
+  }
+}

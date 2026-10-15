@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_shared_seos",
+  "info": {
+    "displayName": "SEO",
+    "icon": "search",
+    "description": "Per-page crawler and unfurl metadata. Required on every page rather than optional, because an optional SEO component is an empty SEO component: the title and description are what a server-rendered page exists to emit, and a page that ships without them renders a blank social card forever. Deliberately has no raw-JSON structured-data field — arbitrary JSON-LD is the same hole through the taxonomy that raw HTML is (PROVE-OUT P22), and meaningful schema.org markup comes from typed content, not from a textarea."
+  },
+  "options": {},
+  "attributes": {
+    "metaTitle": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60,
+      "minLength": 1
+    },
+    "metaDescription": {
+      "type": "text",
+      "required": true,
+      "maxLength": 160,
+      "minLength": 1
+    },
+    "ogImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "canonicalPath": {
+      "type": "string",
+      "required": false,
+      "maxLength": 200,
+      "regex": "^/$|^(/[a-z0-9]+(-[a-z0-9]+)*)+$"
+    },
+    "noindex": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    }
+  }
+}

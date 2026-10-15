@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_block_settings",
+  "info": {
+    "displayName": "Block Settings",
+    "icon": "cog",
+    "description": "Presentation choices shared by every content block. The values are a closed vocabulary the frontend maps to design-system classes, never raw CSS: a width that is not in this enum is a frontend change rather than a content migration. One shared component instead of one per block, because an identical vocabulary everywhere is the thing that keeps the rule enforceable."
+  },
+  "options": {},
+  "attributes": {
+    "containerWidth": {
+      "type": "enumeration",
+      "required": true,
+      "default": "full",
+      "enum": ["full", "contained", "content-contained"]
+    }
+  }
+}

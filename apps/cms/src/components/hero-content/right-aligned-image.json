@@ -1,0 +1,42 @@
+{
+  "collectionName": "components_hero_content_right_aligned_images",
+  "info": {
+    "displayName": "Hero Content — Right Aligned Image",
+    "icon": "arrowRight",
+    "description": "Copy and artwork for the right-aligned-image hero. The only hero block with two CTAs; both labels are required so the pair never renders half-populated. Alt text lives on the media asset, not here."
+  },
+  "options": {},
+  "attributes": {
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "headlineAccent": {
+      "type": "string",
+      "required": false,
+      "maxLength": 40
+    },
+    "description": {
+      "type": "text",
+      "required": false,
+      "maxLength": 240
+    },
+    "primaryCtaLabel": {
+      "type": "string",
+      "required": false,
+      "maxLength": 24
+    },
+    "secondaryCtaLabel": {
+      "type": "string",
+      "required": false,
+      "maxLength": 24
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}

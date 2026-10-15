@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "landing_pages",
+  "info": {
+    "singularName": "landing-page",
+    "pluralName": "landing-pages",
+    "displayName": "Landing Page",
+    "description": "The marketing landing page. `heroSlides` is a dynamic zone: its order is the carousel order, and each entry names its own block type via the `__component` discriminator."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "heroSlides": {
+      "type": "dynamiczone",
+      "required": true,
+      "min": 1,
+      "max": 8,
+      "components": [
+        "hero.centered-product-image",
+        "hero.right-aligned-image",
+        "hero.light-image-background",
+        "hero.dark-image-background"
+      ]
+    },
+    "heroAutoplayInterval": {
+      "type": "integer",
+      "required": true,
+      "default": 6000,
+      "min": 0,
+      "max": 60000
+    }
+  }
+}

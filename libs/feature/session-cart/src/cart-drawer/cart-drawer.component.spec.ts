@@ -16,6 +16,7 @@ describe('CartDrawerComponent', () => {
           useValue: {
             environment: 'local',
             apiBaseUrl: 'https://dummyjson.com',
+            cmsBaseUrl: 'http://localhost:1337',
             features: { experimentalCatalog: false },
           },
         },

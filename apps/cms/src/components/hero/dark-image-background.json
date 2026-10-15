@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_hero_dark_image_backgrounds",
+  "info": {
+    "displayName": "Hero — Dark Image Background",
+    "icon": "envelop",
+    "description": "Email-capture hero: photo under a gradient stack, with an inline input and submit button. Split into content and settings; the settings constrain the copy column only, never the gradient stack."
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "component",
+      "repeatable": false,
+      "component": "hero-content.dark-image-background",
+      "required": true
+    },
+    "settings": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.block-settings",
+      "required": false
+    }
+  }
+}

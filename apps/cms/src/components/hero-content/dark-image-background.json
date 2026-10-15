@@ -1,0 +1,42 @@
+{
+  "collectionName": "components_hero_content_dark_image_backgrounds",
+  "info": {
+    "displayName": "Hero Content — Dark Image Background",
+    "icon": "envelop",
+    "description": "Copy and photo for the email-capture hero. The input placeholder is content because it is user-facing copy; where the address is submitted is not, and stays in the frontend."
+  },
+  "options": {},
+  "attributes": {
+    "headline": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "headlineAccent": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "description": {
+      "type": "text",
+      "required": true,
+      "maxLength": 240
+    },
+    "emailPlaceholder": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "ctaLabel": {
+      "type": "string",
+      "required": true,
+      "maxLength": 24
+    },
+    "backgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    }
+  }
+}

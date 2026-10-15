@@ -142,4 +142,24 @@ export const appRoutes: Route[] = [
       },
     ],
   },
+  // CMS-driven marketing pages, matched by their full URL path.
+  //
+  // Last, and outside the shell. Last because `**` swallows everything, so
+  // every hardcoded route above wins on a collision — a Strapi page published
+  // at `/products` is unreachable rather than shadowing the app, which is the
+  // right way round. Outside because the shell's navbar is application chrome
+  // (Products, Users, Carts) and a marketing page wants the landing page's
+  // treatment, which is why that route sits outside too.
+  //
+  // The cost to name: an unmatched URL now costs a round trip to Strapi before
+  // it can 404. Today that is every typo; once the path list is known at build
+  // time it is only the paths that were never published.
+  //
+  // No resolver: `**` carries no params, so the router's default
+  // `runGuardsAndResolvers: 'paramsChange'` would not re-run one when a CMS
+  // page navigates to another. The component subscribes to `url` instead.
+  {
+    path: '**',
+    loadComponent: () => import('./pages/cms/cms.page').then((m) => m.CmsPage),
+  },
 ];

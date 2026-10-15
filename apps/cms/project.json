@@ -1,0 +1,44 @@
+{
+  "name": "cms",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/cms/src",
+  "tags": ["type:app", "scope:cms"],
+  "targets": {
+    "db": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "apps/cms",
+        "command": "docker compose up -d --wait"
+      }
+    },
+    "db:stop": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "apps/cms",
+        "command": "docker compose stop"
+      }
+    },
+    "db:reset": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "apps/cms",
+        "commands": ["docker compose down -v", "docker compose up -d --wait"],
+        "parallel": false
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "cache": false,
+      "dependsOn": ["db"],
+      "options": {
+        "cwd": "apps/cms",
+        "command": "npm run develop"
+      }
+    }
+  }
+}

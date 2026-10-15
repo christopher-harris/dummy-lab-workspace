@@ -4,6 +4,7 @@
 | -------------- | ----------------------------------------------------------------------------------------- |
 | **Status**     | Proposed — **for discussion, not for approval**                                           |
 | **Date**       | 2026-09-28                                                                                |
+| **Revised**    | 2026-10-13 — library types defined, canonical dependency table, facades for cross-domain  |
 | **Deciders**   | Wingstop internal development leadership                                                  |
 | **Applies to** | `ngfe-web`                                                                                |
 | **Prototype**  | A working multi-project workspace of this shape — _link TBD_                              |
@@ -21,8 +22,9 @@
 ## Context
 
 `ngfe-web` is a single-project Angular CLI workspace. `angular.json` declares exactly one
-project, `factories` (the Angular project name for the web app), carrying **28 build
-configurations**, and that one project contains **1,457 TypeScript files** — 1,230 of them under
+project, `factories` (the Angular project name for the web app), carrying **more than twenty build
+configurations** — the exact count matters less than the fact that nobody can keep up with it (see
+[ADR-0003](./ADR-0003-runtime-environment-configuration.md)) — and that one project contains **1,457 TypeScript files** — 1,230 of them under
 `src/app/lib/ngfe-app`.
 
 The codebase has a real, deliberate architecture in mind. `src/app/lib/ngfe-app` is meant to be
@@ -93,6 +95,9 @@ them. Measured:
 | Lazy chunks emitted from product code | 0                           | 24                      |
 | Initial bundle, transfer              | 1.36 MB                     | 196 kB                  |
 
+_Multi-project figures measured September 2026. The prototype has since grown to 24 projects (2
+applications, 22 libraries); re-measure before citing the column._
+
 The outcomes that matter are not the better numbers; they are the different _kind_ of guarantee. A
 forbidden import fails a build instead of a review, and no single convenience import can
 re-collapse the lazy routes, because there is no whole-app barrel available to import.
@@ -109,18 +114,33 @@ architecture.**
    into a library's internals are blocked.
 3. **Applications are composition roots.** An app owns routing, layout, pages, and components used
    by exactly one page. Domain behaviour does not live in an app.
-4. **Shared UI lives in libraries, not in an app.** A presentational component reused across pages
-   belongs in a `ui-*` library with no domain dependencies. A reusable domain-bound unit — a smart
-   component a second surface needs — belongs in a `feature-*` library.
-5. **Domain data and state live in one `data-access` library per domain**, each owning that
-   domain's API surface, models and state. This is the only library tier being decided now; see
-   Open questions.
-6. **Dependency direction is declared, not assumed.** Every project carries `type:*` and `scope:*`
+4. **Shared UI lives in libraries, not in an app, split by whether it knows about a domain.** A
+   `ui` library is **presentational only**: inputs in, outputs out, no injected store, no
+   dispatched event, no `data-access` dependency of any kind. A `feature` library is
+   **domain-bound**: it may depend on `data-access` libraries and may carry its own UI. The test
+   is a single question — _does this component know where its data comes from?_ If yes, it is a
+   `feature`. See [Library types](#library-types).
+5. **Domain data and state live in one `data-access` library per domain.** A `data-access` library
+   is a reflection of **server state and API-call state** for one domain — it does not hold UI
+   state, and **it does not depend on another domain's `data-access` library.** The only
+   exception is a `scope:shared` library such as auth, which a domain needs to build its own
+   requests. Internals are decided in
+   [ADR-0004](./ADR-0004-data-access-signalstore-structure.md).
+6. **Anything that needs two or more domains composes them in a facade.** A facade is a
+   `signalStore` — or a service wrapping `signalState` — that injects the domain stores, derives
+   decisions from them, and is what the page or component reads. A facade used by one page lives
+   next to that page in the application; a facade a second surface needs lives in a `feature`
+   library. **A facade never lives in a `data-access` library**, because that is the edge that
+   turns the graph into a cycle.
+7. **Dependency direction is declared, not assumed.** Every project carries `type:*` and `scope:*`
    tags, and `@nx/enforce-module-boundaries` enforces the allowed edges at `error`.
-7. **CI runs `nx affected`.** A change to one domain lints, tests and builds that domain and its
+8. **Libraries are organised type-first, then domain** — `libs/<type>/<domain>`, e.g.
+   `libs/feature/auth`, `libs/data-access/auth`. The folder states the tier before the subject, so
+   a misplaced library is visible from its path.
+9. **CI runs `nx affected`.** A change to one domain lints, tests and builds that domain and its
    dependents, not the world.
-8. **Nx and Angular migrations are reviewed, not accepted.** Generated migration output is a
-   proposal, not a result. See Consequences.
+10. **Nx and Angular migrations are reviewed, not accepted.** Generated migration output is a
+    proposal, not a result. See Consequences.
 
 ### Target structure
 
@@ -148,31 +168,64 @@ libs/
     locations/
     menu/
     offers/
-  ui/                                # tags: type:ui, scope:shared — leaf, no domain deps
+  ui/                                # tags: type:ui — presentational only, no data-access
     components/                      # @wingstop/ui-components
     forms/
-  feature/                           # tags: type:feature — shared domain-bound UI, as needed
+    layout/                          # navbar, footer, shell chrome
+  feature/                           # tags: type:feature — domain-bound, may carry UI and facades
+    auth/                            # @wingstop/feature-auth
     location-picker/                 # @wingstop/feature-location-picker
-  shared/                            # tags: type:util, scope:shared — ambient concerns only
+  shared/                            # tags: type:util, scope:shared — cross-cutting only
+    cms/                             # CMS request context (preview contract)
     runtime-config/
+    theme/
     utils/
 ```
 
 **Where does a new feature go?** A screen goes in `apps/ngfe-web/src/app/pages/<domain>/`. The
-data and state it needs go in `libs/data-access/<domain>/`. If a component it needs is
-presentational and a second page will want it, it goes in `libs/ui/`. If it is domain-bound and a
-second page will want it, it goes in `libs/feature/`. If only one page will ever use it, it stays
-next to that page.
+data and state it needs go in `libs/data-access/<domain>/`. If it needs two domains, it reads a
+facade (Decision 6) that lives beside the page. If a component it needs is presentational and a
+second page will want it, it goes in `libs/ui/`. If it is domain-bound and a second page will want
+it, it goes in `libs/feature/`, along with any facade it brings. If only one page will ever use it,
+it stays next to that page.
 
-Allowed dependency edges:
+### Library types
+
+| Type          | Is                                                                      | Is not                                                    |
+| ------------- | ----------------------------------------------------------------------- | --------------------------------------------------------- |
+| `app`         | A composition root: routing, layout assembly, pages, page-local facades | A home for domain behaviour                               |
+| `feature`     | Domain-bound units — smart components, facades, guards — with their UI  | A dumping ground for anything that does not fit elsewhere |
+| `data-access` | One domain's server state and API-call state, behind a store            | UI state, a facade, or a client of a peer domain          |
+| `ui`          | Presentational components: inputs in, outputs out                       | Anything that injects a store or dispatches an event      |
+| `util`        | Pure functions, types, configuration, cross-cutting providers           | Stateful domain logic                                     |
+
+### Allowed dependency edges
+
+**This table is the canonical statement of the dependency rules.** Later ADRs refine what lives
+inside a tier; they do not restate the edges, and where one appears to, this table wins.
 
 ```
-app         → data-access, feature, ui, util
+app         → feature, data-access, ui, util
 feature     → data-access, ui, util
-data-access → data-access (see Open questions), util
-ui          → util
+data-access → util, and scope:shared data-access (e.g. auth) — never a peer domain
+ui          → ui, util
 util        → util
 ```
+
+Two properties follow and are the reason for the shape:
+
+- **Acyclic by construction.** Edges only point down the table, and the one tier that could
+  point sideways — `data-access` — is forbidden from doing so. Two domain stores injecting each
+  other fails at runtime (`NG0200`) and in lint; the rule makes that unwritable rather than
+  merely discouraged.
+- **`ui` stays reusable.** A component with no store dependency renders in a test, in a second
+  application, or against a different data source without bringing a domain's API — and, under
+  [ADR-0005](./ADR-0005-application-topology-and-render-modes.md), without bringing a
+  browser-only library into a server-rendered graph.
+
+`scope:shared` is deliberately narrow: libraries every domain genuinely needs to do its own job
+(session identity, runtime configuration). It currently also covers theme state, which means any
+domain _may_ read theme — accepted as harmless, and the tag needs an owner (Acceptance criteria).
 
 ## Alternatives considered
 
@@ -203,8 +256,9 @@ time, give the isolation without the release ceremony.
 Rejected. Nx applications are not composable — an app has no path entry and importing one is
 blocked by `enforce-module-boundaries` — so this resolves to micro-frontends: all of the cost,
 none of the benefit, absent independently deploying teams. (An app split that _would_ pay for this
-product is by delivery characteristic — marketing pages versus the ordering SPA — but that is a
-separate decision and is out of scope here.)
+product is by delivery characteristic — marketing pages versus the ordering SPA — and that is
+proposed separately in [ADR-0005](./ADR-0005-application-topology-and-render-modes.md). Two
+applications sharing libraries is not this alternative: neither imports the other.)
 
 **E. A `feature` library per domain, with all UI in libraries and the app reduced to a router**
 (the domain-driven layout popularised by Manfred Steyer's Angular architecture work).
@@ -232,7 +286,7 @@ domain teams become independently staffed. The cost of this choice is recorded b
 **Accepted costs**
 
 - **The destination is proven; the migration is not.** A greenfield prototype is generated, not
-  migrated, so it cannot demonstrate that all 28 build configurations survive `nx init`, that the
+  migrated, so it cannot demonstrate that the 20+ build configurations survive `nx init`, that the
   legacy persisted-state read path stays backward-compatible, that the legacy `redux` store can
   coexist during the transition, or that a utility-CSS layer can be introduced alongside
   globally-loaded Bootstrap 4. Each needs a spike on this repo. **This ADR records a destination.
@@ -269,18 +323,19 @@ the following hold:
 | `nx affected -t lint test build` in CI, with explicit base/head selection, plus a scheduled full-workspace run | `affected` is only as trustworthy as its base commit; the periodic full run catches projects that drop out of the graph                                                                                                                                                                                                                                                            |
 | Lint findings are errors with `maxWarnings: 0`, per project                                                    | Replaces one repo-wide glob with per-project targets                                                                                                                                                                                                                                                                                                                               |
 | An architecture fitness test asserting no whole-app barrel is statically reachable from the entry point        | **Carry the existing one forward.** `src/app/architecture/eager-bundle-boundary.spec.ts` and `eager-import-graph.ts` (from ticket WINGD-13582) are a static import-graph walker with a measured ceiling and an explanatory failure message. They exist precisely because a single-project workspace cannot state the invariant in config. Do not discard them during the migration |
-| A negative test proving a forbidden import fails a build                                                       | Otherwise the enforcement itself is unverified                                                                                                                                                                                                                                                                                                                                     |
+| A negative test proving a forbidden import fails a build                                                       | Otherwise the enforcement itself is unverified. At minimum one per rule that matters most: a peer `data-access` → `data-access` import, and a `ui` → `data-access` import                                                                                                                                                                                                          |
 
 ## Acceptance criteria
 
 This ADR stays at **Proposed** until all of the following exist:
 
 1. A migration plan covering extraction order, the first domain to extract, how the 28 build
-   configurations map onto the new projects, how temporary boundary violations are handled and
+   configurations map onto the new projects (or, per ADR-0003, collapse before it), how temporary boundary violations are handled and
    tracked, and a defined stopping point if early extraction reveals worse coupling than expected.
    _(In progress.)_
 2. An owner for the dependency taxonomy — who decides what `type:*` and `scope:*` values exist and
-   approves new ones.
+   approves new ones, and in particular who may grant `scope:shared`, since that tag is the only
+   way around the no-peer-domain rule.
 3. Resolution of the Open questions below, or an explicit decision to defer each.
 4. Sign-off from Wingstop internal development leadership.
 
@@ -288,13 +343,13 @@ This ADR stays at **Proposed** until all of the following exist:
 
 Deliberately unresolved; each is a follow-on decision:
 
-- **Domain-to-domain rules.** May a `data-access` library import another, or must cross-domain
-  composition happen in the app or a `feature` library? This determines whether the graph is
-  layered or flat, and it is the single most consequential remaining question.
+- ~~**Domain-to-domain rules.**~~ **Resolved 2026-10-13** — no peer `data-access` dependencies;
+  cross-domain composition happens in a facade in the app or a `feature` library (Decisions 5–6).
 - **The domain list.** The target structure above is illustrative. The real list comes out of the
   migration plan.
-- **Library granularity beyond `data-access`.** When a `ui-*` or `feature-*` library is warranted
-  versus keeping a component next to its page.
+- **Library granularity beyond `data-access`.** _Partly resolved_ — the `ui` / `feature` line is
+  now defined (Decision 4). Still open: at what reuse count a component leaves its page for a
+  library. "A second surface needs it" is the working rule.
 - **Intra-app enforcement.** Which tool polices import rules _inside_ the application project,
   given Nx cannot.
 - **Guarding against silent coverage loss.** Per-project targets make a missing target visible in
@@ -307,6 +362,7 @@ Reproducible against `ngfe-web` at `f37d8d7d1`:
 
 ```
 node -e "console.log(Object.keys(require('./angular.json').projects))"     # ["factories"]
+node -e "console.log(Object.keys(require('./angular.json').projects.factories.architect.build.configurations).length)"  # 20+
 find src -name '*.ts' | wc -l                                             # 1457
 find src/app/lib/ngfe-app -name '*.ts' | wc -l                            # 1230
 find src/app/lib -name 'ng-package.json' | wc -l                          # 0

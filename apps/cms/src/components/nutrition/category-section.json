@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_nutrition_category_sections",
+  "info": {
+    "displayName": "Nutrition Category Section",
+    "icon": "bulletList",
+    "description": "One section of the nutrition table: which `nutrition-item` category to render and what to call it. A component wrapping a single enum because Strapi has no repeatable-enumeration field, and the list has to be ordered — its order is the render order. `label` is here rather than derived from the enum so marketing can rename a section without a migration."
+  },
+  "options": {},
+  "attributes": {
+    "category": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "classic-wings",
+        "boneless-wings",
+        "chicken-tenders",
+        "chicken-sandwich",
+        "sides",
+        "beverages"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "required": true,
+      "maxLength": 60
+    }
+  }
+}
