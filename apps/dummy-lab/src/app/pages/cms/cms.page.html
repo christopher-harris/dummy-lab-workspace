@@ -26,8 +26,7 @@
   } @else if (blocks().length > 0) { @for (block of blocks(); track block.id) {
   <ng-container
     [ngComponentOutlet]="block.component"
-    [ngComponentOutletInputs]="block.inputs"
-  />
+    [ngComponentOutletInputs]="block.inputs" />
   } } @else if (pages.currentPage()) {
   <!--
       A published page with an empty dynamic zone. `blocks` is optional in

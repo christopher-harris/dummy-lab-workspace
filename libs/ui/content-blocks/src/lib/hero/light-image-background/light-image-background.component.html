@@ -2,8 +2,7 @@
   @defer {
     <div
       class="absolute top-0 left-0 w-full h-full"
-      [style]="backgroundStyle()"
-    ></div>
+      [style]="backgroundStyle()"></div>
   }
 
   <!-- The container width constrains this copy column only; the photo
@@ -16,8 +15,7 @@
       {{ content().headlineAccent }}
     </div>
     <p
-      class="mt-0 mb-6 leading-normal text-center mx-auto text-white max-w-2xl text-xl"
-    >
+      class="mt-0 mb-6 leading-normal text-center mx-auto text-white max-w-2xl text-xl">
       {{ content().description }}
     </p>
 
@@ -33,8 +31,7 @@
         <a [href]="link.href" class="text-white">
           <i
             class="{{ link.iconClass }} text-4xl!"
-            [attr.aria-hidden]="true"
-          ></i>
+            [attr.aria-hidden]="true"></i>
           <span class="sr-only">{{ link.label }}</span>
         </a>
       }

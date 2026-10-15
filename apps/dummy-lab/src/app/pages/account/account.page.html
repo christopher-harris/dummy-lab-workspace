@@ -4,8 +4,7 @@
       Account
     </p>
     <h1
-      class="m-0 text-3xl font-semibold tracking-tight text-surface-900 dark:text-surface-0"
-    >
+      class="m-0 text-3xl font-semibold tracking-tight text-surface-900 dark:text-surface-0">
       Your profile
     </h1>
     <p class="mb-0 mt-2 text-surface-600 dark:text-surface-400">
@@ -26,14 +25,12 @@
           [image]="user.image"
           shape="circle"
           size="xlarge"
-          class="shrink-0"
-        />
+          class="shrink-0" />
 
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-3">
             <h2
-              class="m-0 truncate text-2xl font-semibold text-surface-900 dark:text-surface-0"
-            >
+              class="m-0 truncate text-2xl font-semibold text-surface-900 dark:text-surface-0">
               {{ user.firstName }} {{ user.lastName }}
             </h2>
             <p-tag [value]="user.role" severity="secondary" [rounded]="true" />
@@ -42,12 +39,10 @@
             &#64;{{ user.username }}
           </p>
           <div
-            class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-surface-700 dark:text-surface-300"
-          >
+            class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-surface-700 dark:text-surface-300">
             <a
               [href]="'mailto:' + user.email"
-              class="flex items-center gap-2 text-inherit no-underline hover:text-primary-600"
-            >
+              class="flex items-center gap-2 text-inherit no-underline hover:text-primary-600">
               <i class="pi pi-envelope text-primary-500" aria-hidden="true"></i>
               {{ user.email }}
             </a>
@@ -62,8 +57,7 @@
 
     <p-card>
       <h2
-        class="m-0 text-base font-semibold text-surface-900 dark:text-surface-0"
-      >
+        class="m-0 text-base font-semibold text-surface-900 dark:text-surface-0">
         Resource status
       </h2>
       <div class="mt-4 space-y-3 text-sm">
@@ -74,8 +68,7 @@
           <p-tag
             [value]="usersStore.currentUserStatus()"
             severity="success"
-            [rounded]="true"
-          />
+            [rounded]="true" />
         </div>
         <div class="flex items-center justify-between gap-4">
           <span class="text-surface-600 dark:text-surface-400">User ID</span>
@@ -97,8 +90,7 @@
 
     <p-card>
       <h2
-        class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0"
-      >
+        class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0">
         Personal details
       </h2>
       <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -119,8 +111,7 @@
         <div>
           <dt class="text-sm text-surface-500 dark:text-surface-400">Gender</dt>
           <dd
-            class="m-0 mt-1 font-medium capitalize text-surface-900 dark:text-surface-0"
-          >
+            class="m-0 mt-1 font-medium capitalize text-surface-900 dark:text-surface-0">
             {{ user.gender }}
           </dd>
         </div>
@@ -137,16 +128,14 @@
 
     <p-card>
       <h2
-        class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0"
-      >
+        class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0">
         Work &amp; location
       </h2>
       <div class="mt-5 space-y-5 text-sm">
         <div class="flex gap-3">
           <i
             class="pi pi-briefcase mt-0.5 text-primary-500"
-            aria-hidden="true"
-          ></i>
+            aria-hidden="true"></i>
           <div>
             <p class="m-0 font-medium text-surface-900 dark:text-surface-0">
               {{ user.company.title }}
@@ -159,8 +148,7 @@
         <div class="flex gap-3">
           <i
             class="pi pi-map-marker mt-0.5 text-primary-500"
-            aria-hidden="true"
-          ></i>
+            aria-hidden="true"></i>
           <address class="not-italic text-surface-700 dark:text-surface-300">
             {{ user.address.address }}<br />
             {{ user.address.city }}, {{ user.address.stateCode }} {{
@@ -188,12 +176,10 @@
     <div class="flex items-start gap-3">
       <i
         class="pi pi-exclamation-circle mt-0.5 text-xl text-orange-500"
-        aria-hidden="true"
-      ></i>
+        aria-hidden="true"></i>
       <div>
         <h2
-          class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0"
-        >
+          class="m-0 text-lg font-semibold text-surface-900 dark:text-surface-0">
           Profile unavailable
         </h2>
         <p class="mb-0 mt-1 text-surface-600 dark:text-surface-400">

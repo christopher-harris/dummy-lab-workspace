@@ -16,8 +16,7 @@
         [outlined]="true"
         [href]="href"
         target="_blank"
-        rel="noopener"
-      >
+        rel="noopener">
         <i pButtonIcon class="pi pi-file-pdf"></i>
         <span>{{
           content().pdfLabel ?? 'Download the nutritional guide (PDF)'
@@ -44,8 +43,7 @@
       <p-message
         severity="warn"
         icon="pi pi-exclamation-triangle"
-        class="mt-10 block"
-      >
+        class="mt-10 block">
         This guide is incomplete right now. Please use the printable guide above
         for the full list.
       </p-message>
@@ -72,8 +70,7 @@
           [rowHover]="true"
           stripedRows
           size="small"
-          dataKey="id"
-        >
+          dataKey="id">
           <ng-template #caption>
             <span class="text-xl font-semibold">{{ section.label }}</span>
           </ng-template>

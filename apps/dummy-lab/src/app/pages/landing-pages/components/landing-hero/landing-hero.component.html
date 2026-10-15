@@ -7,13 +7,11 @@
     [autoplayInterval]="autoplayInterval()"
     [showNavigators]="true"
     [showIndicators]="true"
-    [pt]="carouselPt"
-  >
+    [pt]="carouselPt">
     <ng-template #item let-slide>
       <ng-container
         [ngComponentOutlet]="slide.component"
-        [ngComponentOutletInputs]="slide.inputs"
-      />
+        [ngComponentOutletInputs]="slide.inputs" />
     </ng-template>
   </p-carousel>
 </div>

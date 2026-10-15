@@ -1,15 +1,14 @@
 <div
-  class="p-12 lg:p-20 pb-0! text-center bg-linear-to-t from-primary/10 from-10% to-transparent flex flex-col items-center"
->
+  class="p-12 lg:p-20 pb-0! text-center bg-linear-to-t from-primary/10 from-10% to-transparent flex flex-col items-center">
   <!-- The container width constrains this column only; the gradient above is
        on the root and stays full-bleed. -->
   <div class="w-full grow flex flex-col items-center {{ containerClass() }}">
     <div
-      class="bg-primary-100 dark:bg-primary-400/20 text-primary-700 dark:text-primary-100 p-2 mx-auto mb-6 rounded-full border border-primary-200 dark:border-primary-500/30 px-4 backdrop-blur-sm"
-    >
+      class="bg-primary-100 dark:bg-primary-400/20 text-primary-700 dark:text-primary-100 p-2 mx-auto mb-6 rounded-full border border-primary-200 dark:border-primary-500/30 px-4 backdrop-blur-sm">
       {{ content().eyebrow }}
     </div>
-    <h2 class="text-4xl lg:text-5xl text-surface-900 dark:text-surface-0 font-bold mb-1 leading-tight">
+    <h2
+      class="text-4xl lg:text-5xl text-surface-900 dark:text-surface-0 font-bold mb-1 leading-tight">
       {{ content().headline }}
     </h2>
     <h2 class="text-4xl lg:text-5xl text-primary font-bold mb-6 leading-tight">
@@ -19,13 +18,11 @@
       <span pButtonLabel>{{ content().ctaLabel }}</span>
     </button>
     <div
-      class="w-full grow flex items-start justify-center rounded-t-3xl mt-12"
-    >
+      class="w-full grow flex items-start justify-center rounded-t-3xl mt-12">
       <!-- `max-w-[720px]` is art direction on this one image, not a page
            container — it stays put regardless of the container setting. -->
       <div
-        class="relative overflow-hidden w-full aspect-720/295 max-w-[720px] rounded-t-3xl shadow-2xl border border-b-0 border-primary-100 dark:border-primary-400/30"
-      >
+        class="relative overflow-hidden w-full aspect-720/295 max-w-[720px] rounded-t-3xl shadow-2xl border border-b-0 border-primary-100 dark:border-primary-400/30">
         <!-- `priority` is NgOptimizedImage's eager load + high fetch
              priority, and in the prerendered HTML it adds a <link
              rel="preload"> so the browser starts on this image before any
@@ -44,8 +41,7 @@
               fill
               priority
               sizes="(min-width: 816px) 720px, 100vw"
-              class="object-cover object-top rounded-t-3xl"
-            />
+              class="object-cover object-top rounded-t-3xl" />
           }
         }
       </div>

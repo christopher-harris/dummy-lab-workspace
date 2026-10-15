@@ -6,8 +6,7 @@
     [loading]="cartsStore.allCartsIsLoading()"
     dataKey="id"
     [expandedRowKeys]="expandedRows"
-    stripedRows
-  >
+    stripedRows>
     <ng-template #header>
       <tr>
         <th style="width: 5rem"></th>
@@ -28,8 +27,7 @@
             [text]="true"
             severity="secondary"
             [rounded]="true"
-            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-          />
+            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'" />
         </td>
         <td>{{ cart.id }}</td>
         <td>{{ cart.products.length }}</td>
@@ -49,8 +47,7 @@
               stripedRows
               selectionMode="single"
               [selection]="selectedCartId() === cart.id ? selectedProduct() : null"
-              (selectionChange)="onProductSelectionChange(cart.id, $event)"
-            >
+              (selectionChange)="onProductSelectionChange(cart.id, $event)">
               <ng-template #header>
                 <tr>
                   <th>ID</th>
@@ -69,8 +66,7 @@
                       [src]="product.thumbnail"
                       [alt]="product.title"
                       width="50"
-                      class="shadow-xs"
-                    />
+                      class="shadow-xs" />
                   </td>
                   <td class="text-start">{{ product.title }}</td>
                   <td>{{ product.price | currency}}</td>
@@ -94,8 +90,7 @@
   position="right"
   [modal]="true"
   [style]="{ width: '50vw' }"
-  blockScroll="true"
->
+  blockScroll="true">
   @if (productsStore.productPreviewValue(); as productPreview) {
   <div class="h-auto flex flex-col items-center justify-center">
     <div class="relative w-1/2 aspect-square">
@@ -103,8 +98,7 @@
         [ngSrc]="productPreview.thumbnail"
         fill
         class="object-contain"
-        [alt]="productPreview.title"
-      />
+        [alt]="productPreview.title" />
     </div>
   </div>
 
@@ -124,8 +118,7 @@
       @if (productPreview.discountPercentage) {
       <p-tag
         severity="danger"
-        [value]="'-' + productPreview.discountPercentage + '%'"
-      />
+        [value]="'-' + productPreview.discountPercentage + '%'" />
       }
       <span class="flex items-center gap-1 text-sm">
         <i class="pi pi-star-fill text-yellow-500"></i>{{ productPreview.rating
@@ -133,8 +126,7 @@
       </span>
       <p-tag
         [severity]="stockSeverity(productPreview.stock)"
-        [value]="productPreview.availabilityStatus ?? 'Unknown'"
-      />
+        [value]="productPreview.availabilityStatus ?? 'Unknown'" />
     </div>
 
     <p class="text-sm leading-relaxed m-0">{{ productPreview.description }}</p>
