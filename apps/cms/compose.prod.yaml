@@ -4,11 +4,16 @@
 # behind `nx run cms:db`; adding Strapi to it would start a second Strapi on
 # :1337 every time `nx serve cms` brings the database up.
 #
-#   docker compose -f compose.prod.yaml --env-file .env.production up -d --build
+# Deployed by .github/workflows/deploy-cms.yml, which builds the Strapi image
+# in CI, pushes it to ECR, and has the host pull it (deploy/remote-deploy.sh).
+# The host never builds. By hand, on the host:
+#
+#   docker compose -f compose.prod.yaml --env-file .env.production up -d
 #
 # `--env-file` is not optional. Without it Compose interpolates from `.env`,
 # the committed local-dev file, and the stack comes up on dev credentials.
-# `.env.production.example` lists what goes in it.
+# `.env.production.example` lists what goes in it; CMS_IMAGE is written there
+# by each deploy, so manual commands run the same image the pipeline shipped.
 #
 # Caddy terminates TLS and fetches the certificate itself. HTTPS is not a
 # nicety here: the Pages runtime-config adapter rejects any non-https
@@ -34,9 +39,24 @@ services:
       retries: 12
 
   strapi:
-    build: .
-    image: dummy-lab-cms
+    # An ECR URI tagged with the commit SHA. No `build:` — a 2 GB host can't
+    # build the admin panel without swapping for minutes.
+    image: ${CMS_IMAGE:?written to .env.production by deploy/remote-deploy.sh}
     restart: unless-stopped
+    # What `up --wait` blocks on, so a deploy fails loudly if Strapi doesn't
+    # come up instead of reporting success the moment the container starts.
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:1337/_health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 60s
     env_file: .env.production
     environment:
       DATABASE_CLIENT: postgres
