@@ -129,16 +129,21 @@
                 />
               </div>
 
-              <button pButton [disabled]="product.stock === 0" (click)="$event.stopPropagation(); onAddToCartClicked(product)" class="w-full">
+              <button
+                pButton
+                [disabled]="product.stock === 0"
+                (click)="$event.stopPropagation(); onAddToCartClicked(product)"
+                class="w-full"
+              >
                 Add to Cart
               </button>
-<!--              <p-button-->
-<!--                label="Add to Cart"-->
-<!--                icon="pi pi-shopping-cart"-->
-<!--                [disabled]="product.stock === 0"-->
-<!--                styleClass="w-full"-->
-<!--                (onClick)="$event.stopPropagation()"-->
-<!--              />-->
+              <!--              <p-button-->
+              <!--                label="Add to Cart"-->
+              <!--                icon="pi pi-shopping-cart"-->
+              <!--                [disabled]="product.stock === 0"-->
+              <!--                styleClass="w-full"-->
+              <!--                (onClick)="$event.stopPropagation()"-->
+              <!--              />-->
             </div>
           </div>
           }
