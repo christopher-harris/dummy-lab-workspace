@@ -36,6 +36,9 @@
     "node": ">=20.0.0 <=26.x.x",
     "npm": ">=6.0.0"
   },
+  "nx": {
+    "includedScripts": []
+  },
   "strapi": {
     "uuid": "f8cb14f6-0597-4e74-a30e-bd8294aa77b2",
     "installId": "d89502311a4d4573ad6f5a6197284c527848fff8dbc4616c42a5c15470f0ad14"
