@@ -18,7 +18,7 @@ import {
 import { appRoutes } from './app.routes';
 import { providePrimeNgPlatform } from '@dummy-lab/shared-theme';
 import { authInterceptor } from '@dummy-lab/data-access-auth';
-import { CMS_API_TOKEN, cmsInterceptor } from '@dummy-lab/data-access-content';
+import { cmsInterceptor } from '@dummy-lab/data-access-content';
 import { CMS_PREVIEW } from '@dummy-lab/shared-cms';
 import { provideRuntimeConfig } from '@dummy-lab/shared-runtime-config';
 
@@ -52,13 +52,12 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptors([authInterceptor, cmsInterceptor]),
     ),
-    // Strapi read-only API token. Compiled into the browser bundle and visible
-    // in devtools — never put an admin or full-access token here.
-    {
-      provide: CMS_API_TOKEN,
-      useValue:
-        '7374df3e82cc8146dbb5c3c728ed2e74d6ff838fa86a1c66007b498f6c330cfc6b1df23989e514fe9bb6076dce609e5c5a0e4c9d2754bf1756fe02083253e86c069a31684243d00bf0daa0b602ef03c49c26b4840d1e2060bc01d498a120ec0a715b2120786a768d7a78e82bf7942592ecd05af0853b12459fcbc4b8a90ba74d',
-    },
+    // No CMS_API_TOKEN: content is read through Strapi's Public role
+    // (find/findOne on landing-page, page, nutrition-item). A token bought
+    // nothing — it was compiled into the bundle, so it was public anyway —
+    // and Strapi only accepts tokens minted by the same instance, so a
+    // hardcoded one tied every build to a single CMS. The interceptor stays
+    // and is a no-op while the token is empty.
     providePrimeNgPlatform(),
     /**
      * Preview renders unpublished copy at a real, reachable URL

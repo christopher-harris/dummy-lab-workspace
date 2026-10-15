@@ -40,6 +40,18 @@ jobs:
 
       # Prepend any command with "nx record --" to record its logs to Nx Cloud
       # - run: npx nx record -- echo Hello World
+      # dummy-lab prerenders from the CMS, and its build refuses to run
+      # without RUNTIME_CONFIG_JSON. CI borrows the dev site's public config
+      # instead of reading the Pages API like deploy-cloudflare.yml does: the
+      # Cloudflare credentials are scoped to the `dev` environment, and PRs
+      # must not need them. The cost is that a PR changing the config's shape
+      # fails here until the new function is deployed.
+      - name: Read runtime config from the dev site
+        shell: bash
+        run: |
+          set -euo pipefail
+          config=$(curl -fsS https://dummy-lab-dev.pages.dev/runtime-config.json | jq -ce .)
+          echo "RUNTIME_CONFIG_JSON=$config" >> "$GITHUB_ENV"
       - run: npx nx affected -t lint test build
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
       - run: npx nx fix-ci

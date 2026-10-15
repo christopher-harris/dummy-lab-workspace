@@ -1,0 +1,23 @@
+# Rebuilt inside the image.
+node_modules
+dist
+.strapi
+.tmp
+
+# Secrets come from the runtime env file, never the image.
+.env
+.env.*
+!.env.example
+
+# Media lives on a volume (all of public/, see compose.prod.yaml). Content (rows and files together) moves with
+# `strapi transfer`, which keeps the hashed filenames the rows point at.
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Deployment plumbing, not app source.
+Dockerfile
+.dockerignore
+compose*.yaml
+Caddyfile
+.strapi-updater.json
+*.log

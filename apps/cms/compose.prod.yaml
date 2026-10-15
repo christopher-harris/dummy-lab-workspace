@@ -1,0 +1,85 @@
+# The "production" CMS: Strapi, Postgres and Caddy on one host.
+#
+# Separate from compose.yaml on purpose. That file is the local dev database
+# behind `nx run cms:db`; adding Strapi to it would start a second Strapi on
+# :1337 every time `nx serve cms` brings the database up.
+#
+#   docker compose -f compose.prod.yaml --env-file .env.production up -d --build
+#
+# `--env-file` is not optional. Without it Compose interpolates from `.env`,
+# the committed local-dev file, and the stack comes up on dev credentials.
+# `.env.production.example` lists what goes in it.
+#
+# Caddy terminates TLS and fetches the certificate itself. HTTPS is not a
+# nicety here: the Pages runtime-config adapter rejects any non-https
+# `cmsBaseUrl`, and the browser loads media straight from this host.
+
+name: dummy-lab-cms
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME:?set in .env.production}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?set in .env.production}
+      POSTGRES_DB: ${DATABASE_NAME:?set in .env.production}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  strapi:
+    build: .
+    image: dummy-lab-cms
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      PUBLIC_URL: https://${CMS_DOMAIN:?set in .env.production}
+      # Caddy sits in front, so trust X-Forwarded-Proto. Without it Strapi
+      # sees plain HTTP and refuses to set the admin's secure session cookies.
+      IS_PROXIED: 'true'
+    volumes:
+      # The volume holds all of public/, not just public/uploads.
+      # `strapi transfer` backs up existing media by renaming
+      # public/uploads to a sibling folder, and a mount point can't be
+      # renamed. With uploads mounted directly, every push fails with "The
+      # backup folder for the assets could not be created".
+      - public:/opt/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      CMS_DOMAIN: ${CMS_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates. Losing this volume means re-issuing, and Let's Encrypt
+      # rate-limits repeat issuance for the same hostname.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - strapi
+
+volumes:
+  db-data:
+  public:
+  caddy-data:
+  caddy-config:

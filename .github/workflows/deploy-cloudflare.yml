@@ -22,8 +22,48 @@ env:
   NODE_VERSION: 22.23.0
 
 jobs:
+  # Prerendering fetches CMS content at build time, so the build needs the
+  # same RUNTIME_CONFIG_JSON the Pages project serves the browser. It is read
+  # from Cloudflare rather than duplicated in GitHub, so the Pages variable
+  # stays the one place it is set.
+  #
+  # Its own job because the Cloudflare credentials are scoped to the `dev`
+  # environment, and the build job is deliberately environment-free. Read
+  # through the API, not from /runtime-config.json on the live site: that
+  # endpoint is served by the *currently deployed* function, which can reject
+  # a config shape the commit being built is the one to introduce.
+  runtime-config:
+    name: Read runtime config from Cloudflare Pages
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      json: ${{ steps.read.outputs.json }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_PAGES_PROJECT: dummy-lab-dev
+    steps:
+      - id: read
+        name: Read RUNTIME_CONFIG_JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A Secret-type Pages variable comes back without a value, and
+          # `fromjson` on null fails — so this also catches a variable that
+          # was saved as a secret instead of plain text.
+          config=$(
+            curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$CLOUDFLARE_PAGES_PROJECT" |
+              jq -ce '.result.deployment_configs.production.env_vars.RUNTIME_CONFIG_JSON.value | fromjson'
+          ) || {
+            echo "::error::Could not read RUNTIME_CONFIG_JSON from Pages project $CLOUDFLARE_PAGES_PROJECT. It must be a plain-text (not secret) production variable holding valid JSON."
+            exit 1
+          }
+          echo "json=$config" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build release artifact once
+    needs: runtime-config
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.revision.outputs.commit_sha }}
@@ -44,8 +84,18 @@ jobs:
         name: Record resolved revision
         run: echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+      # The build refuses to start without RUNTIME_CONFIG_JSON (see
+      # app.config.server.ts). The prerendered HTML carries content from
+      # whichever CMS it names — dev's — so the artifact is only
+      # environment-neutral while every environment shares one CMS.
+      #
+      # --skip-nx-cache: neither this variable nor CMS content is an Nx input,
+      # so a cache hit (local or Nx Cloud) would ship HTML prerendered against
+      # another CMS, or against content as it was when that build ran.
       - name: Build dummy-lab
-        run: npm exec nx -- build dummy-lab --configuration=production --base-href=/
+        env:
+          RUNTIME_CONFIG_JSON: ${{ needs.runtime-config.outputs.json }}
+        run: npm exec nx -- build dummy-lab --configuration=production --base-href=/ --skip-nx-cache
 
       # The artifact contains the static Angular output and Pages Function
       # source. Wrangler discovers the sibling functions directory during
