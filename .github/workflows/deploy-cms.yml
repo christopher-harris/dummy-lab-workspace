@@ -106,8 +106,17 @@ jobs:
           IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           BUCKET: ${{ steps.release.outputs.bucket }}
           PREFIX: ${{ steps.release.outputs.prefix }}
+          # The site the admin's Preview pane opens. Point it at whichever
+          # Pages project reads from this CMS; changing it is a variable edit
+          # plus a re-run, not a trip onto the host.
+          PREVIEW_URL: ${{ vars.CMS_PREVIEW_URL }}
         run: |
           set -euo pipefail
+
+          if [ -z "$PREVIEW_URL" ]; then
+            echo "::error::Repo variable CMS_PREVIEW_URL is not set"
+            exit 1
+          fi
 
           # Found by tag rather than pinned by ID, so replacing the instance
           # doesn't mean editing this workflow.
@@ -126,7 +135,7 @@ jobs:
           for f in compose.prod.yaml Caddyfile remote-deploy.sh; do
             /snap/bin/aws s3 cp "s3://$BUCKET/$PREFIX/\$f" "\$dir/\$f" --region $AWS_REGION --only-show-errors
           done
-          bash "\$dir/remote-deploy.sh" "$IMAGE" "\$dir"
+          bash "\$dir/remote-deploy.sh" "$IMAGE" "\$dir" "$PREVIEW_URL"
           EOF
           )
           params=$(jq -n --arg script "$script" '{commands: [$script], executionTimeout: ["900"]}')
