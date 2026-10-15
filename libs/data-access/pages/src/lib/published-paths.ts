@@ -62,7 +62,7 @@ async function fetchPage(
     throw new PublishedPathsError(
       `The CMS returned ${response.status} for the page manifest. ` +
         (response.status === 401 || response.status === 403
-          ? 'Check that the CMS API token is set and has read access to Page.'
+          ? "Check that the CMS's Public role has find on Page (Settings → Users & Permissions → Roles → Public)."
           : `Request: ${url}`),
     );
   }

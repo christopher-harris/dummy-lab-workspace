@@ -33,8 +33,8 @@
         above stays reachable regardless.
       -->
       <p-message severity="error" icon="pi pi-times-circle" class="mt-10 block">
-        Nutrition information could not be loaded right now. The printable
-        guide above has the same values.
+        Nutrition information could not be loaded right now. The printable guide
+        above has the same values.
       </p-message>
     } @else if (isTruncated()) {
       <!--
@@ -46,8 +46,8 @@
         icon="pi pi-exclamation-triangle"
         class="mt-10 block"
       >
-        This guide is incomplete right now. Please use the printable guide
-        above for the full list.
+        This guide is incomplete right now. Please use the printable guide above
+        for the full list.
       </p-message>
     } @else {
       @for (section of sections(); track section.category) {

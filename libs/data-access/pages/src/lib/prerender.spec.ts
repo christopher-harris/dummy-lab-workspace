@@ -22,7 +22,9 @@ describe('pagePathsUrl', () => {
     expect(query(pagePathsUrl(CMS))).toContain('pagination[page]=1');
     expect(query(pagePathsUrl(CMS))).toContain('pagination[pageSize]=100');
     expect(query(pagePathsUrl(CMS, 3, 25))).toContain('pagination[page]=3');
-    expect(query(pagePathsUrl(CMS, 3, 25))).toContain('pagination[pageSize]=25');
+    expect(query(pagePathsUrl(CMS, 3, 25))).toContain(
+      'pagination[pageSize]=25',
+    );
   });
 
   it('orders deterministically, so two builds produce the same manifest', () => {

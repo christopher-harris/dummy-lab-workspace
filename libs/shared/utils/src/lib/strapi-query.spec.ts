@@ -75,7 +75,9 @@ describe('strapiQuery', () => {
         status: 'draft',
         populate: { seo: { populate: ['ogImage'] } },
       }),
-    ).toBe('filters[path][$eq]=%2F&status=draft&populate[seo][populate][0]=ogImage');
+    ).toBe(
+      'filters[path][$eq]=%2F&status=draft&populate[seo][populate][0]=ogImage',
+    );
   });
 
   it('drops an undefined value rather than emitting an empty one', () => {

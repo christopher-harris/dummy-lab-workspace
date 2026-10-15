@@ -21,7 +21,10 @@ export default [
           enforceBuildableLibDependency: true,
           allow: [
             '^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$',
-            '^\\.\\./\\.\\./\\.\\./\\.\\./theme/ts$',
+            // The Figma export (theme/ts) isn't an Nx project, so its one
+            // consumer reaches it by relative path. Depth is from
+            // libs/shared/theme/src/lib; it must move if that lib does.
+            '^(\\.\\./){5}theme/ts$',
           ],
           // The edge table in docs/ADR/ADR-0001 ("Allowed dependency edges").
           // Change that table first, then this — not the other way round.

@@ -15,17 +15,20 @@ import {
   type StrapiSchemaSource,
 } from '../../../utils/deep-populate';
 
-export default factories.createCoreController('api::page.page', ({ strapi }) => {
-  const source = strapi as unknown as StrapiSchemaSource;
+export default factories.createCoreController(
+  'api::page.page',
+  ({ strapi }) => {
+    const source = strapi as unknown as StrapiSchemaSource;
 
-  return {
-    async find(ctx) {
-      applyDeepZonePopulate(source, ctx, 'api::page.page', 'blocks');
-      return super.find(ctx);
-    },
-    async findOne(ctx) {
-      applyDeepZonePopulate(source, ctx, 'api::page.page', 'blocks');
-      return super.findOne(ctx);
-    },
-  };
-});
+    return {
+      async find(ctx) {
+        applyDeepZonePopulate(source, ctx, 'api::page.page', 'blocks');
+        return super.find(ctx);
+      },
+      async findOne(ctx) {
+        applyDeepZonePopulate(source, ctx, 'api::page.page', 'blocks');
+        return super.findOne(ctx);
+      },
+    };
+  },
+);

@@ -1,8 +1,16 @@
+import { TestBed } from '@angular/core/testing';
+
 import {
   RuntimeConfigLoadError,
   RuntimeConfigLoader,
   parseRuntimeConfig,
 } from './runtime-config';
+
+// The loader reads RUNTIME_CONFIG_SEED with inject(), so it has to be
+// constructed inside an injection context. The default seed is null, which
+// leaves these tests on the browser fetch path.
+const createLoader = () =>
+  TestBed.runInInjectionContext(() => new RuntimeConfigLoader());
 
 describe('parseRuntimeConfig', () => {
   it('accepts and normalizes a public runtime configuration', () => {
@@ -85,7 +93,7 @@ describe('RuntimeConfigLoader', () => {
       ),
     );
 
-    const loader = new RuntimeConfigLoader();
+    const loader = createLoader();
     await expect(loader.load()).resolves.toMatchObject({
       environment: 'local',
     });
@@ -100,8 +108,6 @@ describe('RuntimeConfigLoader', () => {
   it('rejects a non-success response without providing a fallback', async () => {
     fetchSpy.mockResolvedValue(new Response(null, { status: 500 }));
 
-    await expect(new RuntimeConfigLoader().load()).rejects.toThrow(
-      RuntimeConfigLoadError,
-    );
+    await expect(createLoader().load()).rejects.toThrow(RuntimeConfigLoadError);
   });
 });

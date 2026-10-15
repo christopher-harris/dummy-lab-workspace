@@ -43,7 +43,9 @@ describe('nutritionItemsUrl', () => {
   });
 
   it('sorts by the render order the editor controls', () => {
-    expect(query(nutritionItemsUrl(CMS, ALL))).toContain('sort[0]=sortOrder:asc');
+    expect(query(nutritionItemsUrl(CMS, ALL))).toContain(
+      'sort[0]=sortOrder:asc',
+    );
   });
 
   it('asks for the server maximum rather than accepting the default page', () => {

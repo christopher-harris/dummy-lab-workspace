@@ -87,7 +87,9 @@ function pairs(value: StrapiQueryValue, path: readonly string[]): string[] {
   }
 
   if (Array.isArray(value)) {
-    return value.flatMap((item, index) => pairs(item, [...path, String(index)]));
+    return value.flatMap((item, index) =>
+      pairs(item, [...path, String(index)]),
+    );
   }
 
   if (typeof value === 'object') {
