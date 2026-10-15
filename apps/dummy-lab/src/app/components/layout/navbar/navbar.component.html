@@ -38,15 +38,20 @@
   </ng-template>
   <ng-template #end>
     <div class="flex items-center gap-2">
-      <button pButton
-              iconOnly
-              text
-              class="p-2 text-surface-600 dark:text-surface-400"
-              (click)="themeStore.toggleDarkMode()"
-              [attr.aria-label]="
-              themeStore.isDark() ? 'Switch to light mode' : 'Switch to dark mode'">
-        <i class="text-base! leading-none!"
-           [class]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+      <button
+        pButton
+        iconOnly
+        text
+        class="p-2 text-surface-600 dark:text-surface-400"
+        (click)="themeStore.toggleDarkMode()"
+        [attr.aria-label]="
+          themeStore.isDark() ? 'Switch to light mode' : 'Switch to dark mode'
+        "
+      >
+        <i
+          class="text-base! leading-none!"
+          [class]="themeStore.isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+        ></i>
       </button>
       <button
         pButton
@@ -64,9 +69,13 @@
         styleClass="w-56 max-h-80 overflow-y-auto"
       >
         <ng-template #item let-item>
-          <a class="p-menu-item-link flex items-center gap-2 px-3 py-2 cursor-pointer">
-            <span class="w-4 h-4 rounded-full border border-surface shrink-0"
-                  [style.background-color]="'var(--p-' + item.color + '-500)'"></span>
+          <a
+            class="p-menu-item-link flex items-center gap-2 px-3 py-2 cursor-pointer"
+          >
+            <span
+              class="w-4 h-4 rounded-full border border-surface shrink-0"
+              [style.background-color]="'var(--p-' + item.color + '-500)'"
+            ></span>
             <span class="text-sm capitalize">{{ item.label }}</span>
             @if (item.selected) {
               <i class="pi pi-check ms-auto text-xs"></i>
@@ -74,13 +83,15 @@
           </a>
         </ng-template>
       </p-menu>
-      <button pButton
-              [iconOnly]="!authStore.isLoggedIn()"
-              text
-              class="p-2 text-surface-600 dark:text-surface-400"
-              aria-label="Theme settings"
-              aria-haspopup="true"
-              (click)="colorMenu.toggle($event)">
+      <button
+        pButton
+        [iconOnly]="!authStore.isLoggedIn()"
+        text
+        class="p-2 text-surface-600 dark:text-surface-400"
+        aria-label="Theme settings"
+        aria-haspopup="true"
+        (click)="colorMenu.toggle($event)"
+      >
         <i class="pi pi-cog text-base! leading-none!"></i>
       </button>
     </div>
@@ -94,20 +105,24 @@
       >
         <svg data-p-icon="shopping-cart"></svg>
       </button>
-<!--      <div-->
-<!--        class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">-->
-<!--        Available-->
-<!--      </div>-->
+      <!--      <div-->
+      <!--        class="px-2 py-1 rounded-md text-sm font-medium bg-green-50 dark:bg-green-400/10 text-green-600 dark:text-green-300">-->
+      <!--        Available-->
+      <!--      </div>-->
       <p-menu #accountMenu [model]="accountMenuItems()" [popup]="true" />
-      <button pButton
-              text
-              (click)="accountMenu.toggle($event)"
-              [attr.aria-label]="authStore.isLoggedIn() ? 'Account menu' : 'Sign in'"
-              aria-haspopup="true">
+      <button
+        pButton
+        text
+        (click)="accountMenu.toggle($event)"
+        [attr.aria-label]="authStore.isLoggedIn() ? 'Account menu' : 'Sign in'"
+        aria-haspopup="true"
+      >
         @if (authStore.isLoggedIn()) {
-          <p-avatar shape="circle"
-                    [image]="usersStore.currentUserValue()?.image || ''"
-                    class="w-8 h-8 block cursor-pointer" />
+          <p-avatar
+            shape="circle"
+            [image]="usersStore.currentUserValue()?.image || ''"
+            class="w-8 h-8 block cursor-pointer"
+          />
         } @else {
           <svg data-p-icon="user"></svg>
         }

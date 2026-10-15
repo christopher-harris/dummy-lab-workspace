@@ -21,7 +21,6 @@ import {
   SessionCartStore,
 } from '@dummy-lab/data-access-session-cart';
 
-
 @Component({
   selector: 'dl-navbar',
   imports: [
@@ -37,7 +36,8 @@ import {
     FormsModule,
     RouterLink,
     MenuModule,
-    User, ShoppingCart
+    User,
+    ShoppingCart,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
