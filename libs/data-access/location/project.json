@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/location/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:location"],
+  "tags": ["type:data-access", "scope:location", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

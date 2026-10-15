@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/nutrition/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:content"],
+  "tags": ["type:data-access", "scope:content", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

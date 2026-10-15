@@ -4,7 +4,7 @@
   "sourceRoot": "libs/feature/session-cart/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:feature", "scope:carts"],
+  "tags": ["type:feature", "scope:carts", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

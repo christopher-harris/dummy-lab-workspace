@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/theme/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:shared"],
+  "tags": ["type:data-access", "scope:shared", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

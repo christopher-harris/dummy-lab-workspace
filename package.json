@@ -12,6 +12,7 @@
     "lint": "nx run-many -t lint",
     "check": "nx run-many -t lint build test",
     "check:affected": "nx affected -t lint build test",
+    "check:boundaries": "node tools/boundary-check/check.mjs",
     "serve:cms": "nx serve cms",
     "serve:all": "nx run-many -t serve -p dummy-lab cms",
     "perf": "npm run perf:desktop && npm run perf:mobile",

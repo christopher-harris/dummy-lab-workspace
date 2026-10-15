@@ -1,0 +1,8 @@
+{
+  "name": "fixture-browser-only",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/boundary-check/fixtures/browser-only/src",
+  "projectType": "library",
+  "tags": ["type:util", "scope:fixture", "platform:browser-only"],
+  "targets": {}
+}

@@ -62,6 +62,16 @@ export default [
               sourceTag: 'type:util',
               onlyDependOnLibsWithTags: ['type:util'],
             },
+            // ADR-0005 Decision 12. Route extraction imports every route, so
+            // one module-level `localStorage` read anywhere in a prerendered
+            // app's graph fails the whole server build. `universal` means
+            // safe to *import* on the server, not that it does anything there.
+            // The rule covers direct imports only; it holds transitively
+            // because every universal lib is held to it too.
+            {
+              sourceTag: 'platform:universal',
+              onlyDependOnLibsWithTags: ['platform:universal'],
+            },
           ],
         },
       ],

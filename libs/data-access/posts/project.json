@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/posts/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:posts"],
+  "tags": ["type:data-access", "scope:posts", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [
