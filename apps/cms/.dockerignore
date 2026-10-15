@@ -19,5 +19,6 @@ Dockerfile
 .dockerignore
 compose*.yaml
 Caddyfile
+deploy
 .strapi-updater.json
 *.log
