@@ -38,6 +38,11 @@ jobs:
       # compares against the base SHA set by nx-set-shas above.
       - run: npx nx format:check
 
+      # Not `affected` and not cached: it proves the boundary rules still
+      # reject forbidden imports, and a cache hit would be the false green it
+      # exists to catch. See tools/boundary-check/check.mjs.
+      - run: npm run check:boundaries
+
       # Prepend any command with "nx record --" to record its logs to Nx Cloud
       # - run: npx nx record -- echo Hello World
       # dummy-lab prerenders from the CMS, and its build refuses to run

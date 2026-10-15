@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/carts/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:carts"],
+  "tags": ["type:data-access", "scope:carts", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

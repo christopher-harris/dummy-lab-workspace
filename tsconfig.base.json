@@ -59,7 +59,10 @@
         "./libs/data-access/nutrition/src/index.ts"
       ],
       "@dummy-lab/data-access-pages": ["./libs/data-access/pages/src/index.ts"],
-      "@dummy-lab/shared-theme": ["./libs/shared/theme/src/index.ts"]
+      "@dummy-lab/shared-theme": ["./libs/shared/theme/src/index.ts"],
+      "@dummy-lab/fixture-browser-only": [
+        "./tools/boundary-check/fixtures/browser-only/src/index.ts"
+      ]
     },
     "strict": false,
     "noUncheckedSideEffectImports": false,

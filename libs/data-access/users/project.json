@@ -4,7 +4,7 @@
   "sourceRoot": "libs/data-access/users/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["type:data-access", "scope:users"],
+  "tags": ["type:data-access", "scope:users", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [

@@ -1,6 +1,6 @@
 # 🤖 Prove-Out Backlog — what's left before "this is the example"
 
-**Drafted:** 22 Sept 2026 · **Updated:** 12 Oct 2026 · **Audience:** Chris · **Status:** decision
+**Drafted:** 22 Sept 2026 · **Updated:** 15 Oct 2026 · **Audience:** Chris · **Status:** decision
 instrument, not a plan
 
 Measured directly against this tree and against four sources in `ngfe-web`:
@@ -67,7 +67,7 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 | Vitest + coverage thresholds                              | 🟡 Partial | thresholds pass over placeholder specs                                                                                                                                                                                                                                                                                                                                                                                                       |
 | PrimeNG theming (generated Figma preset)                  | ✅ Proven  | 86-component preset in `theme/ts`, wired via `providePrimeNgPlatform()` — `libs/shared/theme/src/lib/primeng.providers.ts`; `updatePrimaryPalette`, `light-dark()`, `extend` and `cssLayer` order all match the PrimeNG 22.1.1 docs                                                                                                                                                                                                          |
 | Figma → token pipeline                                    | 🟡 Partial | export is committed, not built: no in-repo regeneration step and no CI check that `theme/` matches Figma; `primary` still maps to Aura blue (`theme/ts/base.ts:309`); Tailwind `@theme` carries no colour tokens                                                                                                                                                                                                                             |
-| **Tags / module boundaries**                              | 🟡 Partial | all 13 projects tagged on `type:*`/`scope:*`; `depConstraints` only enforces `type:*` so far — no `scope:*` rules yet, and no negative test committed                                                                                                                                                                                                                                                                                        |
+| **Tags / module boundaries**                              | ✅ Proven  | 27 projects on `type:*`/`scope:*`, linted ones on `platform:*`; `depConstraints` carries the ADR-0001 edge table plus ADR-0005's platform rule; `npm run check:boundaries` proves 11 forbidden edges fail and 8 allowed ones pass, on every CI run — P1. First CI run pending                                                                                                                                                                |
 | Deploy topology (marketing / ordering / account)          | ❌ Absent  | one app                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | SSR / SSG                                                 | 🟡 Partial | **9 Oct 2026** — `@angular/ssr` 22.1.9, `outputMode: 'static'`, server entry, per-route `RenderMode` table. `/` and `/nutrition` prerender with Strapi-sourced `<title>`/`og:*` in the served HTML; CMS routes come from `getPrerenderParams()`, none hardcoded. Production configuration only — dev serve is unchanged CSR. No sitemap, no canonical, no redirects, no second app — see P11, P25, ADR-0005                                  |
 | CI                                                        | ✅ Proven  | `.github/workflows/ci.yml`                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -92,13 +92,35 @@ Scored against `notebook/ideal-architecture.md`, section by section.
 These four are what stand between the current state and being able to say "this is the example"
 at all. Everything in Tier 2+ is enrichment.
 
-### ☐ P1 — Tags and a boundary rule that actually fails a build
+### ✅ P1 — Tags and a boundary rule that actually fails a build
 
-**In progress:** all 13 projects now carry `type:*`/`scope:*` tags. `eslint.config.mjs`
-`depConstraints` enforces `type:data-access → type:data-access|type:util`, but `type:ui` still has
-a no-op rule (`onlyDependOnLibsWithTags: ['*']`) and there are no `scope:*` constraints yet, so
-cross-domain imports (`carts` → `products`) are still unenforced. Still no negative test — nothing
-proves a violating import goes red.
+**Done, 15 Oct 2026 — pending its first CI run.**
+
+- **Tags.** All 27 projects carry one `type:*` and one `scope:*`. Every project with a lint target
+  also carries one `platform:*` — all `platform:universal` today (`cms` is Strapi and unlinted).
+- **Rules.** `eslint.config.mjs` `depConstraints` is the ADR-0001 edge table verbatim, plus
+  `platform:universal → platform:universal` (ADR-0005 Decision 12). Peer-domain imports such as
+  `carts → products` are rejected by the `type:data-access` rule.
+- **Negative test.** `tools/boundary-check/check.mjs` (`npm run check:boundaries`, every CI run,
+  never cached) lints synthetic imports from inside real projects through each project's own
+  config. 11 forbidden edges must fail, **citing the constraint that should reject them**; 8
+  allowed edges must pass; a missing or unknown tag fails. Mutation-tested: loosening `type:ui` to
+  `['*']` and dropping the platform rule turned exactly their four cases red.
+- **The Phase D gate runs:** `content-blocks (ui) → data-access-pages` is case one.
+
+**`scope:*` is deliberately not a fence.** Under ADR-0001 the type rules already block every
+cross-domain edge except `feature`, which is where facades compose domains (§6) — a scope rule
+there would forbid the design. `scope:shared` works as the one exemption key for `data-access`.
+Revisit only if a second tier ever needs to cross domains.
+
+**No real lib is `platform:browser-only`.** `location` reads `navigator` through DI tokens with a
+`null` fallback (`libs/data-access/location/src/lib/platform.ts`) and has been in the prerendered
+graph since the spike. The browser-only case is proven against a fixture,
+`tools/boundary-check/fixtures/browser-only` — tagged `type:util` so the platform rule is the only
+one that can reject it.
+
+**Not covered:** whether CI's `main` job is a required check on `main`. If it is not, a red run
+does not block a merge, and none of the above is enforcement.
 
 **Why it's #1:** `ideal-architecture.md` says boundaries are _"enforced by Nx tags +
 `@nx/enforce-module-boundaries`, not by convention."_ That sentence is the load-bearing claim of
@@ -110,10 +132,8 @@ build**."_ You cannot run that gate here.
 that governs extracted libs, as distinct from Plan 0b which only sketches tags for _new_ libs and
 grandfathers `scope:legacy` across 94% of the code).
 
-**Shape:** tag all 13 projects on both axes (`type:*`, `scope:*`); write the real `depConstraints`;
+**Shape:** tag every project on both axes (`type:*`, `scope:*`); write the real `depConstraints`;
 commit a fixture that violates a constraint and a check that asserts lint fails on it.
-
-**Cost:** ~0.5 day. Highest leverage item in this document by a wide margin.
 
 **Second, independent argument — added 9 Oct 2026, and it is now blocking.** The SSR spike proved
 that a browser global in one library kills the **entire** server build, not just the routes that
@@ -133,7 +153,7 @@ This needs a **`platform:universal` / `platform:browser-only` tag axis** in addi
 `type:*` and `scope:*` work above. ADR-0005 lists it as the load-bearing control for the
 marketing/ordering split: without it nothing stops a browser-only lib entering the prerendered
 graph, and the failure surfaces as an opaque build error months later. **ADR-0005 should not be
-implemented before this lands.**
+implemented before this lands.** _Landed 15 Oct — see above._
 
 ---
 
@@ -654,8 +674,7 @@ right hints:
   loading="eager"
   data-testid="hero-lcp-img"
   class="hero-bg-image"
-  src="…"
-/>
+  src="…" />
 ```
 
 They do nothing, because the element is not in the server response. `curl https://www.wingstop.com`
@@ -916,6 +935,10 @@ both predicted failures on the first build:
 `data-access/location` is untouched and remains inherently browser-only. The tag axis this item
 asks for is now **blocking** rather than advisable — see P1 and ADR-0005.
 
+_Correction, 15 Oct 2026:_ `location` is browser-only in behaviour, not on import — its
+`navigator` access goes through DI tokens with a `null` fallback, and `app.ts` imports it in the
+prerendered build. Every linted project is `platform:universal`; the axis is in place (P1).
+
 SSR is per-**application**, never per-library — but a lib can break it. Enforce with a
 `platform:universal` / `platform:browser-only` tag axis plus a `depConstraints` rule so anything in
 the server-rendered graph cannot import a browser-only lib. That is a second, independent argument
@@ -961,7 +984,7 @@ the normal order.
 splitting marketing from ordering, and the control that makes that split safe is a
 `platform:browser-only` tag rule. The spike proved the failure it prevents is real and total: one
 library's module-level `localStorage` reference killed the entire server build during route
-extraction. **Do P1 before implementing ADR-0005**, not alongside it.
+extraction. **Do P1 before implementing ADR-0005**, not alongside it. _P1 landed 15 Oct 2026._
 
 **P26 contains a live defect** — a stale session in other tabs after logout, reachable today with
 one app and two tabs. It becomes session resurrection the moment auth gains a non-login/logout write

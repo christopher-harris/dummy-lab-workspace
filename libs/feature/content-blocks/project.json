@@ -4,7 +4,7 @@
   "sourceRoot": "libs/feature/content-blocks/src",
   "prefix": "dl",
   "projectType": "library",
-  "tags": ["type:feature", "scope:content"],
+  "tags": ["type:feature", "scope:content", "platform:universal"],
   "targets": {
     "test": {
       "outputs": [
