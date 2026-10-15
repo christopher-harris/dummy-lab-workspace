@@ -3,11 +3,15 @@
 # Runs on the CMS host, as root, sent by .github/workflows/deploy-cms.yml
 # through SSM Run Command. Not meant to be run from a laptop.
 #
-#   remote-deploy.sh <image-uri> <release-dir>
+#   remote-deploy.sh <image-uri> <release-dir> <preview-url>
 #
 # <release-dir> holds this release's compose.prod.yaml and Caddyfile, which
 # the workflow uploaded to S3 and the command downloaded. Copying them in on
 # every deploy keeps the host's copies identical to the commit being shipped.
+#
+# <preview-url> is the frontend origin the admin's Preview pane opens (the
+# CMS_PREVIEW_URL repo variable). It has to be the site that reads from this
+# CMS, or Preview shows a site that has never seen these drafts.
 #
 # Secrets in .env.production and the three data volumes are never touched.
 
@@ -15,6 +19,7 @@ set -euo pipefail
 
 image="$1"
 release_dir="$2"
+preview_url="$3"
 app_dir=/opt/dummy-lab-cms
 # Snap installs the AWS CLI outside the PATH that Run Command gives the shell.
 aws=/snap/bin/aws
@@ -29,6 +34,12 @@ cp "$release_dir/compose.prod.yaml" "$release_dir/Caddyfile" .
 # pulled.
 sed -i '/^CMS_IMAGE=/d' .env.production
 echo "CMS_IMAGE=$image" >> .env.production
+
+# Read at boot by both the preview handler (config/admin.ts) and the
+# frame-src CSP (config/middlewares.ts). A changed value changes the env
+# file, so `up` below recreates Strapi with it.
+sed -i '/^CLIENT_URL=/d' .env.production
+echo "CLIENT_URL=$preview_url" >> .env.production
 
 # The registry is the host part of the image URI. ECR logins last 12 hours,
 # so one per deploy is plenty.
